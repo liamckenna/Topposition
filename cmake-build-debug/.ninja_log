@@ -1,0 +1,6 @@
+# ninja log v5
+4	1393	7082169813005148	CMakeFiles/Topposition.dir/main.cpp.obj	86f621c8b21958ec
+13	737	7080438679496293	CMakeFiles/Topposition.dir/GameObject.cpp.obj	38175d58934fa624
+1393	1668	7082169815542728	Topposition.exe	c55e7b350699f19d
+0	398	7082198801328675	build.ninja	1988358460480a1e
+14	901	7078687464301279	CMakeFiles/Topposition.dir/Input.cpp.obj	8e741fc31d19d3b4
