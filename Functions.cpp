@@ -109,7 +109,7 @@ bool loadMap(std::vector<std::vector<GameObject*>> &gameObjects)
     GameObject* map = new GameObject("map", textures["map"][0], surfaces["map"], false, true);
     gameObjects.push_back(vector<GameObject*>());
     gameObjects[0].push_back(map);
-    SDL_SetTextureColorMod(map->GetTexture(), 0, 0, 255);
+    SDL_SetTextureColorMod(map->GetTexture(), 0, 0, 0);
     for (int i = 1; i < rules->GetMaxHeight() + 1; i++) {
         gameObjects.push_back(vector<GameObject *>());
         //generate map layers
@@ -126,6 +126,7 @@ bool loadMap(std::vector<std::vector<GameObject*>> &gameObjects)
         GenerateTerrain(peak, shape);
     }
 
+    GenerateBase();
 
 
     map->SetPosition(0, 0);
@@ -476,4 +477,11 @@ void GenerateTerrain(Terrain* peak, int shape) {
         SDL_SetTextureColorMod(layer->GetTexture(), 255/rules->GetMaxHeight() * layer->GetLayer(), 255/rules->GetMaxHeight() * layer->GetLayer(), 255/rules->GetMaxHeight() * layer->GetLayer());
         gameObjects[i].push_back(layer);
     }
+}
+
+void GenerateBase() {
+    Terrain* base = new Terrain("base", textures["coin"][1], surfaces["base"], false, true, 1);
+    base->SetCenter(SCREEN_WIDTH/2, SCREEN_HEIGHT/2);
+    SDL_SetTextureColorMod(base->GetTexture(), 255/rules->GetMaxHeight() * base->GetLayer(), 255/rules->GetMaxHeight() * base->GetLayer(), 255/rules->GetMaxHeight() * base->GetLayer());
+    gameObjects[1].push_back(base);
 }

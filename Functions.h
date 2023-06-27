@@ -43,6 +43,7 @@ void RenderScreen(std::vector<std::vector<GameObject*>> gameObjects);
 
 void GenerateTerrain(Terrain* peak, int shape);
 
+void GenerateBase();
 
 
 extern SDL_Window* window;
