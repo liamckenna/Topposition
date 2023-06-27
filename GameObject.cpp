@@ -91,7 +91,7 @@ void Terrain::RenderGameObject(SDL_Renderer *renderer) {
     }
     renderRect->w = (dimensions.second * size * scale);
     renderRect->h = (dimensions.second * size * scale);
-    SDL_RenderCopy( renderer, texture, NULL, renderRect);
+    SDL_RenderCopyEx( renderer, texture, NULL, renderRect, rotation, NULL, SDL_FLIP_NONE);
 }
 
 void Terrain::SetCenter(float x, float y, bool centerOnly){
@@ -116,7 +116,12 @@ void Terrain::SetCenter(float x, float y, bool centerOnly){
 
 }
 
-void Terrain::SetBottomRight() {
+void GameObject::SetBottomRight() {
+    bottomRight.first = position.first + (dimensions.first * size);
+    bottomRight.second = position.second + (dimensions.second * size);
+}
+
+void Terrain::SetBottomRight(){
     bottomRight.first = position.first + (dimensions.first * size * scale);
     bottomRight.second = position.second + (dimensions.second * size * scale);
 }

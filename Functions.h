@@ -15,6 +15,8 @@ bool loadMap(std::vector<std::vector<GameObject*>> &gameObjects);
 
 void loadGamePieces(std::vector<std::vector<GameObject*>> &gameObjects);
 
+void loadUI();
+
 void close();
 
 SDL_Surface* loadSurface( std::string path );
@@ -41,8 +43,9 @@ void HandleEvents(std::vector<std::vector<GameObject*>> gameObjects, Input* play
 
 void RenderScreen(std::vector<std::vector<GameObject*>> gameObjects);
 
-void GenerateTerrain(Terrain* peak, int shape);
+void GenerateTerrain(Terrain* peak, int shape, int height);
 
+bool MergeTerrain(Terrain* peak);
 
 
 extern SDL_Window* window;

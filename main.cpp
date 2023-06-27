@@ -33,17 +33,16 @@ int main( int argc, char* args[] )
         printf( "Failed to load media!\n" );
         return 1;
     }
-    rules->SetPieces(6);
-    rules->SetMaxHeight(6);
+
     loadGamePieces(gameObjects);
     //Main loop flag
-
+    loadUI();
 
     //Event handler
 
     Input* playerInput = new Input();
     //While application is running
-    SDL_SetHint( SDL_HINT_RENDER_SCALE_QUALITY, "0" );
+
 
     while( !quit )
     {
