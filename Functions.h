@@ -43,9 +43,9 @@ void HandleEvents(std::vector<std::vector<GameObject*>> gameObjects, Input* play
 
 void RenderScreen(std::vector<std::vector<GameObject*>> gameObjects);
 
-void GenerateTerrain(Terrain* peak, int shape, int height);
+void GenerateTerrain(Peak* peak, int shape, int height);
 
-bool MergeTerrain(Terrain* peak);
+std::vector<GameObject*> MergeTerrain(Terrain* peak);
 
 
 extern SDL_Window* window;
@@ -68,6 +68,8 @@ extern std::map<std::string, SDL_Surface*> surfaces;
 
 extern std::vector<std::vector<GameObject*>> gameObjects;
 
+extern std::vector<Peak*> peaks;
+
 extern GameObject* heldObject;
 
 extern GameRules* rules;
@@ -75,5 +77,6 @@ extern GameRules* rules;
 enum gameState {
     MAIN_MENU = 0,
     SETTINGS = 1,
-    GAME = 2,
+    LOBBY = 2,
+    GAME = 3
 };

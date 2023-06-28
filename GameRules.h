@@ -4,7 +4,8 @@ class GameRules {
 public:
     int pieces = 6;
     int maxHeight = 8;
-    int peakCount = 20;
+    int peakCount = 25;
+    int totalPoints = 100;
     int GetPieces() {return pieces;}
     int GetMaxHeight() {return maxHeight;}
     int GetPeakCount() {return peakCount;}

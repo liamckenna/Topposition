@@ -38,6 +38,7 @@ int main( int argc, char* args[] )
     //Main loop flag
     loadUI();
 
+
     //Event handler
 
     Input* playerInput = new Input();
