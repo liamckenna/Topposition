@@ -5,12 +5,23 @@
 #include "SDL.h"
 using namespace std;
 class GameObject {
-    float originalRatio;
+public:
+public:
+    enum objectType {
+        GENERIC = 0,
+        TERRAIN = 1,
+        PEAK = 2,
+        PIECE = 3,
+        UI_ELEMENT = 4
+    };
 protected:
+
+
     string name;
     SDL_Texture* texture;
     SDL_Surface* surface;
     bool movable = false;
+    bool selectable = false;
     bool rendered = true;
     SDL_Rect* renderRect = new SDL_Rect();
     float size;
@@ -18,11 +29,11 @@ protected:
     pair<float, float> position;
     pair<int, int> dimensions;
     pair<float, float> center;
-    bool isPeak = false;
     pair<float, float> bottomRight;
     float scale = 1;
 
 public:
+    enum objectType type = GENERIC;
     GameObject(string name, SDL_Texture* texture, SDL_Surface *surface, bool m, bool r);
     pair<float, float> GetPosition(){return position;}
     pair<float, float> GetDimensions(){return dimensions;}
@@ -34,10 +45,11 @@ public:
     float GetSize() const {return size;}
     SDL_Rect* GetRenderRect() {return renderRect;}
     pair<float, float> GetCenter() {return center;}
-    bool GetIsPeak() {return isPeak;}
     float GetScale() const {return scale;}
+    bool GetSelectable() const {return selectable;}
+    void SetTexture(SDL_Texture* t) {texture = t;}
+    void SetSelectable(bool s) {selectable = s;}
     void SetScale(float s) {scale = s;}
-    void SetIsPeak(bool ip) {isPeak = ip;}
     void SetPosition(float x, float y, bool posOnly = false);
     void SetDefaultPosition(float x, float y);
     virtual void SetCenter(float x = 0, float y = 0, bool centerOnly = false);
@@ -48,12 +60,15 @@ public:
     void SetBottomRight();
     pair<float, float> GetBottomRight() {return bottomRight;}
 };
+
+class Peak;
+
 class Terrain : public GameObject
 {
 protected:
     int layer;
     double rotation;
-    Terrain* peak;
+    Peak* peak;
 
 
 public:
@@ -65,10 +80,10 @@ public:
     Terrain(string name, SDL_Texture *texture, SDL_Surface *surface, bool m, bool r, int l) : GameObject(name, texture, surface, m, r) {
         layer = l;
         scale = 1;
-
+        type = TERRAIN;
     }
-    void SetPeak(Terrain* p) {peak = p;}
-    Terrain* GetPeak() const {return peak;}
+    void SetPeak(Peak* p) {peak = p;}
+    Peak* GetPeak() const {return peak;}
     double GetRotation() const {return rotation;}
     void SetRotation(double r) {rotation = r;}
     int GetLayer() const {return layer;}
@@ -77,13 +92,39 @@ public:
 };
 class Peak : public Terrain {
 
-
-
 public:
     std::vector<Terrain*> childTerrain;
 
     Peak(string name, SDL_Texture *texture, SDL_Surface *surface, bool m, bool r, int l) : Terrain(name, texture, surface, m, r, l) {
+    type = PEAK;
+    peak = this;
     }
 
 };
 
+class UIElement : public GameObject {
+
+public:
+    UIElement(string name, SDL_Texture *texture, SDL_Surface *surface, bool r) : GameObject(name, texture, surface, false, r) {
+    type = UI_ELEMENT;
+    }
+};
+
+class Piece : public GameObject {
+private:
+    int altitude;
+    pair<int, int> designatedLocation;
+public:
+    Piece(string name, SDL_Texture* texture, SDL_Surface* surface, bool r) : GameObject(name, texture, surface, true, r) {
+    selectable = true;
+    type = PIECE;
+    }
+    void Move(Terrain* startingPoint, Terrain* targetTerrain, int& movesLeft);
+    void SetDesignatedLocation(int x, int y) {
+        designatedLocation.first = x;
+        designatedLocation.second = y;
+    }
+    pair<int, int> GetDesignatedLocation() {return designatedLocation;}
+    void SetAltitude(int a) {altitude = a;}
+    int GetAltitude() {return altitude;}
+};

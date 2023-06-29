@@ -6,6 +6,7 @@
 #include <map>
 #include <vector>
 #include <dirent.h>
+#include <typeinfo>
 #include "GameObject.h"
 #include "GameRules.h"
 #include "Input.h"
@@ -29,11 +30,23 @@ void zoom(std::vector<std::vector<GameObject*>> gameObjects, SDL_Event e, Input*
 
 void renderObjects(std::vector<std::vector<GameObject*>> gameObjects, SDL_Renderer* gRenderer);
 
+void renderUI();
+
+void renderTerrain();
+
+void renderPieces();
+
 void scroll(std::vector<std::vector<GameObject*>> gameObjects, Input* playerInput);
 
-GameObject* selectObject(std::vector<std::vector<GameObject*>> gameObjects, Input* playerInput);
+GameObject* selectObject(std::vector<std::vector<GameObject*>> gameObjects, int x, int y);
 
-SDL_Color GetPixelColor(const SDL_Surface* pSurface, const int X, const int Y);
+UIElement* selectUI(int x, int y);
+
+Piece* selectPiece(int x, int y);
+
+Terrain* selectTerrain(int x, int y);
+
+SDL_Color GetPixelColor(const SDL_Surface* surface, const int X, const int Y);
 
 void moveHeldObject(GameObject* gameObject, Input* playerInput);
 
@@ -46,6 +59,14 @@ void RenderScreen(std::vector<std::vector<GameObject*>> gameObjects);
 void GenerateTerrain(Peak* peak, int shape, int height);
 
 std::vector<GameObject*> MergeTerrain(Terrain* peak);
+
+void GroomTerrain();
+
+void ConnectTerrain();
+
+void NeighborTerrain();
+
+int Roll();
 
 
 extern SDL_Window* window;
@@ -70,9 +91,19 @@ extern std::vector<std::vector<GameObject*>> gameObjects;
 
 extern std::vector<Peak*> peaks;
 
+extern std::vector<std::vector<Terrain*>> terrain;
+
+extern std::vector<UIElement*> uiElements;
+
+extern std::vector<Piece*> pieces;
+
 extern GameObject* heldObject;
 
 extern GameRules* rules;
+
+extern int currentRoll;
+
+extern int movesLeft;
 
 enum gameState {
     MAIN_MENU = 0,
@@ -80,3 +111,4 @@ enum gameState {
     LOBBY = 2,
     GAME = 3
 };
+

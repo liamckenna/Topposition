@@ -9,7 +9,6 @@ GameObject::GameObject(string name, SDL_Texture *texture, SDL_Surface* surface, 
     SDL_QueryTexture(texture, NULL, NULL, &dimensions.first, &dimensions.second);
     SetPosition(0,0, true);
     SetCenter();
-    originalRatio = dimensions.first/dimensions.second;
     SetDefaultPosition(0, 0);
     movable = m;
     rendered = r;
@@ -33,6 +32,7 @@ void GameObject::SetPosition(float x, float y, bool posOnly) {
     position.second = y;
     if (!posOnly) {
         SetCenter();
+        SetBottomRight();
     }
     if (size == 1) {
         defaultPosition.first = position.first;
@@ -104,5 +104,13 @@ void Terrain::RenderGameObject(SDL_Renderer *renderer) {
     }
     renderRect->w = (dimensions.second * size * scale);
     renderRect->h = (dimensions.second * size * scale);
-    SDL_RenderCopyEx( renderer, texture, NULL, renderRect, rotation, NULL, SDL_FLIP_NONE);
+    SDL_RenderCopyEx( renderer, texture, NULL, renderRect, 0, NULL, SDL_FLIP_NONE);
+}
+
+void Piece::Move(Terrain* startingPoint, Terrain* targetTerrain, int& movesLeft) {
+    int attemptedMoves = 0;
+    Terrain* currentTerrain = startingPoint;
+    /*while(currentTerrain != targetTerrain) {
+
+    }*/
 }

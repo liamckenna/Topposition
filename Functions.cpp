@@ -19,6 +19,11 @@ int SCREEN_HEIGHT = 1080;
 
 bool quit = false;
 
+int currentRoll = 3;
+
+int movesLeft = 3;
+
+
 gameState currentState = MAIN_MENU;
 
 std::map<std::string, std::map<int, SDL_Texture*>> textures;
@@ -29,15 +34,22 @@ std::vector<std::vector<GameObject*>> gameObjects;
 
 std::vector<Peak*> peaks;
 
-GameObject* heldObject = nullptr;
+std::vector<std::vector<Terrain*>> terrain;
+
+std::vector<UIElement*> uiElements;
+
+std::vector<Piece*> pieces;
+
+GameObject* selectedObject = nullptr;
 
 GameRules* rules = new GameRules();
+
 
 bool init()
 {
     //Initialization flag
     bool success = true;
-
+    srand((unsigned) time(NULL));
 
 
     //Initialize SDL
@@ -105,17 +117,19 @@ bool loadMap(std::vector<std::vector<GameObject*>> &gameObjects)
 
     //Loading success flag
     bool success = true;
-    srand((unsigned) time(NULL));
 
     //Load splash image
     GameObject* map = new GameObject("map", textures["map"][0], surfaces["map"], false, true);
-    gameObjects.push_back(vector<GameObject*>());
-    gameObjects[0].push_back(map);
+
+
     SDL_SetTextureColorMod(map->GetTexture(), 0, 0, 0);
+    map->SetPosition(0, 0);
     for (int i = 0; i < rules->GetMaxHeight() + 1; i++) {
         gameObjects.push_back(vector<GameObject *>());
+        terrain.push_back(vector<Terrain*>());
         //generate map layers
     }
+    gameObjects[0].push_back(map);
     for (int i = 0; i < rules->GetPeakCount(); i++) {
         int x = (rand() % (int)(SCREEN_WIDTH/1.2)) + SCREEN_WIDTH/2 - SCREEN_WIDTH/2.4;
         int y = (rand() % (int)(SCREEN_HEIGHT/1.2)) + SCREEN_HEIGHT/2 - SCREEN_HEIGHT/2.4;
@@ -126,8 +140,8 @@ bool loadMap(std::vector<std::vector<GameObject*>> &gameObjects)
         peak->SetRotation(rotation);
         peak->SetScale(0.1);
         peak->SetCenter(x, y);
-        peak->SetIsPeak(true);
         peaks.push_back(peak);
+        terrain[height].push_back(peak);
         gameObjects[height].push_back(peak);
 
         while (MergeTerrain(peak).size() != 0) {
@@ -135,31 +149,13 @@ bool loadMap(std::vector<std::vector<GameObject*>> &gameObjects)
             int b = (rand() % (int)(SCREEN_HEIGHT/1.2)) + SCREEN_HEIGHT/2 - SCREEN_HEIGHT/2.4;
             peak->SetCenter(a, b);
         }
-        std::cout << "peak size is " << MergeTerrain(peak).size() << std::endl;
+        std::cout << "peak size is " << MergeTerrain(static_cast<Terrain *>(peak)).size() << std::endl;
 
         SDL_SetTextureColorMod(peak->GetTexture(), 255/rules->GetMaxHeight() * peak->GetLayer(), 255/rules->GetMaxHeight() * peak->GetLayer(), 255/rules->GetMaxHeight() * peak->GetLayer());
         GenerateTerrain(peak, shape, height);
     }
-    int moveCount = 1;
-    while (moveCount > 0) {
-        moveCount = 0;
-        for (int i = 0; i < peaks.size(); i++) {
-            while (MergeTerrain(peaks[i]).size() != 0) {
-                int a = (rand() % (int)(SCREEN_WIDTH/1.2)) + SCREEN_WIDTH/2 - SCREEN_WIDTH/2.4;
-                int b = (rand() % (int)(SCREEN_HEIGHT/1.2)) + SCREEN_HEIGHT/2 - SCREEN_HEIGHT/2.4;
-                peaks[i]->SetCenter(a, b);
-                moveCount++;
-                std::cout << moveCount << std::endl;
-                if (moveCount > 5000) break;
-            }
-            for (int j = 0; j < peaks[i]->childTerrain.size(); j++) {
-                peaks[i]->childTerrain[j]->SetCenter(peaks[i]->GetCenter().first, peaks[i]->GetCenter().second);
-            }
-        }
-    }
-    std::cout << "There should be no touching peaks now" << std::endl;
+    GroomTerrain();
 
-    map->SetPosition(0, 0);
 
     return success;
 }
@@ -168,20 +164,31 @@ void loadGamePieces(std::vector<std::vector<GameObject*>> &gameObjects)
 {
     gameObjects.push_back(vector<GameObject*>());
     GameObject* coin = new GameObject("coin", textures["coin"][0], surfaces["coin"], true, true);
-    GameObject* red = new GameObject("red", textures["red"][0], surfaces["red"], true, true);
+    Piece* red = new Piece("red", textures["red"][0], surfaces["red"], true);
 
     gameObjects[rules->GetMaxHeight() + 1].push_back(coin);
     gameObjects[rules->GetMaxHeight() + 1].push_back(red);
+    pieces.push_back(red);
     coin->SetCenter(960, 540);
     red->SetPosition(300, 300);
     red->SetScale((float) 1/22);
+    red->SetSelectable(true);
+    coin->SetSelectable(true);
 }
 
 void loadUI() {
-    gameObjects.push_back(vector<GameObject *>());
-    GameObject* resetButton = new GameObject("reset button", textures["reset"][0], surfaces["reset"], false, true);
-    gameObjects[gameObjects.size() - 1].push_back(resetButton);
+
+    UIElement* resetButton = new UIElement("reset button", textures["reset"][0], surfaces["reset"], true);
+    uiElements.push_back(resetButton);
     resetButton->SetPosition(0,0);
+    UIElement* die1 = new UIElement("dieOne", textures["die 1"][0], surfaces["die 1"], true);
+    die1->SetScale(0.1);
+    uiElements.push_back(die1);
+    die1->SetPosition(SCREEN_WIDTH - (die1->GetDimensions().first * die1->GetScale()) - 10, 10);
+    UIElement* die2 = new UIElement("dieTwo", textures["die 2"][0], surfaces["die 2"], true);
+    die2->SetScale(0.1);
+    uiElements.push_back(die2);
+    die2->SetPosition(SCREEN_WIDTH - ((die1->GetDimensions().first * die1->GetScale()) + 10 )*2, 10);
 }
 
 void ResetMap() {
@@ -189,19 +196,32 @@ void ResetMap() {
         peaks[i] = nullptr;
     }
 
+    for (int i = 0; i < terrain.size(); i++) {
+        for (int j = 0; j < terrain[i].size(); j++) {
+            terrain[i][j] = nullptr;
+        }
+    }
+
+    for (int i = 0; i < pieces.size(); i++) {
+        pieces[i] = nullptr;
+    }
+
     for (int i = 0; i < gameObjects.size(); i++) {
         for (int j = 0; j < gameObjects[i].size(); j++) {
             delete gameObjects[i][j];
         }
     }
-
+    std::vector<Piece*> newPieces;
+    std::vector<std::vector<Terrain*>> newTerrain;
     std::vector<std::vector<GameObject*>> newGameObjects;
     std::vector<Peak*> newPeaks;
+    pieces = newPieces;
+    terrain = newTerrain;
     gameObjects = newGameObjects;
     peaks = newPeaks;
     loadMap(gameObjects);
     loadGamePieces(gameObjects);
-    loadUI();
+
 
 }
 
@@ -351,7 +371,26 @@ void renderObjects(std::vector<std::vector<GameObject*>> gameObjects, SDL_Render
             }
         }
     }
+}
 
+void renderUI() {
+    for (int i = 0; i < uiElements.size(); i++) {
+        uiElements[i]->RenderGameObject(renderer);
+    }
+}
+
+void renderTerrain() {
+    for (int i = 0; i < terrain.size(); i++) {
+        for (int j = 0; j < terrain[i].size(); j++) {
+            terrain[i][j]->RenderGameObject(renderer);
+        }
+    }
+}
+
+void renderPieces() {
+    for (int i = 0; i < pieces.size(); i++) {
+        pieces[i]->RenderGameObject(renderer);
+    }
 }
 
 void scroll(std::vector<std::vector<GameObject*>> gameObjects, Input* playerInput) {
@@ -379,32 +418,27 @@ void scroll(std::vector<std::vector<GameObject*>> gameObjects, Input* playerInpu
     RecenterScreen(gameObjects, playerInput);
 }
 
-GameObject* selectObject(std::vector<std::vector<GameObject*>> gameObjects, Input* playerInput) {
-    SDL_GetMouseState(&playerInput->currentMousePosition.first, &playerInput->currentMousePosition.second);
+GameObject* selectObject(std::vector<std::vector<GameObject*>> gameObjects, int x, int y) {
+
     for (int i = gameObjects.size() - 1; i >= 0; i--) {
         for (int j = gameObjects[i].size() - 1; j >= 0; j--) {
             int width_LowerBound = gameObjects[i][j]->GetPosition().first;
-            int width_UpperBound = gameObjects[i][j]->GetPosition().first + (gameObjects[i][j]->GetDimensions().first * gameObjects[i][j]->GetSize() * gameObjects[i][j]->GetScale());
+            int width_UpperBound = gameObjects[i][j]->GetBottomRight().first;
             int height_LowerBound = gameObjects[i][j]->GetPosition().second;
-            int height_UpperBound = gameObjects[i][j]->GetPosition().second + (gameObjects[i][j]->GetDimensions().second * gameObjects[i][j]->GetSize() * gameObjects[i][j]->GetScale());
+            int height_UpperBound = gameObjects[i][j]->GetBottomRight().second;
 
-            if (playerInput->currentMousePosition.first >= width_LowerBound && playerInput->currentMousePosition.first <= width_UpperBound) {
-                if (playerInput->currentMousePosition.second >= height_LowerBound && playerInput->currentMousePosition.second <= height_UpperBound) {
+            if (x >= width_LowerBound && x <= width_UpperBound) {
+                if (y >= height_LowerBound && y <= height_UpperBound) {
 
                     SDL_Color color = GetPixelColor(gameObjects[i][j]->GetSurface(),
-                                                    (playerInput->currentMousePosition.first - width_LowerBound)/(gameObjects[i][j]->GetSize() * gameObjects[i][j]->GetScale()),
-                                                    (playerInput->currentMousePosition.second - height_LowerBound)/(gameObjects[i][j]->GetSize() * gameObjects[i][j]->GetScale()));
+                                                    (x - width_LowerBound)/(gameObjects[i][j]->GetSize() * gameObjects[i][j]->GetScale()),
+                                                    (y - height_LowerBound)/(gameObjects[i][j]->GetSize() * gameObjects[i][j]->GetScale()));
+
                     if (color.r == 0 && color.g == 0 && color.b == 0) {
-
                         continue;
-
-                    } else {
-                        std::cout << gameObjects[i][j]->GetName() << std::endl;
-                        if (gameObjects[i][j]->GetMovable() || gameObjects[i][j]->GetName() == "reset button"){
-                            return gameObjects[i][j];
-                        }
                     }
-
+                    std::cout << gameObjects[i][j]->GetName() << std::endl;
+                    return gameObjects[i][j];
 
                 }
             }
@@ -414,10 +448,94 @@ GameObject* selectObject(std::vector<std::vector<GameObject*>> gameObjects, Inpu
     return nullptr;
 }
 
-SDL_Color GetPixelColor(const SDL_Surface* pSurface, const int X, const int Y)
+UIElement* selectUI(int x, int y) {
+    for (int i = 0; i < uiElements.size(); i++) {
+        int width_LowerBound = uiElements[i]->GetPosition().first;
+        int width_UpperBound = uiElements[i]->GetBottomRight().first;
+        int height_LowerBound = uiElements[i]->GetPosition().second;
+        int height_UpperBound = uiElements[i]->GetBottomRight().first;
+        if (x >= width_LowerBound && x <= width_UpperBound) {
+            if (y >= height_LowerBound && y <= height_UpperBound) {
+
+                SDL_Color color = GetPixelColor(uiElements[i]->GetSurface(),
+                                                (x - width_LowerBound)/(uiElements[i]->GetSize() * uiElements[i]->GetScale()),
+                                                (y - height_LowerBound)/(uiElements[i]->GetSize() * uiElements[i]->GetScale()));
+                if (color.r == 0 && color.g == 0 && color.b == 0) {
+
+                    continue;
+                } else {
+                    return uiElements[i];
+                }
+
+
+            }
+        }
+
+    }
+    return nullptr;
+}
+
+Piece* selectPiece(int x, int y) {
+    for (int i = 0; i < pieces.size(); i++) {
+        int width_LowerBound = pieces[i]->GetPosition().first;
+        int width_UpperBound = pieces[i]->GetBottomRight().first;
+        int height_LowerBound = pieces[i]->GetPosition().second;
+        int height_UpperBound = pieces[i]->GetBottomRight().first;
+        if (x >= width_LowerBound && x <= width_UpperBound) {
+            if (y >= height_LowerBound && y <= height_UpperBound) {
+
+                SDL_Color color = GetPixelColor(uiElements[i]->GetSurface(),
+                                                (x - width_LowerBound)/(uiElements[i]->GetSize() * uiElements[i]->GetScale()),
+                                                (y - height_LowerBound)/(uiElements[i]->GetSize() * uiElements[i]->GetScale()));
+                if (color.r == 0 && color.g == 0 && color.b == 0) {
+
+                    continue;
+                } else {
+                    return pieces[i];
+                }
+
+
+            }
+        }
+
+    }
+    return nullptr;
+}
+
+Terrain* selectTerrain(int x, int y) {
+    for (int i = terrain.size() - 1; i >= 0; i--) {
+        for (int j = terrain[i].size() - 1; j >= 0; j--) {
+            int width_LowerBound = terrain[i][j]->GetPosition().first;
+            int width_UpperBound = terrain[i][j]->GetBottomRight().first;
+            int height_LowerBound = terrain[i][j]->GetPosition().second;
+            int height_UpperBound = terrain[i][j]->GetBottomRight().second;
+
+            if (x >= width_LowerBound && x <= width_UpperBound) {
+                if (y >= height_LowerBound && y <= height_UpperBound) {
+
+                    SDL_Color color = GetPixelColor(gameObjects[i][j]->GetSurface(),
+                                                    (x - width_LowerBound)/(terrain[i][j]->GetSize() * terrain[i][j]->GetScale()),
+                                                    (y - height_LowerBound)/(terrain[i][j]->GetSize() * terrain[i][j]->GetScale()));
+
+                    if (color.r == 0 && color.g == 0 && color.b == 0) {
+                        continue;
+                    }
+                    std::cout << terrain[i][j]->GetName() << std::endl;
+                    return terrain[i][j];
+
+                }
+            }
+
+        }
+    }
+    return nullptr;
+}
+
+
+SDL_Color GetPixelColor(const SDL_Surface * surface, const int X, const int Y)
 {
     // Bytes per pixel
-    const Uint8 Bpp = pSurface->format->BytesPerPixel;
+    const Uint8 Bpp = surface->format->BytesPerPixel;
 
     /*
     Retrieve the address to a specific pixel
@@ -425,18 +543,18 @@ SDL_Color GetPixelColor(const SDL_Surface* pSurface, const int X, const int Y)
     pSurface->pitch		= the length of a row of pixels (in bytes)
     X and Y				= the offset on where on the image to retrieve the pixel, (0, 0) is in the upper left corner of the image
     */
-    Uint8* pPixel = (Uint8*)pSurface->pixels + Y * pSurface->pitch + X * Bpp;
+    Uint8* pPixel = (Uint8*)surface->pixels + Y * surface->pitch + X * Bpp;
 
     Uint32 PixelData = *(Uint32*)pPixel;
 
     SDL_Color Color = {0x00, 0x00, 0x00};
 
     // Retrieve the RGB values of the specific pixel
-    SDL_GetRGBA(PixelData, pSurface->format, &Color.r, &Color.g, &Color.b, &Color.a);
+    SDL_GetRGBA(PixelData, surface->format, &Color.r, &Color.g, &Color.b, &Color.a);
     return Color;
 }
 
-void moveHeldObject(GameObject* gameObject, Input* playerInput) {
+void moveSelectedObject(GameObject* gameObject, Input* playerInput) {
     if (gameObject->GetMovable()) {
         gameObject->SetPosition(gameObject->GetPosition().first + playerInput->currentMousePosition.first - playerInput->prevMousePosition.first,
                                 gameObject->GetPosition().second + playerInput->currentMousePosition.second - playerInput->prevMousePosition.second);
@@ -495,16 +613,31 @@ void HandleEvents(std::vector<std::vector<GameObject*>> gameObjects, Input* play
             case SDL_MOUSEBUTTONDOWN:
                 playerInput->MouseButtonDown(e.button);
                 if (playerInput->GetMouseButtonDown("Left")) {
-                    heldObject = selectObject(gameObjects, playerInput);
+                    SDL_GetMouseState(&playerInput->currentMousePosition.first, &playerInput->currentMousePosition.second);
+                    selectedObject = selectUI(playerInput->currentMousePosition.first, playerInput->currentMousePosition.second);
+                    if (selectedObject == nullptr) {
+                        selectedObject = selectPiece(playerInput->currentMousePosition.first, playerInput->currentMousePosition.second);
+                        if (selectedObject == nullptr) {
+                            selectedObject = selectObject(gameObjects, playerInput->currentMousePosition.first, playerInput->currentMousePosition.second);
+                        }
+                    }
                 }
                 break;
             case SDL_MOUSEBUTTONUP:
-                if (heldObject != NULL && heldObject->GetName() == "reset button" && heldObject == selectObject(gameObjects, playerInput)) {
-                    std::cout << "reset button pressed" << std::endl;
-                    ResetMap();
+                if (selectedObject != nullptr) {
+                    if (selectedObject->GetName() == "reset button") {
+                        std::cout << "reset button pressed" << std::endl;
+                        ResetMap();
+                    } else if ((selectedObject->GetName() == "dieOne" || selectedObject->GetName() == "dieTwo") && movesLeft == 0) {
+                        currentRoll = Roll();
+                        movesLeft = currentRoll;
+                    } else if (selectedObject->type == GameObject::PIECE) {
+                        Piece* piece = dynamic_cast<Piece *>(selectedObject);
+                        piece->Move(selectTerrain(piece->GetDesignatedLocation().first, piece->GetDesignatedLocation().second) ,selectTerrain(piece->GetPosition().first, piece->GetPosition().second), movesLeft);
+                    }
                 }
                 playerInput->MouseButtonUp(e.button);
-                heldObject = nullptr;
+                selectedObject = nullptr;
                 break;
         }
     }
@@ -513,27 +646,29 @@ void HandleEvents(std::vector<std::vector<GameObject*>> gameObjects, Input* play
         scroll(gameObjects, playerInput);
     }
     if (playerInput->GetMouseButtonDown("Left")) {
-        if (heldObject != nullptr) {
-            moveHeldObject(heldObject, playerInput);
+        if (selectedObject != nullptr) {
+            moveSelectedObject(selectedObject, playerInput);
         }
     }
     SDL_GetMouseState(&playerInput->prevMousePosition.first, &playerInput->prevMousePosition.second);
 }
 
 void RenderScreen(std::vector<std::vector<GameObject*>> gameObjects){
-    SDL_SetRenderDrawColor( renderer, 255, 255, 255, 100 );
+    SDL_SetRenderDrawColor( renderer, 0, 100, 255, 100 );
     SDL_RenderClear( renderer );
 
     //Render texture to screen
-    renderObjects(gameObjects, renderer);
-    SDL_SetRenderDrawColor( renderer, 0xFF, 0xFF, 0x00, 0xFF );
+
+    renderTerrain();
+    renderPieces();
+    renderUI();
 
     //Update screen
     SDL_RenderPresent( renderer);
 }
 
 void GenerateTerrain(Peak* peak, int shape, int height) {
-    for (int i = height; i > 0; i--) {
+    for (int i = height - 1; i > 0; i--) {
         Terrain* layer = new Terrain(to_string(gameObjects[i].size()), textures[to_string(shape)][i], surfaces[to_string(shape)], false, true, i);
         layer->SetScale(peak->GetScale() + 0.1 * (height - i));
         layer->SetCenter(peak->GetCenter().first, peak->GetCenter().second);
@@ -541,6 +676,7 @@ void GenerateTerrain(Peak* peak, int shape, int height) {
         layer->SetPeak(peak);
         SDL_SetTextureColorMod(layer->GetTexture(), 255/rules->GetMaxHeight() * layer->GetLayer(), 255/rules->GetMaxHeight() * layer->GetLayer(), 255/rules->GetMaxHeight() * layer->GetLayer());
         gameObjects[i].push_back(layer);
+        terrain[i].push_back(layer);
         peak->childTerrain.push_back(layer);
 
     }
@@ -572,4 +708,68 @@ std::vector<GameObject*> MergeTerrain(Terrain* peak) {
         }
     }
     return connectedTerrain;
+}
+
+void GroomTerrain() {
+    int moveCount = 1;
+    while (moveCount > 0) {
+        moveCount = 0;
+        for (int i = 0; i < peaks.size(); i++) {
+            while (MergeTerrain(peaks[i]).size() != 0) {
+                int a = (rand() % (int)(SCREEN_WIDTH/1.2)) + SCREEN_WIDTH/2 - SCREEN_WIDTH/2.4;
+                int b = (rand() % (int)(SCREEN_HEIGHT/1.2)) + SCREEN_HEIGHT/2 - SCREEN_HEIGHT/2.4;
+                peaks[i]->SetCenter(a, b);
+                moveCount++;
+                std::cout << moveCount << std::endl;
+                if (moveCount > 1000) break;
+            }
+            for (int j = 0; j < peaks[i]->childTerrain.size(); j++) {
+                peaks[i]->childTerrain[j]->SetCenter(peaks[i]->GetCenter().first, peaks[i]->GetCenter().second);
+            }
+        }
+        if (moveCount > 1000) break;
+    }
+
+    ConnectTerrain();
+    NeighborTerrain();
+    std::cout << "There should be no touching peaks now" << std::endl;
+
+}
+
+void ConnectTerrain() {
+    for (int i = 0; i < terrain.size(); i++) {
+        for (int j = 0; j < terrain[i].size(); j++) {
+            terrain[i][j]->connectedTerrain = MergeTerrain(terrain[i][j]);
+        }
+    }
+}
+
+void NeighborTerrain() {
+    for (int i = 0; i < terrain.size(); i++) {
+        for (int j = 0; j < terrain[i].size(); j++) {
+            std::cout << "Children count: " << terrain[i][j]->GetPeak()->childTerrain.size() << std::endl;
+            std::cout << "Terrain Layer: " << terrain[i][j]->GetLayer() << std::endl;
+            if (terrain[i][j]->GetLayer() != 1) {
+                terrain[i][j]->neighboringTerrain.push_back(terrain[i][j]->GetPeak()->childTerrain[terrain[i][j]->GetLayer() - 1]);
+            }
+            if (terrain[i][j]->type != GameObject::PEAK) {
+                terrain[i][j]->neighboringTerrain.push_back(terrain[i][j]->GetPeak()->childTerrain[terrain[i][j]->GetLayer() - 1]);
+            }
+        }
+    }
+}
+
+int Roll(){
+    int rollOne = (rand() % 6) + 1;
+    string rollOneStr = "die " + to_string(rollOne);
+    int rollTwo = (rand() % 6) + 1;
+    string rollTwoStr = "die " + to_string(rollTwo);
+    for (int i = 0; i < uiElements.size(); i++) {
+        if (uiElements[i]->GetName() == "dieOne") {
+            uiElements[i]->SetTexture(textures[rollOneStr][0]);
+        } else if (uiElements[i]->GetName() == "dieTwo") {
+            uiElements[i]->SetTexture(textures[rollTwoStr][0]);
+        }
+    }
+    return rollOne + rollTwo;
 }
