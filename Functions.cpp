@@ -133,12 +133,11 @@ bool loadMap(std::vector<std::vector<GameObject*>> &gameObjects)
     }
 
     gameObjects[0].push_back(map);
-
-    for (int i = 0; i < rules->GetPeakCount(); i++) {
+    rules->SetRemainingPoints(rules->GetMaxPoints());
+    while (rules->GetRemainingPoints() > 0) {
         GeneratePeak();
     }
     GroomTerrain();
-
 
     return success;
 }
@@ -327,6 +326,20 @@ void TextureLoader() {
     printf("There's %d files in the current directory.\n", i);
 }
 
+void RenderScreen(std::vector<std::vector<GameObject*>> gameObjects){
+    SDL_SetRenderDrawColor( renderer, 0, 100, 255, 100 );
+    SDL_RenderClear( renderer );
+
+    //Render texture to screen
+
+    renderTerrain();
+    renderPieces();
+    renderUI();
+
+    //Update screen
+    SDL_RenderPresent( renderer);
+}
+
 void zoom(std::vector<std::vector<GameObject*>> gameObjects, SDL_Event e, Input* playerInput) {
 
     std::pair<float, float> relativePositionB4;
@@ -430,7 +443,7 @@ GameObject* selectObject(std::vector<std::vector<GameObject*>> gameObjects, int 
                                                     (x - width_LowerBound)/(gameObjects[i][j]->GetSize() * gameObjects[i][j]->GetScale()),
                                                     (y - height_LowerBound)/(gameObjects[i][j]->GetSize() * gameObjects[i][j]->GetScale()));
 
-                    if (color.r == 0 && color.g == 0 && color.b == 0) {
+                    if (color.r == 255 && color.g == 0 && color.b == 0) {
                         continue;
                     }
                     return gameObjects[i][j];
@@ -455,7 +468,7 @@ UIElement* selectUI(int x, int y) {
                 SDL_Color color = GetPixelColor(uiElements[i]->GetSurface(),
                                                 (x - width_LowerBound)/(uiElements[i]->GetSize() * uiElements[i]->GetScale()),
                                                 (y - height_LowerBound)/(uiElements[i]->GetSize() * uiElements[i]->GetScale()));
-                if (color.r == 0 && color.g == 0 && color.b == 0) {
+                if (color.r == 255 && color.g == 0 && color.b == 0) {
 
                     continue;
                 } else {
@@ -512,7 +525,7 @@ Terrain* selectTerrain(int x, int y) {
                                                     (x - width_LowerBound)/(terrain[i][j]->GetSize() * terrain[i][j]->GetScale()),
                                                     (y - height_LowerBound)/(terrain[i][j]->GetSize() * terrain[i][j]->GetScale()));
 
-                    if (color.r == 0 && color.g == 0 && color.b == 0) {
+                    if (color.r == 255 && color.g == 0 && color.b == 0) {
                         continue;
                     }
                     return terrain[i][j];
@@ -545,6 +558,8 @@ SDL_Color GetPixelColor(const SDL_Surface * surface, const int X, const int Y)
 
     // Retrieve the RGB values of the specific pixel
     SDL_GetRGBA(PixelData, surface->format, &Color.r, &Color.g, &Color.b, &Color.a);
+
+
     return Color;
 }
 
@@ -655,27 +670,15 @@ void HandleEvents(std::vector<std::vector<GameObject*>> gameObjects, Input* play
     SDL_GetMouseState(&playerInput->prevMousePosition.first, &playerInput->prevMousePosition.second);
 }
 
-void RenderScreen(std::vector<std::vector<GameObject*>> gameObjects){
-    SDL_SetRenderDrawColor( renderer, 0, 100, 255, 100 );
-    SDL_RenderClear( renderer );
-
-    //Render texture to screen
-
-    renderTerrain();
-    renderPieces();
-    renderUI();
-
-    //Update screen
-    SDL_RenderPresent( renderer);
-}
-
 void GeneratePeak() {
     int x = (rand() % (int)(SCREEN_WIDTH/1.2)) + SCREEN_WIDTH/2 - SCREEN_WIDTH/2.4;
     int y = (rand() % (int)(SCREEN_HEIGHT/1.2)) + SCREEN_HEIGHT/2 - SCREEN_HEIGHT/2.4;
     int shape = rand() % (int)(7);
     int height = (rand() % rules->GetMaxHeight()) + 1;
+    if (rules->GetRemainingPoints() <= rules->GetMaxHeight()) height = rules->GetRemainingPoints();
+    rules->SetRemainingPoints(rules->GetRemainingPoints() - height);
     string name = to_string(height) + ", " + to_string(peaks.size() + 1);
-    Peak* peak = new Peak(name, textures[to_string(shape)][height], surfaces[to_string(shape)], false, true, height);
+    Peak* peak = new Peak(name, textures["square"][height], surfaces["square"], false, true, height);
     double rotation = rand() % 360;
     peak->SetRotation(rotation);
     peak->SetScale(0.1);
@@ -698,7 +701,7 @@ void GeneratePeak() {
 void GenerateTerrain(Peak* peak, int shape, int height) {
     for (int i = height - 1; i > 0; i--) {
         string name = to_string(i) + ", " + to_string(peak->GetPeakID());
-        Terrain* layer = new Terrain(name, textures[to_string(shape)][i], surfaces[to_string(shape)], false, true, i);
+        Terrain* layer = new Terrain(name, textures["square"][i], surfaces["square"], false, true, i);
         layer->SetScale(peak->GetScale() + 0.1 * (height - i));
         layer->SetCenter(peak->GetCenter().first, peak->GetCenter().second);
         layer->SetRotation(peak->GetRotation());
@@ -714,121 +717,242 @@ void GenerateTerrain(Peak* peak, int shape, int height) {
 std::vector<Terrain*> MergeTerrain(Terrain* peak) {
     std::vector<Terrain*> connectedTerrain;
     for (int k = 0; k < terrain[peak->GetLayer()].size(); k++) {
+        Terrain* other = terrain[peak->GetLayer()][k];
+        if (peak == other) continue;
         bool intersecting = false;
-        pair<int, int> rectTopLeft;
-        pair<int, int> rectBottomRight;
+        bool topLeftOne = false;
+        bool topRightOne = false;
+        bool bottomLeftOne = false;
+        bool bottomRightOne = false;
+        bool topLeftTwo = false;
+        bool topRightTwo = false;
+        bool bottomLeftTwo = false;
+        bool bottomRightTwo = false;
+        pair<int, int> offsetOne;
+        pair<int, int> offsetTwo;
+        int length = 0;
+        int height = 0;
         SDL_Color pixelOne;
         SDL_Color pixelTwo;
-        if (peak == terrain[peak->GetLayer()][k]) continue;
-        if (peak->GetPosition().first > terrain[peak->GetLayer()][k]->GetPosition().first &&
-             peak->GetPosition().first < terrain[peak->GetLayer()][k]->GetBottomRight().first &&
-             peak->GetPosition().second > terrain[peak->GetLayer()][k]->GetPosition().second &&
-             peak->GetPosition().second < terrain[peak->GetLayer()][k]->GetBottomRight().second) {
 
-            rectTopLeft.first = peak->GetPosition().first;
-            rectTopLeft.second = peak->GetPosition().second;
-            rectBottomRight.first = terrain[peak->GetLayer()][k]->GetBottomRight().first;
-            rectBottomRight.second = terrain[peak->GetLayer()][k]->GetBottomRight().second;
+        //top left
+        if (peak->GetPosition().first > other->GetPosition().first &&
+             peak->GetPosition().first < other->GetBottomRight().first &&
+             peak->GetPosition().second > other->GetPosition().second &&
+             peak->GetPosition().second < other->GetBottomRight().second) {
+
+            topLeftOne = true;
 
 
-            for (int i = 0; i < rectBottomRight.first - rectTopLeft.first; i++) {
-                for (int j = 0; j < rectBottomRight.second - rectTopLeft.second; j++) {
-                    pixelOne = GetPixelColor(peak->GetSurface(), i, j);
-                    pixelTwo = GetPixelColor(terrain[peak->GetLayer()][k]->GetSurface(), (rectTopLeft.first - terrain[peak->GetLayer()][k]->GetPosition().first) + i, (rectTopLeft.second - terrain[peak->GetLayer()][k]->GetPosition().second) + j);
-                    if ((pixelOne.r == 0 && pixelOne.g == 0 && pixelOne.b == 0) ||(pixelTwo.r == 0 && pixelTwo.g == 0 && pixelTwo.b == 0) ) {
-                        continue;
-                    }
+        } if (peak->GetBottomRight().first > other->GetPosition().first &&
+             peak->GetBottomRight().first < other->GetBottomRight().first &&
+             peak->GetPosition().second > other->GetPosition().second &&
+             peak->GetPosition().second < other->GetBottomRight().second) {
 
-                    intersecting = true;
-                    break;
-                }
-                if (intersecting) break;
-            }
-
-        } if (peak->GetBottomRight().first > terrain[peak->GetLayer()][k]->GetPosition().first &&
-             peak->GetBottomRight().first < terrain[peak->GetLayer()][k]->GetBottomRight().first &&
-             peak->GetPosition().second > terrain[peak->GetLayer()][k]->GetPosition().second &&
-             peak->GetPosition().second < terrain[peak->GetLayer()][k]->GetBottomRight().second) {
-
-            rectTopLeft.first = terrain[peak->GetLayer()][k]->GetPosition().first;
-            rectTopLeft.second = peak->GetPosition().second;
-            rectBottomRight.first = peak->GetBottomRight().first;
-            rectBottomRight.second = terrain[peak->GetLayer()][k]->GetBottomRight().second;
-
-            for (int i = 0; i < rectBottomRight.first - rectTopLeft.first; i++) {
-                for (int j = 0; j < rectBottomRight.second - rectTopLeft.second; j++) {
-                    pixelOne = GetPixelColor(peak->GetSurface(), (rectTopLeft.first - peak->GetPosition().first) + i, j);
-                    pixelTwo = GetPixelColor(terrain[peak->GetLayer()][k]->GetSurface(), i, (rectTopLeft.second - terrain[peak->GetLayer()][k]->GetPosition().second) + j);
-                    if ((pixelOne.r == 0 && pixelOne.g == 0 && pixelOne.b == 0) ||(pixelTwo.r == 0 && pixelTwo.g == 0 && pixelTwo.b == 0) ) {
-                        continue;
-                    }
+            topRightOne = true;
 
 
-                    intersecting = true;
-                    break;
-                }
-                if (intersecting) break;
-            }
+        }if (peak->GetPosition().first > other->GetPosition().first &&
+             peak->GetPosition().first < other->GetBottomRight().first &&
+             peak->GetBottomRight().second > other->GetPosition().second &&
+             peak->GetBottomRight().second < other->GetBottomRight().second) {
 
+            bottomLeftOne = true;
 
+        } if (peak->GetBottomRight().first > other->GetPosition().first &&
+             peak->GetBottomRight().first < other->GetBottomRight().first &&
+             peak->GetBottomRight().second > other->GetPosition().second &&
+             peak->GetBottomRight().second < other->GetBottomRight().second) {
 
-        } if (peak->GetPosition().first > terrain[peak->GetLayer()][k]->GetPosition().first &&
-             peak->GetPosition().first < terrain[peak->GetLayer()][k]->GetBottomRight().first &&
-             peak->GetBottomRight().second > terrain[peak->GetLayer()][k]->GetPosition().second &&
-             peak->GetBottomRight().second < terrain[peak->GetLayer()][k]->GetBottomRight().second) {
-
-            intersecting = true;
-            rectTopLeft.first = peak->GetPosition().first;
-            rectTopLeft.second = terrain[peak->GetLayer()][k]->GetPosition().second;
-            rectBottomRight.first = terrain[peak->GetLayer()][k]->GetBottomRight().first;
-            rectBottomRight.second = peak->GetBottomRight().second;
-
-            for (int i = 0; i < rectBottomRight.first - rectTopLeft.first; i++) {
-                for (int j = 0; j < rectBottomRight.second - rectTopLeft.second; j++) {
-                    pixelOne = GetPixelColor(peak->GetSurface(), i,(rectTopLeft.second - peak->GetPosition().second) + j);
-                    pixelTwo = GetPixelColor(terrain[peak->GetLayer()][k]->GetSurface(), (rectTopLeft.first - terrain[peak->GetLayer()][k]->GetPosition().first) + i, j);
-                    if ((pixelOne.r == 0 && pixelOne.g == 0 && pixelOne.b == 0) ||(pixelTwo.r == 0 && pixelTwo.g == 0 && pixelTwo.b == 0) ) {
-                        continue;
-                    }
-
-
-                    intersecting = true;
-                    break;
-                }
-                if (intersecting) break;
-            }
-
-
-        } if (peak->GetBottomRight().first > terrain[peak->GetLayer()][k]->GetPosition().first &&
-             peak->GetBottomRight().first < terrain[peak->GetLayer()][k]->GetBottomRight().first &&
-             peak->GetBottomRight().second > terrain[peak->GetLayer()][k]->GetPosition().second &&
-             peak->GetBottomRight().second < terrain[peak->GetLayer()][k]->GetBottomRight().second) {
-
-            intersecting = true;
-            rectTopLeft.first = terrain[peak->GetLayer()][k]->GetPosition().first;
-            rectTopLeft.second = terrain[peak->GetLayer()][k]->GetPosition().second;
-            rectBottomRight.first = peak->GetBottomRight().first;
-            rectBottomRight.second = peak->GetBottomRight().second;
-
-            for (int i = 0; i < rectBottomRight.first - rectTopLeft.first; i++) {
-                for (int j = 0; j < rectBottomRight.second - rectTopLeft.second; j++) {
-                    pixelOne = GetPixelColor(peak->GetSurface(), (rectTopLeft.first - peak->GetPosition().first) + i,(rectTopLeft.second - peak->GetPosition().second) + j);
-                    pixelTwo = GetPixelColor(terrain[peak->GetLayer()][k]->GetSurface(), i, j);
-                    if ((pixelOne.r == 0 && pixelOne.g == 0 && pixelOne.b == 0) ||(pixelTwo.r == 0 && pixelTwo.g == 0 && pixelTwo.b == 0) ) {
-                        continue;
-                    }
-
-                    intersecting = true;
-                    break;
-                }
-                if (intersecting) break;
-            }
-
+            bottomRightOne = true;
         }
+
+
+        if (other->GetPosition().first > peak->GetPosition().first &&
+            other->GetPosition().first < peak->GetBottomRight().first &&
+            other->GetPosition().second > peak->GetPosition().second &&
+            other->GetPosition().second < peak->GetBottomRight().second) {
+
+            topLeftTwo = true;
+
+
+        } if (other->GetBottomRight().first > peak->GetPosition().first &&
+              other->GetBottomRight().first < peak->GetBottomRight().first &&
+              other->GetPosition().second > peak->GetPosition().second &&
+              other->GetPosition().second < peak->GetBottomRight().second) {
+
+            topRightTwo = true;
+
+        }if (other->GetPosition().first > peak->GetPosition().first &&
+             other->GetPosition().first < peak->GetBottomRight().first &&
+             other->GetBottomRight().second > peak->GetPosition().second &&
+             other->GetBottomRight().second < peak->GetBottomRight().second) {
+
+            bottomLeftTwo = true;
+
+        } if (other->GetBottomRight().first > peak->GetPosition().first &&
+              other->GetBottomRight().first < peak->GetBottomRight().first &&
+              other->GetBottomRight().second > peak->GetPosition().second &&
+              other->GetBottomRight().second < peak->GetBottomRight().second) {
+
+            bottomRightTwo = true;
+        }
+
+        if (!topLeftOne && !topRightOne && !bottomLeftOne && !bottomRightOne && !topLeftTwo && !topRightTwo && !bottomLeftTwo && !bottomRightTwo) {
+            continue;
+        } else if (topLeftOne && !topRightOne && bottomLeftOne && !bottomRightOne) {
+            std::cout << "One" << std::endl;
+            length = other->GetBottomRight().first - peak->GetPosition().first;
+            height = peak->GetBottomRight().second - peak->GetPosition().second;
+            offsetOne.first = 0;
+            offsetOne.second = 0;
+            offsetTwo.first = peak->GetPosition().first - other->GetPosition().first;
+            offsetTwo.second = peak->GetPosition().second - other->GetPosition().second;
+
+        } else if (!topLeftOne && !topRightOne && bottomLeftOne && bottomRightOne) {
+            std::cout << "Two" << std::endl;
+            length = peak->GetBottomRight().first - peak->GetPosition().first;
+            height = peak->GetBottomRight().second - other->GetPosition().second;
+            offsetOne.first = 0;
+            offsetOne.second = other->GetPosition().second - peak->GetPosition().second;
+            offsetTwo.first = peak->GetPosition().first - other->GetPosition().first;
+            offsetTwo.second = 0;
+
+        } else if (!topLeftOne && topRightOne && !bottomLeftOne && bottomRightOne) {
+            std::cout << "Three" << std::endl;
+            length = peak->GetBottomRight().first - other->GetPosition().first;
+            height = peak->GetBottomRight().second - peak->GetPosition().second;
+            offsetOne.first = other->GetPosition().first - peak->GetPosition().first;
+            offsetOne.second = 0;
+            offsetTwo.first = 0;
+            offsetTwo.second = peak->GetPosition().second - other->GetPosition().second;
+
+        } else if (topLeftOne && topRightOne && !bottomLeftOne && !bottomRightOne) {
+            std::cout << "Four" << std::endl;
+            length = peak->GetBottomRight().first - peak->GetPosition().first;
+            height = other->GetBottomRight().second - peak->GetPosition().second;
+            offsetOne.first = 0;
+            offsetOne.second = 0;
+            offsetTwo.first = peak->GetPosition().first - other->GetPosition().first;
+            offsetTwo.second = peak->GetPosition().second - other->GetPosition().second;
+
+        } else if (topLeftOne && !topRightOne && !bottomLeftOne && !bottomRightOne) {
+            std::cout << "Five" << std::endl;
+            length = other->GetBottomRight().first - peak->GetPosition().first;
+            height = other->GetBottomRight().second - peak->GetPosition().second;
+            offsetOne.first = 0;
+            offsetOne.second = 0;
+            offsetTwo.first = peak->GetPosition().first - other->GetPosition().first;
+            offsetTwo.second = peak->GetPosition().second - other->GetPosition().second;
+
+        } else if (!topLeftOne && topRightOne && !bottomLeftOne && !bottomRightOne) {
+            std::cout << "Six" << std::endl;
+            length = peak->GetBottomRight().first - other->GetPosition().first;
+            height = other->GetBottomRight().second - peak->GetPosition().second;
+            offsetOne.first = other->GetPosition().first - peak->GetPosition().first;
+            offsetOne.second = 0;
+            offsetTwo.first = 0;
+            offsetTwo.second = peak->GetPosition().second - other->GetPosition().second;
+
+        } else if (!topLeftOne && !topRightOne && bottomLeftOne && !bottomRightOne) {
+            std::cout << "Seven" << std::endl;
+            length = other->GetBottomRight().first - peak->GetPosition().first;
+            height = peak->GetBottomRight().second - other->GetPosition().second;
+            offsetOne.first = 0;
+            offsetOne.second = other->GetPosition().second - peak->GetPosition().second;
+            offsetTwo.first = peak->GetPosition().first - other->GetPosition().first;
+            offsetTwo.second = 0;
+
+        } else if (!topLeftOne && !topRightOne && !bottomLeftOne && bottomRightOne) {
+            std::cout << "Eight" << std::endl;
+            length = peak->GetBottomRight().first - other->GetPosition().first;
+            height = peak->GetBottomRight().second - other->GetPosition().second;
+            offsetOne.first = other->GetPosition().first - peak->GetPosition().first;
+            offsetOne.second = other->GetPosition().second - peak->GetPosition().second;
+            offsetTwo.first = 0;
+            offsetTwo.second = 0;
+
+
+        } else if (topLeftOne && topRightOne && bottomLeftOne && bottomRightOne) {
+            std::cout << "Nine" << std::endl;
+            length = peak->GetBottomRight().first - peak->GetPosition().first;
+            height = peak->GetBottomRight().second - peak->GetPosition().second;
+            offsetOne.first = 0;
+            offsetOne.second = 0;
+            offsetTwo.first = peak->GetPosition().first - other->GetPosition().first;
+            offsetTwo.second = peak->GetPosition().second - other->GetPosition().second;
+
+
+        } else if (topLeftTwo && topRightTwo && bottomLeftTwo && bottomRightTwo) {
+            std::cout << "Ten" << std::endl;
+            length = other->GetBottomRight().first - other->GetPosition().first;
+            height = other->GetBottomRight().second - other->GetPosition().second;
+            offsetOne.first = other->GetPosition().first - peak->GetPosition().first;
+            offsetOne.second = other->GetPosition().second - peak->GetPosition().second;
+            offsetTwo.first = 0;
+            offsetTwo.second = 0;
+
+        } else if (topLeftTwo && !topRightTwo && bottomLeftTwo && !bottomRightTwo) {
+            std::cout << "Eleven" << std::endl;
+            length = peak->GetBottomRight().first - other->GetPosition().first;
+            height = other->GetBottomRight().second - other->GetPosition().second;
+            offsetOne.first = other->GetPosition().first - peak->GetPosition().first;
+            offsetOne.second = other->GetPosition().second - peak->GetPosition().second;
+            offsetTwo.first = 0;
+            offsetTwo.second = 0;
+
+        } else if (!topLeftTwo && !topRightTwo && bottomLeftTwo && bottomRightTwo) {
+            std::cout << "Twelve" << std::endl;
+            length = other->GetBottomRight().first - other->GetPosition().first;
+            height = peak->GetBottomRight().second - peak->GetPosition().second;
+            offsetOne.first = other->GetPosition().first - peak->GetPosition().first;
+            offsetOne.second = 0;
+            offsetTwo.first = 0;
+            offsetTwo.second = peak->GetPosition().second - other->GetPosition().second;
+
+        } else if (!topLeftTwo && topRightTwo && !bottomLeftTwo && bottomRightTwo) {
+            std::cout << "Thirteen" << std::endl;
+            length = other->GetBottomRight().first - peak->GetPosition().first;
+            height = other->GetBottomRight().second - other->GetPosition().second;
+            offsetOne.first = 0;
+            offsetOne.second = other->GetPosition().second - peak->GetPosition().second;
+            offsetTwo.first = peak->GetPosition().first - other->GetPosition().first;
+            offsetTwo.second = 0;
+
+        } else if (topLeftTwo && topRightTwo && !bottomLeftTwo && !bottomRightTwo) {
+            std::cout << "Fourteen" << std::endl;
+            length = other->GetBottomRight().first - other->GetPosition().first;
+            height = peak->GetBottomRight().second - other->GetPosition().second;
+            offsetOne.first = other->GetPosition().first - peak->GetPosition().first;
+            offsetOne.second = other->GetPosition().second - peak->GetPosition().second;
+            offsetTwo.first = 0;
+            offsetTwo.second = 0;
+        }
+
+
+        for (int i = 0; i < length; i++) {
+            for (int j = 0; j < height; j++) {
+                pixelOne = GetPixelColor(peak->GetSurface(), i + offsetOne.first, j + offsetOne.second);
+                pixelTwo = GetPixelColor(other->GetSurface(), i + offsetTwo.first, j + offsetTwo.second);
+
+
+
+                if ((pixelOne.r == 255 && pixelOne.g == 0 && pixelOne.b == 0) || (pixelTwo.r == 255 && pixelTwo.g == 0 && pixelTwo.b == 0)) {
+                    continue;
+                } else {
+                    intersecting = true;
+                    break;
+                }
+            }
+            if (intersecting) break;
+        }
+
         if (intersecting) {
-            connectedTerrain.push_back(terrain[peak->GetLayer()][k]);
+            connectedTerrain.push_back(other);
         }
+
     }
+
     return connectedTerrain;
 }
 
@@ -912,10 +1036,7 @@ int Roll(){
 }
 
 void Move(Piece* piece, Terrain* startingPoint, Terrain* targetTerrain, int& movesLeft) {
-    if (movesLeft < 1 && startingPoint != targetTerrain) {
-        piece->SetCenter(piece->GetDesignatedLocation().first, piece->GetDesignatedLocation().second);
-        return;
-    }
+
     int moveCount = 0;
     int heightDifference;
     std::vector<Terrain*> currentPath;
@@ -955,12 +1076,6 @@ bool MovementAttempt(int& heightDifference, int& attemptedMoves, Terrain* curren
     else currentTerrainLayer =  currentTerrain->GetLayer();
 
     heightDifference = targetTerrainLayer - currentTerrainLayer;
-    std::cout << "height difference is : " << heightDifference << std::endl;
-
-    if (currentTerrain != NULL) std::cout << "current terrain: " << currentTerrain->GetName() << std::endl;
-    else std::cout << "current terrain: NULL" << std::endl;
-    if (targetTerrain != NULL) std::cout << "target terrain: " << targetTerrain->GetName() << std::endl;
-    else std::cout << "target terrain: NULL" << std::endl;
 
     if (heightDifference == 0) {
         if (currentTerrain == targetTerrain && attemptedMoves <= movesLeft) return true;
@@ -986,13 +1101,13 @@ bool MovementAttempt(int& heightDifference, int& attemptedMoves, Terrain* curren
     if (currentTerrain->GetLowerTerrain() != NULL && !fromAdjacent) {
 
         currentPath.push_back(currentTerrain->GetLowerTerrain());
-        std::cout << "Going down one layer" << std::endl;
+
         attemptedMoves++;
         if (MovementAttempt(heightDifference, attemptedMoves, currentTerrain->GetLowerTerrain(), targetTerrain, currentPath, false) && attemptedMoves <= movesLeft) return true;
 
 
     } else if (!fromAdjacent) {
-        std::cout << "Attempting to cross seas" << std::endl;
+
 
         attemptedMoves = attemptedMoves + 2;
         if (attemptedMoves > movesLeft) return false;
@@ -1007,7 +1122,7 @@ bool MovementAttempt(int& heightDifference, int& attemptedMoves, Terrain* curren
 }
 
 bool DirectMovementUp(int& heightDifference, int& attemptedMoves, Terrain* currentTerrain, Terrain*& targetTerrain ,std::vector<Terrain*>& currentPath) {
-    std::cout << "Going directly up" <<std::endl;
+
 
     int i;
     for (i = 0; i < heightDifference; i++) {
@@ -1024,17 +1139,13 @@ bool DirectMovementUp(int& heightDifference, int& attemptedMoves, Terrain* curre
         for (int j = 0; j < i; j++) {
             currentPath.pop_back();
             attemptedMoves--;
-            std::cout << "reversing moves (up)" << std::endl;
+
         }
     }
     return false;
 }
 
 bool DirectMovementDown(int& heightDifference, int& attemptedMoves, Terrain* currentTerrain, Terrain*& targetTerrain ,std::vector<Terrain*>& currentPath) {
-
-    std::cout << "Going directly down" <<std::endl;
-
-
     int i;
     for (i = 0; i > heightDifference; i--) {
         currentTerrain = currentTerrain->GetLowerTerrain();
@@ -1046,7 +1157,7 @@ bool DirectMovementDown(int& heightDifference, int& attemptedMoves, Terrain* cur
         for (int j = 0; j > i; j--) {
             currentPath.pop_back();
             attemptedMoves--;
-            std::cout << "reversing moves (down)" << std::endl;
+
         }
     }
     return false;
@@ -1062,7 +1173,7 @@ Terrain* GetTargetTerrainBase(Terrain* targetTerrain) {
 }
 
 bool AdjacentMovement(int& heightDifference, int& attemptedMoves, Terrain* currentTerrain, Terrain*& targetTerrain ,std::vector<Terrain*>& currentPath) {
-    std::cout << "connected terrain count of current terrain: " << currentTerrain->connectedTerrain.size() << std::endl;
+
     for (int i = 0; i < currentTerrain->connectedTerrain.size(); i++) {
 
         bool alreadyCovered = false;
@@ -1075,7 +1186,7 @@ bool AdjacentMovement(int& heightDifference, int& attemptedMoves, Terrain* curre
         if (alreadyCovered) continue;
 
         currentPath.push_back(currentTerrain->connectedTerrain[i]);
-        std::cout << "Moving to adjacent terrain" << std::endl;
+
         if (MovementAttempt(heightDifference, attemptedMoves, currentTerrain->connectedTerrain[i], targetTerrain, currentPath, true) && attemptedMoves <= movesLeft) return true;
         else currentPath.pop_back();
     }
