@@ -69,11 +69,11 @@ protected:
     int layer;
     double rotation;
     Peak* peak;
-
+    Terrain* upperTerrain = nullptr;
+    Terrain* lowerTerrain = nullptr;
 
 public:
-    std::vector<GameObject*> neighboringTerrain;
-    std::vector<GameObject*> connectedTerrain;
+    std::vector<Terrain*> connectedTerrain;
 
     void RenderGameObject(SDL_Renderer* renderer);
 
@@ -85,13 +85,18 @@ public:
     void SetPeak(Peak* p) {peak = p;}
     Peak* GetPeak() const {return peak;}
     double GetRotation() const {return rotation;}
+    Terrain* GetUpperTerrain() {return upperTerrain;}
+    Terrain* GetLowerTerrain() {return lowerTerrain;}
+    void SetUpperTerrain(Terrain* ut) {upperTerrain = ut;}
+    void SetLowerTerrain(Terrain* lt) {lowerTerrain = lt;}
     void SetRotation(double r) {rotation = r;}
     int GetLayer() const {return layer;}
     void SetLayer(int l) {layer = l;}
 
+
 };
 class Peak : public Terrain {
-
+    int peakID;
 public:
     std::vector<Terrain*> childTerrain;
 
@@ -99,6 +104,8 @@ public:
     type = PEAK;
     peak = this;
     }
+    void SetPeakID(int pid) {peakID = pid;}
+    int GetPeakID() {return peakID;}
 
 };
 
@@ -119,7 +126,6 @@ public:
     selectable = true;
     type = PIECE;
     }
-    void Move(Terrain* startingPoint, Terrain* targetTerrain, int& movesLeft);
     void SetDesignatedLocation(int x, int y) {
         designatedLocation.first = x;
         designatedLocation.second = y;
