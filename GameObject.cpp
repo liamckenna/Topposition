@@ -24,7 +24,9 @@ void GameObject::RenderGameObject(SDL_Renderer* renderer) {
     }
     renderRect->w = (float) (dimensions.first * size * scale);
     renderRect->h = (float) (dimensions.second * size * scale);
-    SDL_RenderCopy( renderer, texture, NULL, renderRect);
+    if (rendered) {
+        SDL_RenderCopy( renderer, texture, NULL, renderRect);
+    }
 }
 
 void GameObject::SetPosition(float x, float y, bool posOnly) {
@@ -90,8 +92,8 @@ void GameObject::SetDefaultPosition(float x, float y) {
 
 
 void GameObject::SetBottomRight() {
-    bottomRight.first = position.first + (dimensions.first * size) * scale;
-    bottomRight.second = position.second + (dimensions.second * size) * scale;
+    bottomRight.first = position.first + (dimensions.first * size * scale);
+    bottomRight.second = position.second + (dimensions.second * size * scale);
 }
 
 void Terrain::RenderGameObject(SDL_Renderer *renderer) {
@@ -104,8 +106,7 @@ void Terrain::RenderGameObject(SDL_Renderer *renderer) {
     }
     renderRect->w = (dimensions.second * size * scale);
     renderRect->h = (dimensions.second * size * scale);
-    SDL_RenderCopyEx( renderer, texture, NULL, renderRect, 0, NULL, SDL_FLIP_NONE);
+    if (rendered) {
+        SDL_RenderCopyEx( renderer, texture, NULL, renderRect, 0, NULL, SDL_FLIP_NONE);
+    }
 }
-
-
-

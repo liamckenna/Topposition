@@ -62,6 +62,7 @@ public:
 };
 
 class Peak;
+class Piece;
 
 class Terrain : public GameObject
 {
@@ -72,7 +73,9 @@ protected:
     Terrain* upperTerrain = nullptr;
     Terrain* lowerTerrain = nullptr;
 
+
 public:
+    std::vector<Piece*> occupants;
     std::vector<Terrain*> connectedTerrain;
 
     void RenderGameObject(SDL_Renderer* renderer);
@@ -95,36 +98,52 @@ public:
 
 
 };
+
+
+class UIElement : public GameObject {
+    Peak* associatedPeak;
+public:
+    UIElement(string name, SDL_Texture *texture, SDL_Surface *surface, bool r, Peak* ap = nullptr) : GameObject(name, texture, surface, false, r) {
+    type = UI_ELEMENT;
+    associatedPeak = ap;
+    }
+    Peak* GetAssociatedPeak() {return associatedPeak;}
+    void SetAssociatedPeak(Peak* ap) {associatedPeak = ap;}
+
+};
+
 class Peak : public Terrain {
     int peakID;
+    UIElement* claimNotif;
+    string claimedBy = "";
 public:
     std::vector<Terrain*> childTerrain;
 
     Peak(string name, SDL_Texture *texture, SDL_Surface *surface, bool m, bool r, int l) : Terrain(name, texture, surface, m, r, l) {
-    type = PEAK;
-    peak = this;
+        type = PEAK;
+        peak = this;
     }
     void SetPeakID(int pid) {peakID = pid;}
     int GetPeakID() {return peakID;}
-
-};
-
-class UIElement : public GameObject {
-
-public:
-    UIElement(string name, SDL_Texture *texture, SDL_Surface *surface, bool r) : GameObject(name, texture, surface, false, r) {
-    type = UI_ELEMENT;
+    void SetClaimNotif(UIElement* cn) {claimNotif = cn;}
+    UIElement* GetClaimNotif() {return claimNotif;}
+    void Claim(string team) {
+        claimedBy = team;
     }
+    string GetClaimedBy() {return claimedBy;}
+
 };
 
 class Piece : public GameObject {
 private:
     int altitude;
     pair<int, int> designatedLocation;
+    Terrain* occupyingTerrain;
+
 public:
     Piece(string name, SDL_Texture* texture, SDL_Surface* surface, bool r) : GameObject(name, texture, surface, true, r) {
-    selectable = true;
     type = PIECE;
+    occupyingTerrain = nullptr;
     }
     void SetDesignatedLocation(int x, int y) {
         designatedLocation.first = x;
@@ -133,4 +152,7 @@ public:
     pair<int, int> GetDesignatedLocation() {return designatedLocation;}
     void SetAltitude(int a) {altitude = a;}
     int GetAltitude() {return altitude;}
+    void SetOccupyingTerrain(Terrain* ot) {occupyingTerrain = ot;}
+    Terrain* GetOccupyingTerrain() {return occupyingTerrain;}
+
 };

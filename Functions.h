@@ -84,6 +84,16 @@ Terrain* GetTargetTerrainBase(Terrain* targetTerrain);
 
 bool AdjacentMovement(int& heightDifference, int& attemptedMoves, Terrain* currentTerrain, Terrain*& targetTerrain ,std::vector<Terrain*>& currentPath);
 
+void RotateTurn();
+
+void UpdateMovesLeft();
+
+void RefreshClaimNotifs(Peak* individualPeak = NULL);
+
+void FinishTurn();
+
+void ClaimPeak(UIElement* claimNotif);
+
 extern SDL_Window* window;
 //The surface contained by the window
 extern SDL_Surface* screenSurface;
@@ -126,4 +136,3 @@ enum gameState {
     LOBBY = 2,
     GAME = 3
 };
-

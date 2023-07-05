@@ -44,6 +44,8 @@ GameObject* selectedObject = nullptr;
 
 GameRules* rules = new GameRules();
 
+string currentTurn = "playerOne";
+
 
 bool init()
 {
@@ -145,21 +147,49 @@ bool loadMap(std::vector<std::vector<GameObject*>> &gameObjects)
 void loadGamePieces(std::vector<std::vector<GameObject*>> &gameObjects)
 {
     gameObjects.push_back(vector<GameObject*>());
-    GameObject* coin = new GameObject("coin", textures["coin"][0], surfaces["coin"], true, true);
-    Piece* red = new Piece("red", textures["red"][0], surfaces["red"], true);
+    for (int j = 0; j < rules->GetPlayerCount(); j++) {
+        string color;
+        string playerNumber;
+        bool selectable;
+        switch(j) {
+            case 0:
+                color = "red";
+                playerNumber = "playerOne";
+                selectable = true;
+                break;
+            case 1:
+                color = "green";
+                playerNumber = "playerTwo";
+                selectable = false;
+                break;
+            case 2:
+                color = "blue";
+                playerNumber = "playerThree";
+                selectable = false;
+                break;
+            case 3:
+                color = "yellow";
+                playerNumber = "playerFour";
+                selectable = false;
+                break;
+        }
+        for (int i = 0; i < rules->GetPieces(); i++) {
+            Piece* piece = new Piece(playerNumber, textures[color][0], surfaces[color], true);
+            gameObjects[rules->GetMaxHeight() + 1].push_back(piece);
+            pieces.push_back(piece);
+            piece->SetScale((float) 1/22);
+            int x = (rand() % (int)(SCREEN_WIDTH/1.05)) + SCREEN_WIDTH/2 - SCREEN_WIDTH/2.1;
+            int y = (rand() % (int)(SCREEN_HEIGHT/1.05)) + SCREEN_HEIGHT/2 - SCREEN_HEIGHT/2.1;
+            while (selectTerrain(x, y) != NULL) {
+                x = (rand() % (int)(SCREEN_WIDTH/1.05)) + SCREEN_WIDTH/2 - SCREEN_WIDTH/2.1;
+                y = (rand() % (int)(SCREEN_HEIGHT/1.05)) + SCREEN_HEIGHT/2 - SCREEN_HEIGHT/2.1;
+            }
+            piece->SetCenter(x, y);
+            piece->SetDesignatedLocation(x, y);
+            piece->SetSelectable(selectable);
+        }
+    }
 
-    gameObjects[rules->GetMaxHeight() + 1].push_back(coin);
-    gameObjects[rules->GetMaxHeight() + 1].push_back(red);
-    pieces.push_back(red);
-
-    red->SetScale((float) 1/22);
-    coin->SetCenter(960, 540);
-    red->SetPosition(300, 300);
-    red->SetCenter();
-    red->SetDesignatedLocation(red->GetCenter().first, red->GetCenter().second);
-    std::cout << red->GetDesignatedLocation().first << ", " << red->GetDesignatedLocation().second << std::endl;
-    red->SetSelectable(true);
-    coin->SetSelectable(true);
 }
 
 void loadUI() {
@@ -170,19 +200,36 @@ void loadUI() {
     UIElement* die1 = new UIElement("dieOne", textures["die 1"][0], surfaces["die 1"], true);
     die1->SetScale(0.1);
     uiElements.push_back(die1);
-    die1->SetPosition(SCREEN_WIDTH - (die1->GetDimensions().first * die1->GetScale()) - 10, 10);
+    die1->SetPosition(SCREEN_WIDTH - (die1->GetDimensions().first * die1->GetScale() * die1->GetSize()) - 10, 10);
     UIElement* die2 = new UIElement("dieTwo", textures["die 2"][0], surfaces["die 2"], true);
     die2->SetScale(0.1);
     uiElements.push_back(die2);
-    die2->SetPosition(SCREEN_WIDTH - ((die1->GetDimensions().first * die1->GetScale()) + 10 )*2, 10);
+    die2->SetPosition(SCREEN_WIDTH - ((die1->GetDimensions().first * die1->GetScale() * die1->GetSize()) + 10 )*2, 10);
     UIElement* movesLeftText = new UIElement("movesLeftText", textures["moves left"][0], surfaces["moves left"], true);
     movesLeftText->SetScale(0.1);
     uiElements.push_back(movesLeftText);
-    movesLeftText->SetPosition(0, SCREEN_HEIGHT - (movesLeftText->GetDimensions().second * movesLeftText->GetScale()));
+    movesLeftText->SetPosition(0, SCREEN_HEIGHT - (movesLeftText->GetDimensions().second * movesLeftText->GetScale() * movesLeftText->GetSize()));
     UIElement* movesLeftCount = new UIElement("movesLeftCount", textures["moves left 3"][0], surfaces["moves left 3"], true);
     movesLeftCount->SetScale(0.1);
     uiElements.push_back(movesLeftCount);
-    movesLeftCount->SetPosition(0, SCREEN_HEIGHT - (movesLeftCount->GetDimensions().second * movesLeftCount->GetScale()));
+    movesLeftCount->SetPosition(0, SCREEN_HEIGHT - (movesLeftCount->GetDimensions().second * movesLeftCount->GetScale() * movesLeftCount->GetSize()));
+    UIElement* finishTurnButton = new UIElement("finish turn button", textures["finish turn"][0], surfaces["finish turn"], true);
+    finishTurnButton->SetScale(0.1);
+    finishTurnButton->SetPosition(SCREEN_WIDTH - (finishTurnButton->GetDimensions().first * finishTurnButton->GetScale() * finishTurnButton->GetSize()) - 10,
+                             SCREEN_HEIGHT - (finishTurnButton->GetDimensions().second * finishTurnButton->GetScale() * finishTurnButton->GetSize()) - 10);
+    uiElements.push_back(finishTurnButton);
+
+
+    for(int i = 0; i < peaks.size(); i++) {
+        UIElement* claimPeakButton = new UIElement("claim peak button", textures["claim peak"][0], surfaces["claim peak"], false, peaks[i]);
+        claimPeakButton->SetScale(0.1);
+        claimPeakButton->SetCenter(peaks[i]->GetCenter().first + 50, peaks[i]->GetCenter().second - 50);
+        uiElements.push_back(claimPeakButton);
+        gameObjects[gameObjects.size() - 1].push_back(claimPeakButton);
+        peaks[i]->SetClaimNotif(claimPeakButton);
+    }
+    currentRoll = Roll();
+    movesLeft = currentRoll;
 
 }
 
@@ -443,7 +490,7 @@ GameObject* selectObject(std::vector<std::vector<GameObject*>> gameObjects, int 
                                                     (x - width_LowerBound)/(gameObjects[i][j]->GetSize() * gameObjects[i][j]->GetScale()),
                                                     (y - height_LowerBound)/(gameObjects[i][j]->GetSize() * gameObjects[i][j]->GetScale()));
 
-                    if (color.r == 255 && color.g == 0 && color.b == 0) {
+                    if (color.r == 0 && color.g == 0 && color.b == 0) {
                         continue;
                     }
                     return gameObjects[i][j];
@@ -461,7 +508,7 @@ UIElement* selectUI(int x, int y) {
         int width_LowerBound = uiElements[i]->GetPosition().first;
         int width_UpperBound = uiElements[i]->GetBottomRight().first;
         int height_LowerBound = uiElements[i]->GetPosition().second;
-        int height_UpperBound = uiElements[i]->GetBottomRight().first;
+        int height_UpperBound = uiElements[i]->GetBottomRight().second;
         if (x >= width_LowerBound && x <= width_UpperBound) {
             if (y >= height_LowerBound && y <= height_UpperBound) {
 
@@ -471,7 +518,7 @@ UIElement* selectUI(int x, int y) {
                 if (color.r == 255 && color.g == 0 && color.b == 0) {
 
                     continue;
-                } else {
+                } else if (uiElements[i]->GetRendered()){
                     return uiElements[i];
                 }
 
@@ -485,10 +532,11 @@ UIElement* selectUI(int x, int y) {
 
 Piece* selectPiece(int x, int y) {
     for (int i = 0; i < pieces.size(); i++) {
+        if (!pieces[i]->GetSelectable()) continue;
         int width_LowerBound = pieces[i]->GetPosition().first;
         int width_UpperBound = pieces[i]->GetBottomRight().first;
         int height_LowerBound = pieces[i]->GetPosition().second;
-        int height_UpperBound = pieces[i]->GetBottomRight().first;
+        int height_UpperBound = pieces[i]->GetBottomRight().second;
         if (x >= width_LowerBound && x <= width_UpperBound) {
             if (y >= height_LowerBound && y <= height_UpperBound) {
 
@@ -496,7 +544,6 @@ Piece* selectPiece(int x, int y) {
                                                 (x - width_LowerBound)/(pieces[i]->GetSize() * pieces[i]->GetScale()),
                                                 (y - height_LowerBound)/(pieces[i]->GetSize() * pieces[i]->GetScale()));
                 if (color.r == 0 && color.g == 0 && color.b == 0) {
-
                     continue;
                 } else {
                     return pieces[i];
@@ -632,7 +679,7 @@ void HandleEvents(std::vector<std::vector<GameObject*>> gameObjects, Input* play
                             Piece* piece = dynamic_cast<Piece *>(selectedObject);
                             piece->SetDesignatedLocation(piece->GetCenter().first, piece->GetCenter().second);
                         } else {
-                            selectedObject = selectObject(gameObjects, playerInput->currentMousePosition.first, playerInput->currentMousePosition.second);
+                            //selectedObject = selectObject(gameObjects, playerInput->currentMousePosition.first, playerInput->currentMousePosition.second);
                         }
                     }
                 }
@@ -642,14 +689,22 @@ void HandleEvents(std::vector<std::vector<GameObject*>> gameObjects, Input* play
                     if (selectedObject->GetName() == "reset button") {
                         std::cout << "reset button pressed" << std::endl;
                         ResetMap();
-                    } else if ((selectedObject->GetName() == "dieOne" || selectedObject->GetName() == "dieTwo" && movesLeft < 1)) {
+                    } else if ((selectedObject->GetName() == "dieOne" ||
+                                selectedObject->GetName() == "dieTwo") && movesLeft < 1) {
                         currentRoll = Roll();
                         movesLeft = currentRoll;
-                    } else if (selectedObject->type == GameObject::PIECE) {
-                        Piece* piece = dynamic_cast<Piece *>(selectedObject);
-                        Terrain* startingTerrain = selectTerrain(piece->GetDesignatedLocation().first, piece->GetDesignatedLocation().second);
-                        Terrain* targetTerrain = selectTerrain(piece->GetCenter().first, piece->GetCenter().second);
-                        Move(piece, startingTerrain, targetTerrain, movesLeft);
+                    } else if (selectedObject->GetName() == "finish turn button") {
+                        FinishTurn();
+
+                    } else if (selectedObject->GetName() == "claim peak button") {
+                        ClaimPeak(dynamic_cast<UIElement *>(selectedObject));
+                        RefreshClaimNotifs();
+
+                    }else if (selectedObject->type == GameObject::PIECE) {
+                            Piece* piece = dynamic_cast<Piece *>(selectedObject);
+                            Terrain* startingTerrain = selectTerrain(piece->GetDesignatedLocation().first, piece->GetDesignatedLocation().second);
+                            Terrain* targetTerrain = selectTerrain(piece->GetCenter().first, piece->GetCenter().second);
+                            Move(piece, startingTerrain, targetTerrain, movesLeft);
 
                     }
                 }
@@ -801,7 +856,7 @@ std::vector<Terrain*> MergeTerrain(Terrain* peak) {
         if (!topLeftOne && !topRightOne && !bottomLeftOne && !bottomRightOne && !topLeftTwo && !topRightTwo && !bottomLeftTwo && !bottomRightTwo) {
             continue;
         } else if (topLeftOne && !topRightOne && bottomLeftOne && !bottomRightOne) {
-            std::cout << "One" << std::endl;
+            //std::cout << "One" << std::endl;
             length = other->GetBottomRight().first - peak->GetPosition().first;
             height = peak->GetBottomRight().second - peak->GetPosition().second;
             offsetOne.first = 0;
@@ -810,7 +865,7 @@ std::vector<Terrain*> MergeTerrain(Terrain* peak) {
             offsetTwo.second = peak->GetPosition().second - other->GetPosition().second;
 
         } else if (!topLeftOne && !topRightOne && bottomLeftOne && bottomRightOne) {
-            std::cout << "Two" << std::endl;
+            //std::cout << "Two" << std::endl;
             length = peak->GetBottomRight().first - peak->GetPosition().first;
             height = peak->GetBottomRight().second - other->GetPosition().second;
             offsetOne.first = 0;
@@ -819,7 +874,7 @@ std::vector<Terrain*> MergeTerrain(Terrain* peak) {
             offsetTwo.second = 0;
 
         } else if (!topLeftOne && topRightOne && !bottomLeftOne && bottomRightOne) {
-            std::cout << "Three" << std::endl;
+            //std::cout << "Three" << std::endl;
             length = peak->GetBottomRight().first - other->GetPosition().first;
             height = peak->GetBottomRight().second - peak->GetPosition().second;
             offsetOne.first = other->GetPosition().first - peak->GetPosition().first;
@@ -828,7 +883,7 @@ std::vector<Terrain*> MergeTerrain(Terrain* peak) {
             offsetTwo.second = peak->GetPosition().second - other->GetPosition().second;
 
         } else if (topLeftOne && topRightOne && !bottomLeftOne && !bottomRightOne) {
-            std::cout << "Four" << std::endl;
+            //std::cout << "Four" << std::endl;
             length = peak->GetBottomRight().first - peak->GetPosition().first;
             height = other->GetBottomRight().second - peak->GetPosition().second;
             offsetOne.first = 0;
@@ -837,7 +892,7 @@ std::vector<Terrain*> MergeTerrain(Terrain* peak) {
             offsetTwo.second = peak->GetPosition().second - other->GetPosition().second;
 
         } else if (topLeftOne && !topRightOne && !bottomLeftOne && !bottomRightOne) {
-            std::cout << "Five" << std::endl;
+            //std::cout << "Five" << std::endl;
             length = other->GetBottomRight().first - peak->GetPosition().first;
             height = other->GetBottomRight().second - peak->GetPosition().second;
             offsetOne.first = 0;
@@ -846,7 +901,7 @@ std::vector<Terrain*> MergeTerrain(Terrain* peak) {
             offsetTwo.second = peak->GetPosition().second - other->GetPosition().second;
 
         } else if (!topLeftOne && topRightOne && !bottomLeftOne && !bottomRightOne) {
-            std::cout << "Six" << std::endl;
+            //std::cout << "Six" << std::endl;
             length = peak->GetBottomRight().first - other->GetPosition().first;
             height = other->GetBottomRight().second - peak->GetPosition().second;
             offsetOne.first = other->GetPosition().first - peak->GetPosition().first;
@@ -855,7 +910,7 @@ std::vector<Terrain*> MergeTerrain(Terrain* peak) {
             offsetTwo.second = peak->GetPosition().second - other->GetPosition().second;
 
         } else if (!topLeftOne && !topRightOne && bottomLeftOne && !bottomRightOne) {
-            std::cout << "Seven" << std::endl;
+            //std::cout << "Seven" << std::endl;
             length = other->GetBottomRight().first - peak->GetPosition().first;
             height = peak->GetBottomRight().second - other->GetPosition().second;
             offsetOne.first = 0;
@@ -864,7 +919,7 @@ std::vector<Terrain*> MergeTerrain(Terrain* peak) {
             offsetTwo.second = 0;
 
         } else if (!topLeftOne && !topRightOne && !bottomLeftOne && bottomRightOne) {
-            std::cout << "Eight" << std::endl;
+            //std::cout << "Eight" << std::endl;
             length = peak->GetBottomRight().first - other->GetPosition().first;
             height = peak->GetBottomRight().second - other->GetPosition().second;
             offsetOne.first = other->GetPosition().first - peak->GetPosition().first;
@@ -874,7 +929,7 @@ std::vector<Terrain*> MergeTerrain(Terrain* peak) {
 
 
         } else if (topLeftOne && topRightOne && bottomLeftOne && bottomRightOne) {
-            std::cout << "Nine" << std::endl;
+            //std::cout << "Nine" << std::endl;
             length = peak->GetBottomRight().first - peak->GetPosition().first;
             height = peak->GetBottomRight().second - peak->GetPosition().second;
             offsetOne.first = 0;
@@ -884,7 +939,7 @@ std::vector<Terrain*> MergeTerrain(Terrain* peak) {
 
 
         } else if (topLeftTwo && topRightTwo && bottomLeftTwo && bottomRightTwo) {
-            std::cout << "Ten" << std::endl;
+            //std::cout << "Ten" << std::endl;
             length = other->GetBottomRight().first - other->GetPosition().first;
             height = other->GetBottomRight().second - other->GetPosition().second;
             offsetOne.first = other->GetPosition().first - peak->GetPosition().first;
@@ -893,7 +948,7 @@ std::vector<Terrain*> MergeTerrain(Terrain* peak) {
             offsetTwo.second = 0;
 
         } else if (topLeftTwo && !topRightTwo && bottomLeftTwo && !bottomRightTwo) {
-            std::cout << "Eleven" << std::endl;
+            //std::cout << "Eleven" << std::endl;
             length = peak->GetBottomRight().first - other->GetPosition().first;
             height = other->GetBottomRight().second - other->GetPosition().second;
             offsetOne.first = other->GetPosition().first - peak->GetPosition().first;
@@ -902,7 +957,7 @@ std::vector<Terrain*> MergeTerrain(Terrain* peak) {
             offsetTwo.second = 0;
 
         } else if (!topLeftTwo && !topRightTwo && bottomLeftTwo && bottomRightTwo) {
-            std::cout << "Twelve" << std::endl;
+            //std::cout << "Twelve" << std::endl;
             length = other->GetBottomRight().first - other->GetPosition().first;
             height = peak->GetBottomRight().second - peak->GetPosition().second;
             offsetOne.first = other->GetPosition().first - peak->GetPosition().first;
@@ -911,7 +966,7 @@ std::vector<Terrain*> MergeTerrain(Terrain* peak) {
             offsetTwo.second = peak->GetPosition().second - other->GetPosition().second;
 
         } else if (!topLeftTwo && topRightTwo && !bottomLeftTwo && bottomRightTwo) {
-            std::cout << "Thirteen" << std::endl;
+            //std::cout << "Thirteen" << std::endl;
             length = other->GetBottomRight().first - peak->GetPosition().first;
             height = other->GetBottomRight().second - other->GetPosition().second;
             offsetOne.first = 0;
@@ -920,7 +975,7 @@ std::vector<Terrain*> MergeTerrain(Terrain* peak) {
             offsetTwo.second = 0;
 
         } else if (topLeftTwo && topRightTwo && !bottomLeftTwo && !bottomRightTwo) {
-            std::cout << "Fourteen" << std::endl;
+            //std::cout << "Fourteen" << std::endl;
             length = other->GetBottomRight().first - other->GetPosition().first;
             height = peak->GetBottomRight().second - other->GetPosition().second;
             offsetOne.first = other->GetPosition().first - peak->GetPosition().first;
@@ -966,13 +1021,11 @@ void GroomTerrain() {
                 int b = (rand() % (int)(SCREEN_HEIGHT/1.2)) + SCREEN_HEIGHT/2 - SCREEN_HEIGHT/2.4;
                 peaks[i]->SetCenter(a, b);
                 moveCount++;
-                if (moveCount > 1000) break;
             }
             for (int j = 0; j < peaks[i]->childTerrain.size(); j++) {
                 peaks[i]->childTerrain[j]->SetCenter(peaks[i]->GetCenter().first, peaks[i]->GetCenter().second);
             }
         }
-        if (moveCount > 1000) break;
     }
 
     ConnectTerrain();
@@ -1024,13 +1077,8 @@ int Roll(){
         }
     }
     movesLeft = rollOne + rollTwo;
-    string movesLeftStr = "moves left " + to_string(movesLeft);
 
-    for (int i = 0; i < uiElements.size(); i++) {
-        if (uiElements[i]->GetName() == "movesLeftCount") {
-            uiElements[i]->SetTexture(textures[movesLeftStr][0]);
-        }
-    }
+    UpdateMovesLeft();
 
     return movesLeft;
 }
@@ -1048,16 +1096,22 @@ void Move(Piece* piece, Terrain* startingPoint, Terrain* targetTerrain, int& mov
     } else {
         movesLeft = movesLeft - moveCount;
         piece->SetDesignatedLocation(piece->GetCenter().first, piece->GetCenter().second);
-    }
-
-
-    string movesLeftStr = "moves left " + to_string(movesLeft);
-
-    for (int i = 0; i < uiElements.size(); i++) {
-        if (uiElements[i]->GetName() == "movesLeftCount") {
-            uiElements[i]->SetTexture(textures[movesLeftStr][0]);
+        piece->SetOccupyingTerrain(targetTerrain);
+        if (startingPoint != NULL) {
+            for (int i = 0; i < startingPoint->occupants.size(); i++) {
+                if (startingPoint->occupants[i] == piece) startingPoint->occupants.erase(startingPoint->occupants.begin() + i);
+            }
         }
+        if (targetTerrain != NULL) targetTerrain->occupants.push_back(piece);
+        if (targetTerrain != NULL && targetTerrain->type == GameObject::PEAK) {
+            RefreshClaimNotifs(dynamic_cast<Peak *>(targetTerrain));
+        } else RefreshClaimNotifs();
     }
+
+
+
+
+    UpdateMovesLeft();
 
     for (int i = 0; i < currentPath.size(); i++) {
         if (currentPath[i] == NULL) std::cout << "NULL" << std::endl;
@@ -1086,17 +1140,15 @@ bool MovementAttempt(int& heightDifference, int& attemptedMoves, Terrain* curren
         return MovementAttempt(heightDifference, ++attemptedMoves, GetTargetTerrainBase(targetTerrain), targetTerrain, currentPath, false);
     }
 
-
     if (heightDifference > 0) {
         if (DirectMovementUp(heightDifference, attemptedMoves, currentTerrain, targetTerrain, currentPath) && attemptedMoves <= movesLeft) return true;
-
     }
+
     if (heightDifference < 0) {
         if (DirectMovementDown(heightDifference, attemptedMoves, currentTerrain, targetTerrain, currentPath) && attemptedMoves <= movesLeft) return true;
     }
 
     if (AdjacentMovement(heightDifference, attemptedMoves, currentTerrain, targetTerrain, currentPath) && attemptedMoves <= movesLeft) return true;
-
 
     if (currentTerrain->GetLowerTerrain() != NULL && !fromAdjacent) {
 
@@ -1107,7 +1159,6 @@ bool MovementAttempt(int& heightDifference, int& attemptedMoves, Terrain* curren
 
 
     } else if (!fromAdjacent) {
-
 
         attemptedMoves = attemptedMoves + 2;
         if (attemptedMoves > movesLeft) return false;
@@ -1194,3 +1245,64 @@ bool AdjacentMovement(int& heightDifference, int& attemptedMoves, Terrain* curre
     return false;
 }
 
+void RotateTurn() {
+    if (currentTurn == "playerOne") currentTurn = "playerTwo";
+    else if (currentTurn == "playerTwo") currentTurn = "playerThree";
+    else if (currentTurn == "playerThree") currentTurn = "playerFour";
+    else if (currentTurn == "playerFour") currentTurn = "playerOne";
+
+    for (int i = 0; i < pieces.size(); i++) {
+        if (currentTurn == pieces[i]->GetName()) {
+            pieces[i]->SetSelectable(true);
+        } else pieces[i]->SetSelectable(false);
+    }
+}
+
+void UpdateMovesLeft() {
+    string movesLeftStr = "moves left " + to_string(movesLeft);
+
+    for (int i = 0; i < uiElements.size(); i++) {
+        if (uiElements[i]->GetName() == "movesLeftCount") {
+            uiElements[i]->SetTexture(textures[movesLeftStr][0]);
+        }
+    }
+}
+
+void RefreshClaimNotifs(Peak* individualPeak) {
+    if (individualPeak != NULL) {
+        for (int i = 0; i < individualPeak->occupants.size(); i++) {
+            if (individualPeak->occupants[i]->GetName() == currentTurn && individualPeak->GetClaimedBy() != currentTurn) {
+                individualPeak->GetClaimNotif()->SetRendered(true);
+                break;
+            }
+            else {
+                individualPeak->GetClaimNotif()->SetRendered(false);
+            }
+        }
+    } else {
+        for (int i = 0; i < peaks.size(); i++) {
+            for (int j = 0; j < peaks[i]->occupants.size(); j++) {
+                if (peaks[i]->occupants[j]->GetName() == currentTurn && peaks[i]->GetClaimedBy() != currentTurn) {
+                    peaks[i]->GetClaimNotif()->SetRendered(true);
+                    break;
+                } else {
+                    peaks[i]->GetClaimNotif()->SetRendered(false);
+                }
+            }
+        }
+    }
+}
+
+void FinishTurn() {
+    std::cout << "finish turn selected" << std::endl;
+    RotateTurn();
+    std::cout << "Current turn: " << currentTurn << std::endl;
+    movesLeft = 0;
+    UpdateMovesLeft();
+    RefreshClaimNotifs();
+}
+
+void ClaimPeak(UIElement* peakNotif) {
+    Peak* claimedPeak = peakNotif->GetAssociatedPeak();
+    claimedPeak->Claim(currentTurn);
+}
