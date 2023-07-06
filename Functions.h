@@ -94,6 +94,16 @@ void FinishTurn();
 
 void ClaimPeak(UIElement* claimNotif);
 
+void PeakBattle(Peak* peak, string attackingTeam, string defendingTeam);
+
+void Retreat(Peak* peak, string retreatingTeam);
+
+void UpdateScore(Peak* peak = nullptr);
+
+void GameFinished(string winner);
+
+void Tiebreaker();
+
 extern SDL_Window* window;
 //The surface contained by the window
 extern SDL_Surface* screenSurface;
@@ -129,6 +139,14 @@ extern GameRules* rules;
 extern int currentRoll;
 
 extern int movesLeft;
+
+extern int playerOneScore;
+
+extern int playerTwoScore;
+
+extern int playerThreeScore;
+
+extern int playerFourScore;
 
 enum gameState {
     MAIN_MENU = 0,

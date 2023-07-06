@@ -31,6 +31,7 @@ protected:
     pair<float, float> center;
     pair<float, float> bottomRight;
     float scale = 1;
+    bool resizable = true;
 
 public:
     enum objectType type = GENERIC;
@@ -47,6 +48,8 @@ public:
     pair<float, float> GetCenter() {return center;}
     float GetScale() const {return scale;}
     bool GetSelectable() const {return selectable;}
+    bool GetResizable() const {return resizable;}
+    void SetResizable(bool r) {resizable = r;}
     void SetTexture(SDL_Texture* t) {texture = t;}
     void SetSelectable(bool s) {selectable = s;}
     void SetScale(float s) {scale = s;}
@@ -106,6 +109,7 @@ public:
     UIElement(string name, SDL_Texture *texture, SDL_Surface *surface, bool r, Peak* ap = nullptr) : GameObject(name, texture, surface, false, r) {
     type = UI_ELEMENT;
     associatedPeak = ap;
+    resizable = false;
     }
     Peak* GetAssociatedPeak() {return associatedPeak;}
     void SetAssociatedPeak(Peak* ap) {associatedPeak = ap;}
@@ -116,8 +120,10 @@ class Peak : public Terrain {
     int peakID;
     UIElement* claimNotif;
     string claimedBy = "";
+
 public:
     std::vector<Terrain*> childTerrain;
+    std::vector<Piece*> flags;
 
     Peak(string name, SDL_Texture *texture, SDL_Surface *surface, bool m, bool r, int l) : Terrain(name, texture, surface, m, r, l) {
         type = PEAK;

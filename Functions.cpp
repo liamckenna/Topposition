@@ -46,6 +46,13 @@ GameRules* rules = new GameRules();
 
 string currentTurn = "playerOne";
 
+int playerOneScore = 0;
+
+int playerTwoScore = 0;
+
+int playerThreeScore = 0;
+
+int playerFourScore = 0;
 
 bool init()
 {
@@ -173,17 +180,29 @@ void loadGamePieces(std::vector<std::vector<GameObject*>> &gameObjects)
                 selectable = false;
                 break;
         }
+
+        string flagName = playerNumber + " flag";
+        for (int i = 0; i < peaks.size(); i++) {
+            Piece* flag = new Piece(playerNumber, textures[flagName][0], surfaces[flagName], false);
+            flag->SetScale(0.1);
+            flag->SetCenter(peaks[i]->GetCenter().first, peaks[i]->GetCenter().second - 20);
+            pieces.push_back(flag);
+            gameObjects[gameObjects.size() - 2].push_back(flag);
+            peaks[i]->flags.push_back(flag);
+
+        }
+        string pieceName = playerNumber + " piece";
+        int x = (rand() % (int)(SCREEN_WIDTH/1.05)) + SCREEN_WIDTH/2 - SCREEN_WIDTH/2.1;
+        int y = (rand() % (int)(SCREEN_HEIGHT/1.05)) + SCREEN_HEIGHT/2 - SCREEN_HEIGHT/2.1;
+        while (selectTerrain(x, y) != NULL) {
+            x = (rand() % (int)(SCREEN_WIDTH/1.05)) + SCREEN_WIDTH/2 - SCREEN_WIDTH/2.1;
+            y = (rand() % (int)(SCREEN_HEIGHT/1.05)) + SCREEN_HEIGHT/2 - SCREEN_HEIGHT/2.1;
+        }
         for (int i = 0; i < rules->GetPieces(); i++) {
-            Piece* piece = new Piece(playerNumber, textures[color][0], surfaces[color], true);
+            Piece* piece = new Piece(playerNumber, textures[pieceName][0], surfaces[pieceName], true);
             gameObjects[rules->GetMaxHeight() + 1].push_back(piece);
             pieces.push_back(piece);
             piece->SetScale((float) 1/22);
-            int x = (rand() % (int)(SCREEN_WIDTH/1.05)) + SCREEN_WIDTH/2 - SCREEN_WIDTH/2.1;
-            int y = (rand() % (int)(SCREEN_HEIGHT/1.05)) + SCREEN_HEIGHT/2 - SCREEN_HEIGHT/2.1;
-            while (selectTerrain(x, y) != NULL) {
-                x = (rand() % (int)(SCREEN_WIDTH/1.05)) + SCREEN_WIDTH/2 - SCREEN_WIDTH/2.1;
-                y = (rand() % (int)(SCREEN_HEIGHT/1.05)) + SCREEN_HEIGHT/2 - SCREEN_HEIGHT/2.1;
-            }
             piece->SetCenter(x, y);
             piece->SetDesignatedLocation(x, y);
             piece->SetSelectable(selectable);
@@ -196,37 +215,45 @@ void loadUI() {
 
     UIElement* resetButton = new UIElement("reset button", textures["reset"][0], surfaces["reset"], true);
     uiElements.push_back(resetButton);
+    gameObjects[gameObjects.size() - 1].push_back(resetButton);
     resetButton->SetPosition(0,0);
     UIElement* die1 = new UIElement("dieOne", textures["die 1"][0], surfaces["die 1"], true);
     die1->SetScale(0.1);
     uiElements.push_back(die1);
+    gameObjects[gameObjects.size() - 1].push_back(die1);
     die1->SetPosition(SCREEN_WIDTH - (die1->GetDimensions().first * die1->GetScale() * die1->GetSize()) - 10, 10);
     UIElement* die2 = new UIElement("dieTwo", textures["die 2"][0], surfaces["die 2"], true);
     die2->SetScale(0.1);
     uiElements.push_back(die2);
+    gameObjects[gameObjects.size() - 1].push_back(die2);
     die2->SetPosition(SCREEN_WIDTH - ((die1->GetDimensions().first * die1->GetScale() * die1->GetSize()) + 10 )*2, 10);
     UIElement* movesLeftText = new UIElement("movesLeftText", textures["moves left"][0], surfaces["moves left"], true);
     movesLeftText->SetScale(0.1);
     uiElements.push_back(movesLeftText);
+    gameObjects[gameObjects.size() - 1].push_back(movesLeftText);
     movesLeftText->SetPosition(0, SCREEN_HEIGHT - (movesLeftText->GetDimensions().second * movesLeftText->GetScale() * movesLeftText->GetSize()));
     UIElement* movesLeftCount = new UIElement("movesLeftCount", textures["moves left 3"][0], surfaces["moves left 3"], true);
     movesLeftCount->SetScale(0.1);
     uiElements.push_back(movesLeftCount);
+    gameObjects[gameObjects.size() - 1].push_back(movesLeftCount);
     movesLeftCount->SetPosition(0, SCREEN_HEIGHT - (movesLeftCount->GetDimensions().second * movesLeftCount->GetScale() * movesLeftCount->GetSize()));
     UIElement* finishTurnButton = new UIElement("finish turn button", textures["finish turn"][0], surfaces["finish turn"], true);
     finishTurnButton->SetScale(0.1);
     finishTurnButton->SetPosition(SCREEN_WIDTH - (finishTurnButton->GetDimensions().first * finishTurnButton->GetScale() * finishTurnButton->GetSize()) - 10,
                              SCREEN_HEIGHT - (finishTurnButton->GetDimensions().second * finishTurnButton->GetScale() * finishTurnButton->GetSize()) - 10);
     uiElements.push_back(finishTurnButton);
+    gameObjects[gameObjects.size() - 1].push_back(finishTurnButton);
 
 
     for(int i = 0; i < peaks.size(); i++) {
         UIElement* claimPeakButton = new UIElement("claim peak button", textures["claim peak"][0], surfaces["claim peak"], false, peaks[i]);
         claimPeakButton->SetScale(0.1);
         claimPeakButton->SetCenter(peaks[i]->GetCenter().first + 50, peaks[i]->GetCenter().second - 50);
+        claimPeakButton->SetResizable(true);
         uiElements.push_back(claimPeakButton);
         gameObjects[gameObjects.size() - 1].push_back(claimPeakButton);
         peaks[i]->SetClaimNotif(claimPeakButton);
+
     }
     currentRoll = Roll();
     movesLeft = currentRoll;
@@ -248,21 +275,30 @@ void ResetMap() {
         pieces[i] = nullptr;
     }
 
+    for (int i = 0; i < uiElements.size(); i++) {
+        uiElements[i] = nullptr;
+    }
+
     for (int i = 0; i < gameObjects.size(); i++) {
         for (int j = 0; j < gameObjects[i].size(); j++) {
             delete gameObjects[i][j];
         }
     }
+
     std::vector<Piece*> newPieces;
     std::vector<std::vector<Terrain*>> newTerrain;
     std::vector<std::vector<GameObject*>> newGameObjects;
     std::vector<Peak*> newPeaks;
+    std::vector<UIElement*> newUIElements;
+    uiElements = newUIElements;
     pieces = newPieces;
     terrain = newTerrain;
     gameObjects = newGameObjects;
     peaks = newPeaks;
     loadMap(gameObjects);
     loadGamePieces(gameObjects);
+    loadUI();
+    currentTurn = "playerOne";
 
 
 }
@@ -374,7 +410,7 @@ void TextureLoader() {
 }
 
 void RenderScreen(std::vector<std::vector<GameObject*>> gameObjects){
-    SDL_SetRenderDrawColor( renderer, 0, 100, 255, 100 );
+    SDL_SetRenderDrawColor( renderer, 75, 150, 255, 100 );
     SDL_RenderClear( renderer );
 
     //Render texture to screen
@@ -394,7 +430,7 @@ void zoom(std::vector<std::vector<GameObject*>> gameObjects, SDL_Event e, Input*
     SDL_GetMouseState(&playerInput->currentMousePosition.first, &playerInput->currentMousePosition.second);
     for (int i = 0; i < gameObjects.size(); i++) {
         for (int j = 0; j < gameObjects[i].size(); j++) {
-            if (gameObjects[i][j]->GetRendered()) {
+            if (gameObjects[i][j]->GetResizable()) {
                 if ((e.wheel.preciseY < 0 && gameObjects[i][j]->GetSize() <= 1) || (e.wheel.preciseY > 0 && gameObjects[i][j]->GetSize() >= 3.5)) {
                     continue;
                 } else {
@@ -465,7 +501,7 @@ void scroll(std::vector<std::vector<GameObject*>> gameObjects, Input* playerInpu
                     enabled = true;
                 }
             }
-            if (enabled){
+            if (enabled && gameObjects[i][j]->GetResizable()){
                 gameObjects[i][j]->SetPosition(gameObjects[i][j]->GetPosition().first + playerInput->currentMousePosition.first - playerInput->prevMousePosition.first,
                                                gameObjects[i][j]->GetPosition().second + playerInput->currentMousePosition.second - playerInput->prevMousePosition.second);
             }
@@ -515,7 +551,7 @@ UIElement* selectUI(int x, int y) {
                 SDL_Color color = GetPixelColor(uiElements[i]->GetSurface(),
                                                 (x - width_LowerBound)/(uiElements[i]->GetSize() * uiElements[i]->GetScale()),
                                                 (y - height_LowerBound)/(uiElements[i]->GetSize() * uiElements[i]->GetScale()));
-                if (color.r == 255 && color.g == 0 && color.b == 0) {
+                if (color.r == 0 && color.g == 0 && color.b == 0) {
 
                     continue;
                 } else if (uiElements[i]->GetRendered()){
@@ -572,7 +608,7 @@ Terrain* selectTerrain(int x, int y) {
                                                     (x - width_LowerBound)/(terrain[i][j]->GetSize() * terrain[i][j]->GetScale()),
                                                     (y - height_LowerBound)/(terrain[i][j]->GetSize() * terrain[i][j]->GetScale()));
 
-                    if (color.r == 255 && color.g == 0 && color.b == 0) {
+                    if (color.r == 0 && color.g == 0 && color.b == 0) {
                         continue;
                     }
                     return terrain[i][j];
@@ -621,32 +657,40 @@ void RecenterScreen(std::vector<std::vector<GameObject*>> gameObjects, Input* pl
     if (gameObjects[0][0]->GetPosition().first > 0) {
         for (int i = gameObjects.size() - 1; i >= 0; i--) {
             for (int j = gameObjects[i].size() - 1; j >= 0; j--) {
-                gameObjects[i][j]->SetPosition(gameObjects[i][j]->GetPosition().first - gameObjects[0][0]->GetPosition().first,
-                                               gameObjects[i][j]->GetPosition().second);
+                if (gameObjects[i][j]->GetResizable()) {
+                    gameObjects[i][j]->SetPosition(gameObjects[i][j]->GetPosition().first - gameObjects[0][0]->GetPosition().first,
+                                                   gameObjects[i][j]->GetPosition().second);
+                }
             }
         }
     }
     if (gameObjects[0][0]->GetPosition().first + gameObjects[0][0]->GetDimensions().first * gameObjects[0][0]->GetSize() < SCREEN_WIDTH) {
         for (int i = gameObjects.size() - 1; i >= 0; i--) {
             for (int j = gameObjects[i].size() - 1; j >= 0; j--) {
-                gameObjects[i][j]->SetPosition(gameObjects[i][j]->GetPosition().first + (SCREEN_WIDTH - (gameObjects[0][0]->GetPosition().first + gameObjects[0][0]->GetDimensions().first * gameObjects[0][0]->GetSize())),
-                                               gameObjects[i][j]->GetPosition().second);
+                if (gameObjects[i][j]->GetResizable()) {
+                    gameObjects[i][j]->SetPosition(gameObjects[i][j]->GetPosition().first + (SCREEN_WIDTH - (gameObjects[0][0]->GetPosition().first + gameObjects[0][0]->GetDimensions().first * gameObjects[0][0]->GetSize())),
+                                                   gameObjects[i][j]->GetPosition().second);
+                }
             }
         }
     }
     if (gameObjects[0][0]->GetPosition().second > 0) {
         for (int i = gameObjects.size() - 1; i >= 0; i--) {
             for (int j = gameObjects[i].size() - 1; j >= 0; j--) {
-                gameObjects[i][j]->SetPosition(gameObjects[i][j]->GetPosition().first,
-                                               gameObjects[i][j]->GetPosition().second - gameObjects[0][0]->GetPosition().second);
+                if (gameObjects[i][j]->GetResizable()) {
+                    gameObjects[i][j]->SetPosition(gameObjects[i][j]->GetPosition().first,
+                                                   gameObjects[i][j]->GetPosition().second - gameObjects[0][0]->GetPosition().second);
+                }
             }
         }
     }
     if (gameObjects[0][0]->GetPosition().second + gameObjects[0][0]->GetDimensions().second * gameObjects[0][0]->GetSize() < SCREEN_HEIGHT) {
         for (int i = gameObjects.size() - 1; i >= 0; i--) {
             for (int j = gameObjects[i].size() - 1; j >= 0; j--) {
-                gameObjects[i][j]->SetPosition(gameObjects[i][j]->GetPosition().first,
-                                               gameObjects[i][j]->GetPosition().second + (SCREEN_HEIGHT - (gameObjects[0][0]->GetPosition().second + gameObjects[0][0]->GetDimensions().second * gameObjects[0][0]->GetSize())));
+                if (gameObjects[i][j]->GetResizable()) {
+                    gameObjects[i][j]->SetPosition(gameObjects[i][j]->GetPosition().first,
+                                                   gameObjects[i][j]->GetPosition().second + (SCREEN_HEIGHT - (gameObjects[0][0]->GetPosition().second + gameObjects[0][0]->GetDimensions().second * gameObjects[0][0]->GetSize())));
+                }
             }
         }
     }
@@ -725,15 +769,17 @@ void HandleEvents(std::vector<std::vector<GameObject*>> gameObjects, Input* play
     SDL_GetMouseState(&playerInput->prevMousePosition.first, &playerInput->prevMousePosition.second);
 }
 
+//-------------------//
+
 void GeneratePeak() {
     int x = (rand() % (int)(SCREEN_WIDTH/1.2)) + SCREEN_WIDTH/2 - SCREEN_WIDTH/2.4;
     int y = (rand() % (int)(SCREEN_HEIGHT/1.2)) + SCREEN_HEIGHT/2 - SCREEN_HEIGHT/2.4;
-    int shape = rand() % (int)(7);
+    int shape = rand() % (int)(15);
     int height = (rand() % rules->GetMaxHeight()) + 1;
     if (rules->GetRemainingPoints() <= rules->GetMaxHeight()) height = rules->GetRemainingPoints();
     rules->SetRemainingPoints(rules->GetRemainingPoints() - height);
     string name = to_string(height) + ", " + to_string(peaks.size() + 1);
-    Peak* peak = new Peak(name, textures["square"][height], surfaces["square"], false, true, height);
+    Peak* peak = new Peak(name, textures[to_string(shape)][height], surfaces[to_string(shape)], false, true, height);
     double rotation = rand() % 360;
     peak->SetRotation(rotation);
     peak->SetScale(0.1);
@@ -748,20 +794,27 @@ void GeneratePeak() {
         int b = (rand() % (int)(SCREEN_HEIGHT/1.2)) + SCREEN_HEIGHT/2 - SCREEN_HEIGHT/2.4;
         peak->SetCenter(a, b);
     }
-
-    SDL_SetTextureColorMod(peak->GetTexture(), 255/rules->GetMaxHeight() * peak->GetLayer(), 255/rules->GetMaxHeight() * peak->GetLayer(), 255/rules->GetMaxHeight() * peak->GetLayer());
+    if (height == 1) {
+        SDL_SetTextureColorMod(peak->GetTexture(), 246, 215, 176);
+    } else {
+        SDL_SetTextureColorMod(peak->GetTexture(), 255/rules->GetMaxHeight() * peak->GetLayer(), std::min(200/rules->GetMaxHeight() * peak->GetLayer() * 2, 255), 255/rules->GetMaxHeight() * peak->GetLayer());
+    }
     GenerateTerrain(peak, shape, height);
 }
 
 void GenerateTerrain(Peak* peak, int shape, int height) {
     for (int i = height - 1; i > 0; i--) {
         string name = to_string(i) + ", " + to_string(peak->GetPeakID());
-        Terrain* layer = new Terrain(name, textures["square"][i], surfaces["square"], false, true, i);
+        Terrain* layer = new Terrain(name, textures[to_string(shape)][i], surfaces[to_string(shape)], false, true, i);
         layer->SetScale(peak->GetScale() + 0.1 * (height - i));
         layer->SetCenter(peak->GetCenter().first, peak->GetCenter().second);
         layer->SetRotation(peak->GetRotation());
         layer->SetPeak(peak);
-        SDL_SetTextureColorMod(layer->GetTexture(), 255/rules->GetMaxHeight() * layer->GetLayer(), 255/rules->GetMaxHeight() * layer->GetLayer(), 255/rules->GetMaxHeight() * layer->GetLayer());
+        if (i == 1) {
+            SDL_SetTextureColorMod(layer->GetTexture(), 246, 215, 176);
+        } else {
+            SDL_SetTextureColorMod(layer->GetTexture(), 200/rules->GetMaxHeight() * layer->GetLayer(), std::min(200/rules->GetMaxHeight() * layer->GetLayer() * 2, 255), 200/rules->GetMaxHeight() * layer->GetLayer());
+        }
         gameObjects[i].push_back(layer);
         terrain[i].push_back(layer);
         peak->childTerrain.push_back(layer);
@@ -959,7 +1012,7 @@ std::vector<Terrain*> MergeTerrain(Terrain* peak) {
         } else if (!topLeftTwo && !topRightTwo && bottomLeftTwo && bottomRightTwo) {
             //std::cout << "Twelve" << std::endl;
             length = other->GetBottomRight().first - other->GetPosition().first;
-            height = peak->GetBottomRight().second - peak->GetPosition().second;
+            height = other->GetBottomRight().second - peak->GetPosition().second;
             offsetOne.first = other->GetPosition().first - peak->GetPosition().first;
             offsetOne.second = 0;
             offsetTwo.first = 0;
@@ -984,17 +1037,25 @@ std::vector<Terrain*> MergeTerrain(Terrain* peak) {
             offsetTwo.second = 0;
         }
 
-
         for (int i = 0; i < length; i++) {
             for (int j = 0; j < height; j++) {
-                pixelOne = GetPixelColor(peak->GetSurface(), i + offsetOne.first, j + offsetOne.second);
-                pixelTwo = GetPixelColor(other->GetSurface(), i + offsetTwo.first, j + offsetTwo.second);
+                pixelOne = GetPixelColor(peak->GetSurface(),  (offsetOne.first + i) / (peak->GetScale() * peak->GetSize()) , (offsetOne.second + j) / (peak->GetScale() * peak->GetSize()));
+                pixelTwo = GetPixelColor(other->GetSurface(), (offsetTwo.first + i) / (other->GetScale() * other->GetSize()), (offsetTwo.second + j) / (other->GetScale() * other->GetSize()));
 
 
 
-                if ((pixelOne.r == 255 && pixelOne.g == 0 && pixelOne.b == 0) || (pixelTwo.r == 255 && pixelTwo.g == 0 && pixelTwo.b == 0)) {
-                    continue;
-                } else {
+                if ((pixelOne.r == 255 && pixelOne.g == 255 && pixelOne.b == 255) && (pixelTwo.r == 255 && pixelTwo.g == 255 && pixelTwo.b == 255)) {
+                    /*UIElement* circle = new UIElement("circle", textures["circle"][0], surfaces["circle"], true );
+                    circle->SetResizable(true);
+                    std::cout << "location of first pixel: " << (peak->GetPosition().first + i + offsetOne.first) << ", " << (peak->GetPosition().second + j + offsetOne.second) << endl;
+                    std::cout << "location of second pixel: " << (other->GetPosition().first + i + offsetTwo.first) << ", " << (other->GetPosition().second + j + offsetTwo.second) << endl;
+                    circle->SetCenter(peak->GetPosition().first + i + offsetOne.first, peak->GetPosition().second + j + offsetOne.second);
+
+                    uiElements.push_back(circle);
+                    gameObjects[gameObjects.size() - 1].push_back(circle);
+
+                    std::cout << "i: " << i << std::endl;
+                    std::cout << "j: " << j << std::endl;*/
                     intersecting = true;
                     break;
                 }
@@ -1027,10 +1088,10 @@ void GroomTerrain() {
             }
         }
     }
-
+    std::cout << "There should be no touching peaks now" << std::endl;
     ConnectTerrain();
     NeighborTerrain();
-    std::cout << "There should be no touching peaks now" << std::endl;
+
 
 }
 
@@ -1042,8 +1103,6 @@ void ConnectTerrain() {
     }
 
 }
-
-
 
 void NeighborTerrain() {
     for (int i = 0; i < peaks.size(); i++) {
@@ -1064,24 +1123,7 @@ void NeighborTerrain() {
     }
 }
 
-int Roll(){
-    int rollOne = (rand() % 6) + 1;
-    string rollOneStr = "die " + to_string(rollOne);
-    int rollTwo = (rand() % 6) + 1;
-    string rollTwoStr = "die " + to_string(rollTwo);
-    for (int i = 0; i < uiElements.size(); i++) {
-        if (uiElements[i]->GetName() == "dieOne") {
-            uiElements[i]->SetTexture(textures[rollOneStr][0]);
-        } else if (uiElements[i]->GetName() == "dieTwo") {
-            uiElements[i]->SetTexture(textures[rollTwoStr][0]);
-        }
-    }
-    movesLeft = rollOne + rollTwo;
-
-    UpdateMovesLeft();
-
-    return movesLeft;
-}
+//-------------------//
 
 void Move(Piece* piece, Terrain* startingPoint, Terrain* targetTerrain, int& movesLeft) {
 
@@ -1245,6 +1287,27 @@ bool AdjacentMovement(int& heightDifference, int& attemptedMoves, Terrain* curre
     return false;
 }
 
+//-------------------//
+
+int Roll(){
+    int rollOne = (rand() % 6) + 1;
+    string rollOneStr = "die " + to_string(rollOne);
+    int rollTwo = (rand() % 6) + 1;
+    string rollTwoStr = "die " + to_string(rollTwo);
+    for (int i = 0; i < uiElements.size(); i++) {
+        if (uiElements[i]->GetName() == "dieOne") {
+            uiElements[i]->SetTexture(textures[rollOneStr][0]);
+        } else if (uiElements[i]->GetName() == "dieTwo") {
+            uiElements[i]->SetTexture(textures[rollTwoStr][0]);
+        }
+    }
+    movesLeft = rollOne + rollTwo;
+
+    UpdateMovesLeft();
+
+    return movesLeft;
+}
+
 void RotateTurn() {
     if (currentTurn == "playerOne") currentTurn = "playerTwo";
     else if (currentTurn == "playerTwo") currentTurn = "playerThree";
@@ -1303,6 +1366,134 @@ void FinishTurn() {
 }
 
 void ClaimPeak(UIElement* peakNotif) {
-    Peak* claimedPeak = peakNotif->GetAssociatedPeak();
-    claimedPeak->Claim(currentTurn);
+    Peak* peak = peakNotif->GetAssociatedPeak();
+
+    for (int i = 0; i < peak->occupants.size(); i++) {
+        if (peak->occupants[i]->GetName() != currentTurn) {
+            PeakBattle(peak, currentTurn, peak->occupants[i]->GetName());
+        }
+    }
+    for (int i = 0; i < peak->occupants.size(); i++) {
+        if (peak->occupants[i]->GetName() == currentTurn) {
+            peak->Claim(currentTurn);
+            for (int j = 0; j < peak->flags.size(); j++) {
+                if (peak->flags[j]->GetName() == currentTurn) {
+                    peak->flags[j]->SetRendered(true);
+                } else {
+                    peak->flags[j]->SetRendered(false);
+                }
+            }
+            break;
+        }
+    }
+
+    UpdateScore(peak);
+
+}
+
+void PeakBattle(Peak* peak, string attackingTeam, string defendingTeam) {
+    int attackers = 0;
+    int attackPower = 0;
+    int defenders = 0;
+    int defensePower = 0;
+    for (int i = 0; i < peak->occupants.size(); i++) {
+        if (peak->occupants[i]->GetName() == attackingTeam) {
+            attackers++;
+        } else if (peak->occupants[i]->GetName() == defendingTeam) {
+            defenders++;
+        }
+    }
+    for (int i = 0; i < attackers; i++) {
+        attackPower += rand() % 6 + 1;
+    }
+    for (int i = 0; i < defenders; i++) {
+        defensePower += rand() % 6 + 1;
+    }
+    std::cout << "Attack power: " << attackPower << std::endl;
+    std::cout << "Defense power: " << defensePower << std::endl;
+    if (attackPower > defensePower) {
+        Retreat(peak, defendingTeam);
+    } else {
+        Retreat(peak, attackingTeam);
+    }
+}
+
+void Retreat(Peak* peak, string retreatingTeam) {
+    for (int i = 0; i < peak->occupants.size(); i++) {
+        if (peak->occupants[i]->GetName() == retreatingTeam) {
+            std::cout << peak->occupants[i]->GetName() << std::endl;
+            int x = (rand() % (int)(SCREEN_WIDTH/1.05)) + SCREEN_WIDTH/2 - SCREEN_WIDTH/2.1;
+            int y = (rand() % (int)(SCREEN_HEIGHT/1.05)) + SCREEN_HEIGHT/2 - SCREEN_HEIGHT/2.1;
+            while (selectTerrain(x, y) != NULL) {
+                x = (rand() % (int)(SCREEN_WIDTH/1.05)) + SCREEN_WIDTH/2 - SCREEN_WIDTH/2.1;
+                y = (rand() % (int)(SCREEN_HEIGHT/1.05)) + SCREEN_HEIGHT/2 - SCREEN_HEIGHT/2.1;
+            }
+            peak->occupants[i]->SetCenter(x, y);
+            peak->occupants.erase(peak->occupants.begin() + i);
+        }
+    }
+}
+
+void UpdateScore(Peak* peak) {
+    playerOneScore = 0;
+    playerTwoScore = 0;
+    playerThreeScore = 0;
+    playerFourScore = 0;
+    int peaksLeft = peaks.size();
+    for (int i = 0; i < peaks.size(); i++) {
+        if (peaks[i]->GetClaimedBy() == "playerOne") {
+            peaksLeft--;
+            playerOneScore += peak->GetLayer();
+        } else if (peaks[i]->GetClaimedBy() == "playerTwo") {
+            peaksLeft--;
+            playerTwoScore += peak->GetLayer();
+        } else if (peaks[i]->GetClaimedBy() == "playerThree") {
+            peaksLeft--;
+            playerThreeScore += peak->GetLayer();
+        } else if (peaks[i]->GetClaimedBy() == "playerFour") {
+            peaksLeft--;
+            playerFourScore += peak->GetLayer();
+        }
+    }
+    if (peaksLeft == 0) {
+        if (playerOneScore > playerTwoScore && playerOneScore > playerThreeScore && playerOneScore > playerFourScore) {
+            GameFinished("playerOne");
+        } else if (playerTwoScore > playerOneScore && playerTwoScore > playerThreeScore && playerTwoScore > playerFourScore) {
+            GameFinished("playerTwo");
+        } else if (playerThreeScore > playerOneScore && playerThreeScore > playerTwoScore && playerThreeScore > playerFourScore) {
+            GameFinished("playerThree");
+        } else if (playerFourScore > playerOneScore && playerFourScore > playerTwoScore && playerFourScore > playerThreeScore) {
+            GameFinished("playerFour");
+        } else {
+            Tiebreaker();
+        }
+
+    }
+    std::cout << "Player One: " << playerOneScore << endl;
+    std::cout << "Player Two: " << playerTwoScore << endl;
+    std::cout << "Player Three: " << playerThreeScore << endl;
+    std::cout << "Player Four: " << playerFourScore << endl;
+
+}
+
+void GameFinished(string winner) {
+    string winnerColor;
+    if (winner == "playerOne") {
+        winnerColor = "winnerRed";
+    } else if (winner == "playerTwo") {
+        winnerColor = "winnerGreen";
+    } else if (winner == "playerThree") {
+        winnerColor = "winnerBlue";
+    } else if (winner == "playerFour") {
+        winnerColor = "winnerYellow";
+    }
+
+    UIElement* winnerMessage = new UIElement("winner message", textures[winnerColor][0], surfaces[winnerColor], true);
+    winnerMessage->SetCenter(SCREEN_WIDTH/2, SCREEN_HEIGHT/2);
+    uiElements.push_back(winnerMessage);
+    gameObjects[gameObjects.size()-1].push_back(winnerMessage);
+}
+
+void Tiebreaker() {
+
 }
