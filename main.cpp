@@ -28,13 +28,13 @@ int main( int argc, char* args[] )
 
 
 
-    if( !loadMap(gameObjects) )
+    if( !loadMap() )
     {
         printf( "Failed to load media!\n" );
         return 1;
     }
 
-    loadGamePieces(gameObjects);
+    loadGamePieces();
     //Main loop flag
     loadUI();
 
@@ -49,9 +49,8 @@ int main( int argc, char* args[] )
     {
 
         //Handle events on queue
-        HandleEvents(gameObjects, playerInput);
-
-        RenderScreen(gameObjects);
+        HandleEvents(playerInput);
+        RenderScreen();
 
     }
     //Free resources and close SDL

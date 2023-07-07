@@ -12,7 +12,8 @@ public:
         TERRAIN = 1,
         PEAK = 2,
         PIECE = 3,
-        UI_ELEMENT = 4
+        ITEM = 4,
+        UI_ELEMENT = 5
     };
 protected:
 
@@ -66,6 +67,7 @@ public:
 
 class Peak;
 class Piece;
+class Item;
 
 class Terrain : public GameObject
 {
@@ -75,6 +77,7 @@ protected:
     Peak* peak;
     Terrain* upperTerrain = nullptr;
     Terrain* lowerTerrain = nullptr;
+    GameObject* outline = nullptr;
 
 
 public:
@@ -93,6 +96,8 @@ public:
     double GetRotation() const {return rotation;}
     Terrain* GetUpperTerrain() {return upperTerrain;}
     Terrain* GetLowerTerrain() {return lowerTerrain;}
+    GameObject* GetOutline() {return outline;}
+    void SetOutline(GameObject* o) {outline = o;}
     void SetUpperTerrain(Terrain* ut) {upperTerrain = ut;}
     void SetLowerTerrain(Terrain* lt) {lowerTerrain = lt;}
     void SetRotation(double r) {rotation = r;}
@@ -101,7 +106,6 @@ public:
 
 
 };
-
 
 class UIElement : public GameObject {
     Peak* associatedPeak;
@@ -119,6 +123,7 @@ public:
 class Peak : public Terrain {
     int peakID;
     UIElement* claimNotif;
+    Item* item = nullptr;
     string claimedBy = "";
 
 public:
@@ -133,6 +138,8 @@ public:
     int GetPeakID() {return peakID;}
     void SetClaimNotif(UIElement* cn) {claimNotif = cn;}
     UIElement* GetClaimNotif() {return claimNotif;}
+    void SetItem(Item* i) {item = i;}
+    Item* GetItem() {return item;}
     void Claim(string team) {
         claimedBy = team;
     }
@@ -161,4 +168,19 @@ public:
     void SetOccupyingTerrain(Terrain* ot) {occupyingTerrain = ot;}
     Terrain* GetOccupyingTerrain() {return occupyingTerrain;}
 
+};
+
+class Item : public Piece {
+    bool used = false;
+    string owner = "";
+
+public:
+    Item(string name, SDL_Texture* texture, SDL_Surface* surface, bool r) : Piece(name, texture, surface, r) {
+        type = ITEM;
+        movable = false;
+    }
+    void SetUsed(bool u) {used = u;}
+    void SetOwner(string o) {owner = o;}
+    bool Getused() {return used;}
+    string GetOwner() {return owner;}
 };

@@ -12,9 +12,9 @@
 #include "Input.h"
 bool init();
 
-bool loadMap(std::vector<std::vector<GameObject*>> &gameObjects);
+bool loadMap();
 
-void loadGamePieces(std::vector<std::vector<GameObject*>> &gameObjects);
+void loadGamePieces();
 
 void loadUI();
 
@@ -26,9 +26,9 @@ SDL_Texture* loadTexture( std::string path );
 
 void TextureLoader();
 
-void zoom(std::vector<std::vector<GameObject*>> gameObjects, SDL_Event e, Input* playerInput);
+void zoom(SDL_Event e, Input* playerInput);
 
-void renderObjects(std::vector<std::vector<GameObject*>> gameObjects, SDL_Renderer* gRenderer);
+void renderObjects(SDL_Renderer* gRenderer);
 
 void renderUI();
 
@@ -36,9 +36,11 @@ void renderTerrain();
 
 void renderPieces();
 
-void scroll(std::vector<std::vector<GameObject*>> gameObjects, Input* playerInput);
+void renderInventory();
 
-GameObject* selectObject(std::vector<std::vector<GameObject*>> gameObjects, int x, int y);
+void scroll(Input* playerInput);
+
+GameObject* selectObject(int x, int y);
 
 UIElement* selectUI(int x, int y);
 
@@ -46,15 +48,17 @@ Piece* selectPiece(int x, int y);
 
 Terrain* selectTerrain(int x, int y);
 
+Item* selectItem(int x, int y);
+
 SDL_Color GetPixelColor(const SDL_Surface* surface, const int X, const int Y);
 
 void moveHeldObject(GameObject* gameObject, Input* playerInput);
 
-void RecenterScreen(std::vector<std::vector<GameObject*>> gameObjects, Input* playerInput);
+void RecenterScreen(Input* playerInput);
 
-void HandleEvents(std::vector<std::vector<GameObject*>> gameObjects, Input* playerInput);
+void HandleEvents(Input* playerInput);
 
-void RenderScreen(std::vector<std::vector<GameObject*>> gameObjects);
+void RenderScreen();
 
 void GeneratePeak();
 
@@ -98,7 +102,7 @@ void PeakBattle(Peak* peak, string attackingTeam, string defendingTeam);
 
 void Retreat(Peak* peak, string retreatingTeam);
 
-void UpdateScore(Peak* peak = nullptr);
+void UpdateScore();
 
 void GameFinished(string winner);
 
@@ -128,6 +132,8 @@ extern std::vector<Peak*> peaks;
 
 extern std::vector<std::vector<Terrain*>> terrain;
 
+extern std::vector<std::vector<GameObject*>> terrainOutlines;
+
 extern std::vector<UIElement*> uiElements;
 
 extern std::vector<Piece*> pieces;
@@ -147,6 +153,16 @@ extern int playerTwoScore;
 extern int playerThreeScore;
 
 extern int playerFourScore;
+
+extern std::vector<Item*> playerOneInventory;
+
+extern std::vector<Item*> playerTwoInventory;
+
+extern std::vector<Item*> playerThreeInventory;
+
+extern std::vector<Item*> playerFourInventory;
+
+extern std::vector<Item*> currentInventory;
 
 enum gameState {
     MAIN_MENU = 0,
