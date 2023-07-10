@@ -27,16 +27,8 @@ int main( int argc, char* args[] )
     }
 
 
+    ResetMap();
 
-    if( !loadMap() )
-    {
-        printf( "Failed to load media!\n" );
-        return 1;
-    }
-
-    loadGamePieces();
-    //Main loop flag
-    loadUI();
 
 
     //Event handler
@@ -44,13 +36,25 @@ int main( int argc, char* args[] )
     Input* playerInput = new Input();
     //While application is running
 
-
+    int frames_drawn = 0;
+    Uint32 fps_counter = 0;
+    float fps = 0.0f;
+    Uint32 prev_ticks = SDL_GetTicks64();
     while( !quit )
     {
 
         //Handle events on queue
         HandleEvents(playerInput);
         RenderScreen();
+
+
+        Uint32 ticks_now = SDL_GetTicks64();
+        Uint32 diff = ticks_now - prev_ticks;
+        fps_counter = diff;
+        prev_ticks = ticks_now;
+        fps = 1000.0f/(float)fps_counter;
+
+        //std::cout << (int)fps << std::endl;
 
     }
     //Free resources and close SDL

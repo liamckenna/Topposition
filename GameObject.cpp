@@ -104,7 +104,7 @@ void Terrain::RenderGameObject(SDL_Renderer *renderer) {
         renderRect->x = position.first;
         renderRect->y = position.second;
     }
-    renderRect->w = (dimensions.second * size * scale);
+    renderRect->w = (dimensions.first * size * scale);
     renderRect->h = (dimensions.second * size * scale);
     if (rendered) {
         SDL_RenderCopyEx( renderer, texture, NULL, renderRect, 0, NULL, SDL_FLIP_NONE);
@@ -112,6 +112,7 @@ void Terrain::RenderGameObject(SDL_Renderer *renderer) {
 }
 
 void Pixel::RenderGameObject(SDL_Renderer *renderer) {
+
     if (size == 1) {
         renderRect->x = defaultPosition.first;
         renderRect->y = defaultPosition.second;
@@ -119,16 +120,9 @@ void Pixel::RenderGameObject(SDL_Renderer *renderer) {
         renderRect->x = position.first;
         renderRect->y = position.second;
     }
+    renderRect->w = (width * size * scale);
+    renderRect->h = (height * size * scale);
+    SDL_SetTextureColorMod(texture, color.r, color.g, color.b);
 
-
-    if (hiddenTerrain->GetLayer() == 1) {
-        SDL_SetTextureColorMod(texture, 246, 215, 176);
-    } else {
-        SDL_SetTextureColorMod(texture, 200 / rules->GetMaxHeight() * hiddenTerrain->GetLayer(),
-                               std::min(200 / rules->GetMaxHeight() * hiddenTerrain->GetLayer() * 2, 255),
-                               200 / rules->GetMaxHeight() * hiddenTerrain->GetLayer());
-    }
-    if (rendered) {
-        SDL_RenderCopyEx( renderer, texture, NULL, renderRect, 0, NULL, SDL_FLIP_NONE);
-    }
+    SDL_RenderCopy(renderer, texture, NULL, renderRect);
 }

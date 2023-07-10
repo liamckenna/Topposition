@@ -39,7 +39,7 @@
 				{
 					"directoryIndex" : 0,
 					"id" : "Topposition::@6890427a1f51a3e7e1df",
-					"jsonFile" : "target-Topposition-Debug-8790c25abdd3f595367b.json",
+					"jsonFile" : "target-Topposition-Debug-32c8e6669f7e70396289.json",
 					"name" : "Topposition",
 					"projectIndex" : 0
 				}
@@ -49,8 +49,8 @@
 	"kind" : "codemodel",
 	"paths" : 
 	{
-		"build" : "C:/Users/lmcmc/CLionProjects/Topposition/cmake-build-debug",
-		"source" : "C:/Users/lmcmc/CLionProjects/Topposition"
+		"build" : "C:/Users/LMckenna/CLionProjects/Topposition/cmake-build-debug",
+		"source" : "C:/Users/LMckenna/CLionProjects/Topposition"
 	},
 	"version" : 
 	{

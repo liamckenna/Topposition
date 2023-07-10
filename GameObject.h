@@ -7,7 +7,6 @@
 using namespace std;
 class GameObject {
 public:
-public:
     enum objectType {
         GENERIC = 0,
         TERRAIN = 1,
@@ -17,6 +16,9 @@ public:
         UI_ELEMENT = 5,
         PIXEL = 6
     };
+
+    float GetSize() const {return size;}
+
 protected:
 
 
@@ -46,14 +48,17 @@ public:
     SDL_Surface* GetSurface(){return surface;}
     bool GetRendered() const {return rendered;}
     bool GetMovable() const {return movable;}
-    float GetSize() const {return size;}
+
     SDL_Rect* GetRenderRect() {return renderRect;}
     pair<float, float> GetCenter() {return center;}
     float GetScale() const {return scale;}
     bool GetSelectable() const {return selectable;}
     bool GetResizable() const {return resizable;}
+    SDL_Rect* GetRectangle() const {return renderRect;}
+    void SetRectangle(SDL_Rect* r) {renderRect = r;}
     void SetResizable(bool r) {resizable = r;}
     void SetTexture(SDL_Texture* t) {texture = t;}
+    void SetSurface (SDL_Surface* s) {surface = s;}
     void SetSelectable(bool s) {selectable = s;}
     void SetScale(float s) {scale = s;}
     void SetPosition(float x, float y, bool posOnly = false);
@@ -187,13 +192,22 @@ public:
     string GetOwner() {return owner;}
 };
 
-class Pixel : GameObject {
-
-public:
-    SDL_Color color;
+class Pixel : public GameObject {
     Terrain* hiddenTerrain;
-    Pixel(string name, SDL_Texture* texture, SDL_Surface *surface, bool m, bool r) : GameObject(name, texture, surface, false, r) {
+    SDL_Color color;
+    int width;
+    int height;
+public:
+    Pixel(string name, SDL_Texture *texture, SDL_Surface *surface, bool m, bool r) : GameObject(name, texture, surface, false, r) {
         type = PIXEL;
     }
     void RenderGameObject(SDL_Renderer *renderer);
+    void SetHiddenTerrain(Terrain* ht) {hiddenTerrain = ht;}
+    void SetColor(SDL_Color c) {color = c;}
+    void SetWidth(int w) {width = w;}
+    void SetHeight(int h) {height = h;}
+
+    SDL_Color GetColor() {return color;}
+    Terrain* GetHiddenTerrain() {return hiddenTerrain;}
+
 };

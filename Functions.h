@@ -20,6 +20,8 @@ void loadUI();
 
 void close();
 
+void ResetMap();
+
 SDL_Surface* loadSurface( std::string path );
 
 SDL_Texture* loadTexture( std::string path );
@@ -37,6 +39,8 @@ void renderTerrain();
 void renderPieces();
 
 void renderInventory();
+
+void renderPixels();
 
 void scroll(Input* playerInput);
 
@@ -65,6 +69,8 @@ void GeneratePeak();
 void GenerateTerrain(Peak* peak, int shape, int height);
 
 std::vector<Terrain*> MergeTerrain(Terrain* peak);
+
+bool TerrainIsSurrounded(Terrain* peak, Terrain* other);
 
 void GroomTerrain();
 
@@ -133,6 +139,8 @@ extern std::vector<std::vector<GameObject*>> gameObjects;
 extern std::vector<Peak*> peaks;
 
 extern std::vector<std::vector<Terrain*>> terrain;
+
+extern std::vector<Pixel*> pixels;
 
 extern std::vector<std::vector<GameObject*>> terrainOutlines;
 
