@@ -108,6 +108,8 @@ void GameFinished(string winner);
 
 void Tiebreaker();
 
+void GeneratePixels();
+
 extern SDL_Window* window;
 //The surface contained by the window
 extern SDL_Surface* screenSurface;

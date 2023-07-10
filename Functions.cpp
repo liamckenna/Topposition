@@ -457,11 +457,12 @@ void RenderScreen(){
     SDL_RenderClear( renderer );
 
     //Render texture to screen
-
-    renderTerrain();
+    //renderTerrain();
+    GeneratePixels();
     renderPieces();
     renderUI();
     renderInventory();
+
     //Update screen
     SDL_RenderPresent( renderer);
 }
@@ -725,6 +726,7 @@ SDL_Color GetPixelColor(const SDL_Surface * surface, const int X, const int Y)
 
     return Color;
 }
+
 
 void moveSelectedObject(GameObject* gameObject, Input* playerInput) {
     if (gameObject->GetMovable()) {
@@ -1656,4 +1658,40 @@ void GameFinished(string winner) {
 
 void Tiebreaker() {
 
+}
+
+void GeneratePixels() {
+    SDL_Rect* rectangle = new SDL_Rect;
+    for (int i = 0; i < SCREEN_WIDTH/8; i++) {
+        for (int j = 0; j < SCREEN_HEIGHT/8; j++) {
+            int x = i*8 + 4;
+            int y = j*8 + 4;
+            Terrain* currentTerrain = selectTerrain(x, y);
+            if (currentTerrain == nullptr) continue;
+
+            Pixel* pixel = new Pixel("pixel", textures["pixel"][0], surfaces["pixel"], false, true);
+            pixel->hiddenTerrain = currentTerrain;
+
+            y += 8;
+            Terrain* nextTerrain = selectTerrain(x, y);
+            int width= 8;
+            int height = 8;
+            rectangle->x = i*8;
+            rectangle->y = j*8;
+            while (nextTerrain != NULL && nextTerrain->GetLayer() == currentTerrain->GetLayer()) {
+                y += 8;
+                nextTerrain = selectTerrain(x, y);
+                height += 8;
+                j++;
+
+            }
+            rectangle->w = width;
+            rectangle->h = height;
+
+
+            SDL_RenderCopy(renderer, textures["pixel"][0], NULL, rectangle);
+
+        }
+    }
+    delete rectangle;
 }

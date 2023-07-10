@@ -3,6 +3,7 @@
 #include <string>
 #include <vector>
 #include "SDL.h"
+#include "GameRules.h"
 using namespace std;
 class GameObject {
 public:
@@ -13,7 +14,8 @@ public:
         PEAK = 2,
         PIECE = 3,
         ITEM = 4,
-        UI_ELEMENT = 5
+        UI_ELEMENT = 5,
+        PIXEL = 6
     };
 protected:
 
@@ -183,4 +185,15 @@ public:
     void SetOwner(string o) {owner = o;}
     bool Getused() {return used;}
     string GetOwner() {return owner;}
+};
+
+class Pixel : GameObject {
+
+public:
+    SDL_Color color;
+    Terrain* hiddenTerrain;
+    Pixel(string name, SDL_Texture* texture, SDL_Surface *surface, bool m, bool r) : GameObject(name, texture, surface, false, r) {
+        type = PIXEL;
+    }
+    void RenderGameObject(SDL_Renderer *renderer);
 };
