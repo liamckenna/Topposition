@@ -126,3 +126,29 @@ void Pixel::RenderGameObject(SDL_Renderer *renderer) {
 
     SDL_RenderCopy(renderer, texture, NULL, renderRect);
 }
+
+Text::Text(string n, const char* fp, SDL_Color c, int x, int y, int w, int h, int s, SDL_Renderer* r, const char* t) {
+    name = n;
+    fontPath = fp;
+    color = c;
+    text = t;
+    size = s;
+    position.first = x;
+    position.second = y;
+    dimensions.first = w;
+    dimensions.second = h;
+    font = TTF_OpenFont(fontPath, size);
+    surface = TTF_RenderText_Solid(font, text, color);
+    texture = SDL_CreateTextureFromSurface(r, surface);
+}
+
+void Text::RenderText(SDL_Renderer* renderer) {
+    if (rendered) {
+        rect->x = position.first;
+        rect->y = position.second;
+        rect->w = dimensions.first;
+        rect->h = dimensions.second;
+        SDL_RenderCopy(renderer, texture, NULL, rect);
+    }
+
+}

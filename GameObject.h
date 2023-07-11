@@ -3,6 +3,7 @@
 #include <string>
 #include <vector>
 #include "SDL.h"
+#include <SDL2/SDL_ttf.h>
 #include "GameRules.h"
 using namespace std;
 class GameObject {
@@ -85,6 +86,8 @@ protected:
     Terrain* upperTerrain = nullptr;
     Terrain* lowerTerrain = nullptr;
     GameObject* outline = nullptr;
+    int offsetX;
+    int offsetY;
 
 
 public:
@@ -104,6 +107,10 @@ public:
     Terrain* GetUpperTerrain() {return upperTerrain;}
     Terrain* GetLowerTerrain() {return lowerTerrain;}
     GameObject* GetOutline() {return outline;}
+    int GetOffsetX() {return offsetX;}
+    int GetOffsetY() {return offsetY;}
+    void SetOffsetX(int ox) {offsetX = ox;}
+    void SetOffsetY(int oy) {offsetY = oy;}
     void SetOutline(GameObject* o) {outline = o;}
     void SetUpperTerrain(Terrain* ut) {upperTerrain = ut;}
     void SetLowerTerrain(Terrain* lt) {lowerTerrain = lt;}
@@ -197,6 +204,7 @@ class Pixel : public GameObject {
     SDL_Color color;
     int width;
     int height;
+    bool outline = false;
 public:
     Pixel(string name, SDL_Texture *texture, SDL_Surface *surface, bool m, bool r) : GameObject(name, texture, surface, false, r) {
         type = PIXEL;
@@ -206,8 +214,30 @@ public:
     void SetColor(SDL_Color c) {color = c;}
     void SetWidth(int w) {width = w;}
     void SetHeight(int h) {height = h;}
+    void SetOutline(bool o) {outline = o;}
 
     SDL_Color GetColor() {return color;}
+    bool GetOutline() {return outline;}
     Terrain* GetHiddenTerrain() {return hiddenTerrain;}
+
+};
+
+class Text {
+    string name;
+    const char* fontPath;
+    TTF_Font* font;
+    SDL_Color color;
+    const char* text;
+    std::pair<int, int> position;
+    std::pair<int, int> dimensions;
+    SDL_Rect* rect = new SDL_Rect();
+    SDL_Surface* surface;
+    SDL_Texture* texture;
+    int size;
+    bool rendered = true;
+public:
+    Text(string n, const char* fp, SDL_Color c, int x, int y, int w, int h, int s, SDL_Renderer* r, const char* t);
+    void RenderText(SDL_Renderer* renderer);
+    void SetRendered(bool r) {rendered = r;}
 
 };

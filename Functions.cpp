@@ -44,11 +44,15 @@ std::vector<UIElement*> uiElements;
 
 std::vector<Piece*> pieces;
 
+std::vector<Text*> text;
+
 GameObject* selectedObject = nullptr;
 
 Item* selectedItem = nullptr;
 
 GameRules* rules = new GameRules();
+
+int shapeCount = 0;
 
 string currentTurn = "playerOne";
 
@@ -129,6 +133,7 @@ bool init()
                 else {
                     screenSurface = SDL_GetWindowSurface( window );
                     TextureLoader();
+                    TTF_Init();
                 }
             }
         }
@@ -274,6 +279,21 @@ void loadUI() {
     currentRoll = Roll();
     movesLeft = currentRoll;
 
+    SDL_Color White = {255, 255, 255};
+
+    Text* currentTurnText = new Text("currentTurnText", "Fonts/yoster.ttf", White, 150, 0, 300, 50, 100, renderer, "Current Turn: ");
+    text.push_back(currentTurnText);
+    SDL_Color Red = {255, 0, 0};
+
+    Text* currentTurnPlayerOneText = new Text("currentTurnPlayerOneText", "Fonts/yoster.ttf", Red, 450, 0, 300, 50, 100, renderer, "Player One");
+    text.push_back(currentTurnPlayerOneText);
+
+    SDL_Color Green = {0, 255, 0};
+
+    Text* currentTurnPlayerTwoText = new Text("currentTurnPlayerTwoText", "Fonts/yoster.ttf", Red, 450, 0, 300, 50, 100, renderer, "Player Two");
+    text.push_back(currentTurnPlayerOneText);
+
+
 }
 
 void ResetMap() {
@@ -322,6 +342,10 @@ void ResetMap() {
         }
     }
 
+    for (int i = 0; i < text.size(); i++) {
+        delete text[i];
+    }
+
     std::vector<Piece*> newPieces;
     std::vector<std::vector<Terrain*>> newTerrain;
     std::vector<std::vector<GameObject*>> newTerrainOutlines;
@@ -333,6 +357,8 @@ void ResetMap() {
     std::vector<Item*> newPlayerThreeInventory;
     std::vector<Item*> newPlayerFourInventory;
     std::vector<Pixel*> newPixels;
+    std::vector<Text*> newText;
+    text = newText;
     pixels = newPixels;
     uiElements = newUIElements;
     pieces = newPieces;
@@ -345,11 +371,10 @@ void ResetMap() {
     playerThreeInventory = newPlayerThreeInventory;
     playerFourInventory = newPlayerFourInventory;
     loadMap();
-    loadGamePieces();
     loadUI();
+    loadGamePieces();
     GeneratePixels();
     currentTurn = "playerOne";
-
 
 }
 
@@ -428,35 +453,43 @@ SDL_Texture* loadTexture( std::string path )
 
 void TextureLoader() {
     //load all textures
-    DIR* dp;
-    int i = 0;
-    struct dirent* ep;
-    dp = opendir("Images");
-    if (dp != NULL) {
-        while (ep = readdir(dp)) {
-            if (ep->d_namlen == 1 || ep->d_namlen == 2) continue;
-            else {
-                std::string fileName = ep->d_name;
-                std::size_t pos = fileName.find(".");
-                std::string shorthand = fileName.substr(0,pos);
-                std::string texturePath = "Images/" + fileName;
-
-                for (int j = 0; j < rules->GetMaxHeight()+1; j++) {
-                    textures[shorthand][j] = loadTexture(texturePath);
-                }
-
+    struct dirent *entry = nullptr;
+    struct dirent* innerEntry = nullptr;
+    DIR *odp = nullptr;
+    DIR* idp = nullptr;
+    const char* innerDir = "";
+    odp = opendir("Textures");
+    int textureCount = 0;
+    if (odp != nullptr) {
+        while (entry = readdir(odp)) {
+            if (entry->d_namlen == 1 || entry->d_namlen == 2) continue;
+            string fp = "Textures/" + (string)entry->d_name + "/";
+            innerDir = fp.c_str();
+            idp = opendir(innerDir);
+            while (innerEntry = readdir(idp)) {
+                if (innerEntry->d_namlen == 1 || innerEntry->d_namlen == 2) continue;
+                string fileName = innerEntry->d_name;
+                size_t pos = fileName.find(".");
+                string shorthand = fileName.substr(0,pos);
+                string texturePath = fp + fileName;
+                if ((string)entry->d_name == "Terrain") {
+                    for (int j = 0; j < rules->GetMaxHeight()+1; j++) {
+                        textures[shorthand][j] = loadTexture(texturePath);
+                    }
+                    shapeCount++;
+                } else textures[shorthand][0] = loadTexture(texturePath);
                 surfaces[shorthand] = loadSurface(texturePath);
-                i++;
-            }
+                textureCount++;
 
+            }
+            closedir(idp);
         }
 
-        (void) closedir(dp);
     }
-    else
-        perror ("Couldn't open the directory");
 
-    printf("There's %d files in the current directory.\n", i);
+    closedir(odp);
+    printf("There are %d unique terrain shapes.\n", shapeCount);
+    printf("There's %d files in the current directory.\n", textureCount);
 }
 
 void RenderScreen(){
@@ -464,11 +497,14 @@ void RenderScreen(){
     SDL_RenderClear( renderer );
 
     //Render texture to screen
-    //renderTerrain();
+    renderTerrain();
     renderPixels();
+    renderClaimNotifs();
     renderPieces();
     renderUI();
+    renderText();
     renderInventory();
+
 
     //Update screen
     SDL_RenderPresent( renderer);
@@ -520,15 +556,22 @@ void renderObjects(SDL_Renderer* renderer) {
 
 void renderUI() {
     for (int i = 0; i < uiElements.size(); i++) {
-        uiElements[i]->RenderGameObject(renderer);
+        if (uiElements[i]->GetAssociatedPeak() == nullptr) {
+            uiElements[i]->RenderGameObject(renderer);
+        }
+    }
+}
+
+void renderClaimNotifs() {
+    for (int i = 0; i < uiElements.size(); i++) {
+        if (uiElements[i]->GetAssociatedPeak() != nullptr) {
+            uiElements[i]->RenderGameObject(renderer);
+        }
     }
 }
 
 void renderTerrain() {
     for (int i = 0; i < terrain.size(); i++) {
-        /*or (int j = 0; j < terrainOutlines[i].size(); j++) {
-            terrainOutlines[i][j]->RenderGameObject(renderer);
-        }*/
         for (int j = 0; j < terrain[i].size(); j++) {
             terrain[i][j]->RenderGameObject(renderer);
         }
@@ -536,7 +579,7 @@ void renderTerrain() {
 }
 
 void renderPieces() {
-    for (int i = 0; i < pieces.size(); i++) {
+    for (int i = pieces.size() - 1; i >= 0; i--) {
         if (pieces[i]->type != GameObject::ITEM) {
             pieces[i]->RenderGameObject(renderer);
         }
@@ -552,6 +595,12 @@ void renderInventory(){
 void renderPixels(){
     for (int i = 0; i < pixels.size(); i++) {
         pixels[i]->RenderGameObject(renderer);
+    }
+}
+
+void renderText(){
+    for(int i = 0; i < text.size(); i++) {
+        text[i]->RenderText(renderer);
     }
 }
 
@@ -624,7 +673,6 @@ UIElement* selectUI(int x, int y) {
                                                 (x - width_LowerBound)/(uiElements[i]->GetSize() * uiElements[i]->GetScale()),
                                                 (y - height_LowerBound)/(uiElements[i]->GetSize() * uiElements[i]->GetScale()));
                 if (color.r == 0 && color.g == 0 && color.b == 0) {
-                    std::cout << (int)color.a << std::endl;
                     continue;
                 } else if (uiElements[i]->GetRendered()){
                     return uiElements[i];
@@ -639,7 +687,7 @@ UIElement* selectUI(int x, int y) {
 }
 
 Piece* selectPiece(int x, int y) {
-    for (int i = 0; i < pieces.size(); i++) {
+    for (int i = pieces.size() - 1; i >= 0; i--) {
         if (!pieces[i]->GetSelectable() || !pieces[i]->GetRendered()) continue;
         int width_LowerBound = pieces[i]->GetPosition().first;
         int width_UpperBound = pieces[i]->GetBottomRight().first;
@@ -654,7 +702,10 @@ Piece* selectPiece(int x, int y) {
                 if (color.r == 0 && color.g == 0 && color.b == 0) {
                     continue;
                 } else {
-                    return pieces[i];
+                    Piece* temp = pieces[0];
+                    pieces[0] = pieces[i];
+                    pieces[i] = temp;
+                    return pieces[0];
                 }
 
 
@@ -827,7 +878,6 @@ void HandleEvents(Input* playerInput) {
                                 piece->SetScale(piece->GetScale()*2);
                                 piece->SetCenter(centerX, centerY - (piece->GetDimensions().second/2) * piece->GetSize());
                                 piece->SetDesignatedLocation(piece->GetCenter().first, piece->GetCenter().second);
-                                std::cout << piece->GetCenter().first << ", " << piece->GetCenter().second << std::endl;
                             } else {
                                 //selectedObject = selectObject(gameObjects, playerInput->currentMousePosition.first, playerInput->currentMousePosition.second);
                             }
@@ -863,7 +913,6 @@ void HandleEvents(Input* playerInput) {
                         piece->SetScale(piece->GetScale()*0.5f);
                         piece->SetCenter(centerX, centerY + (piece->GetDimensions().second/2) * piece->GetSize());
                         Move(piece, startingTerrain, targetTerrain, movesLeft);
-                        std::cout << piece->GetCenter().first << ", " << piece->GetCenter().second << std::endl;
                         if (targetTerrain != NULL) std::cout <<targetTerrain->GetName() << std::endl;
 
                     } else if (selectedObject->type == GameObject::ITEM) {
@@ -892,7 +941,7 @@ void HandleEvents(Input* playerInput) {
 void GeneratePeak() {
     int x = (rand() % (int)(SCREEN_WIDTH/1.2)) + SCREEN_WIDTH/2 - SCREEN_WIDTH/2.4;
     int y = (rand() % (int)(SCREEN_HEIGHT/1.2)) + SCREEN_HEIGHT/2 - SCREEN_HEIGHT/2.4;
-    int shape = rand() % (int)(15);
+    int shape = rand() % (int)(shapeCount);
     int height = (rand() % rules->GetMaxHeight()) + 1;
     if (rules->GetRemainingPoints() <= rules->GetMaxHeight()) height = rules->GetRemainingPoints();
     rules->SetRemainingPoints(rules->GetRemainingPoints() - height);
@@ -918,8 +967,6 @@ void GeneratePeak() {
     int itemChance = (rand() % 100) + 1;
     float odds = (float)height / (float)rules->GetMaxHeight() * 100;
     if (odds > itemChance) {
-        std::cout << "Odds: " << odds << std::endl;
-        std::cout << "Item Chance: " << itemChance << std::endl;
         if (rules->GetRemainingItems() > 0) {
             rules->SetRemainingItems(rules->GetRemainingItems() - 1);
             int itemID = rand() % 3;
@@ -957,26 +1004,38 @@ void GenerateTerrain(Peak* peak, int shape, int height) {
     for (int i = height - 1; i > 0; i--) {
         string name = to_string(i) + ", " + to_string(peak->GetPeakID());
         //shape = rand() % (int)(15);
+
+
+        Terrain* layer = new Terrain(name, textures[to_string(shape)][i], surfaces[to_string(shape)], false, true, i);
+        layer->SetScale(peak->GetScale() + 0.1 * (height - i));
+        layer->SetRotation(peak->GetRotation());
+        layer->SetPeak(peak);
+
+
         Terrain* above;
         if (peak->childTerrain.size() == 0) {
             above = peak;
         } else {
             above = peak->childTerrain[peak->childTerrain.size() - 1];
         }
-        Terrain* layer = new Terrain(name, textures[to_string(shape)][i], surfaces[to_string(shape)], false, true, i);
-        layer->SetScale(peak->GetScale() + 0.1 * (height - i));
-        layer->SetCenter(peak->GetCenter().first, peak->GetCenter().second);
-        layer->SetRotation(peak->GetRotation());
-        layer->SetPeak(peak);
-
-        /*while (!TerrainIsSurrounded(above, layer)) {
-            shape = rand() % (int)(15);
-            layer->SetTexture(textures[to_string(shape)][i]);
-            layer->SetSurface(surfaces[to_string(shape)]);
-            std::cout << shape << std::endl;
-        }*/
-        std::cout << "done" << std::endl;
-
+        int offsetX = rand() % 20;
+        int offsetY = rand() % 20;
+        int negativeX = rand() % 2;
+        int negativeY = rand() % 2;
+        if (negativeX == 1) offsetX *= -1;
+        if (negativeY == 1) offsetY *= -1;
+        layer->SetCenter(above->GetCenter().first + offsetX, above->GetCenter().second + offsetY);
+        while (!TerrainIsSurrounded(above, layer)) {
+            offsetX = rand() % 20;
+            offsetY = rand() % 20;
+            negativeX = rand() % 2;
+            negativeY = rand() % 2;
+            if (negativeX == 1) offsetX *= -1;
+            if (negativeY == 1) offsetY *= -1;
+            layer->SetCenter(above->GetCenter().first + offsetX, above->GetCenter().second + offsetY);
+        }
+        layer->SetOffsetX(offsetX);
+        layer->SetOffsetY(offsetY);
         if (i == 1) {
             SDL_SetTextureColorMod(layer->GetTexture(), 246, 215, 176);
         } else {
@@ -1220,17 +1279,6 @@ std::vector<Terrain*> MergeTerrain(Terrain* peak) {
 
 
                 if ((pixelOne.r == 255 && pixelOne.g == 255 && pixelOne.b == 255) && (pixelTwo.r == 255 && pixelTwo.g == 255 && pixelTwo.b == 255)) {
-                    /*UIElement* circle = new UIElement("circle", textures["circle"][0], surfaces["circle"], true );
-                    circle->SetResizable(true);
-                    std::cout << "location of first pixel: " << (peak->GetPosition().first + i + offsetOne.first) << ", " << (peak->GetPosition().second + j + offsetOne.second) << endl;
-                    std::cout << "location of second pixel: " << (other->GetPosition().first + i + offsetTwo.first) << ", " << (other->GetPosition().second + j + offsetTwo.second) << endl;
-                    circle->SetCenter(peak->GetPosition().first + i + offsetOne.first, peak->GetPosition().second + j + offsetOne.second);
-
-                    uiElements.push_back(circle);
-                    gameObjects[gameObjects.size() - 1].push_back(circle);
-
-                    std::cout << "i: " << i << std::endl;
-                    std::cout << "j: " << j << std::endl;*/
                     intersecting = true;
                     break;
                 }
@@ -1297,7 +1345,6 @@ bool TerrainIsSurrounded(Terrain* peak, Terrain* other) {
     }
 
     if (topLeftOne && topRightOne && bottomLeftOne && bottomRightOne) {
-        //std::cout << "Nine" << std::endl;
         length = peak->GetBottomRight().first - peak->GetPosition().first;
         height = peak->GetBottomRight().second - peak->GetPosition().second;
         offsetOne.first = 0;
@@ -1314,17 +1361,6 @@ bool TerrainIsSurrounded(Terrain* peak, Terrain* other) {
 
 
             if ((pixelOne.r == 255 && pixelOne.g == 255 && pixelOne.b == 255) && (pixelTwo.r != 255 || pixelTwo.g != 255 || pixelTwo.b != 255)) {
-                /*UIElement* circle = new UIElement("circle", textures["circle"][0], surfaces["circle"], true );
-                circle->SetResizable(true);
-                std::cout << "location of first pixel: " << (peak->GetPosition().first + i + offsetOne.first) << ", " << (peak->GetPosition().second + j + offsetOne.second) << endl;
-                std::cout << "location of second pixel: " << (other->GetPosition().first + i + offsetTwo.first) << ", " << (other->GetPosition().second + j + offsetTwo.second) << endl;
-                circle->SetCenter(peak->GetPosition().first + i + offsetOne.first, peak->GetPosition().second + j + offsetOne.second);
-
-                uiElements.push_back(circle);
-                gameObjects[gameObjects.size() - 1].push_back(circle);
-
-                std::cout << "i: " << i << std::endl;
-                std::cout << "j: " << j << std::endl;*/
                 surrounded = false;
                 break;
             }
@@ -1345,19 +1381,24 @@ void GroomTerrain() {
                 int a = (rand() % (int)(SCREEN_WIDTH/1.2)) + SCREEN_WIDTH/2 - SCREEN_WIDTH/2.4;
                 int b = (rand() % (int)(SCREEN_HEIGHT/1.2)) + SCREEN_HEIGHT/2 - SCREEN_HEIGHT/2.4;
                 peaks[i]->SetCenter(a, b);
-                peaks[i]->GetOutline()->SetCenter(a, b);
                 if (peaks[i]->GetItem() != nullptr) {
                     peaks[i]->GetItem()->SetCenter(a, b);
                 }
                 moveCount++;
             }
+            Terrain* above = nullptr;
+            Terrain* current = nullptr;
             for (int j = 0; j < peaks[i]->childTerrain.size(); j++) {
-                peaks[i]->childTerrain[j]->SetCenter(peaks[i]->GetCenter().first, peaks[i]->GetCenter().second);
-                peaks[i]->childTerrain[j]->GetOutline()->SetCenter(peaks[i]->GetCenter().first, peaks[i]->GetCenter().second);
+                current = peaks[i]->childTerrain[j];
+                if (j == 0) {
+                    above = peaks[i];
+                } else {
+                    above = peaks[i]->childTerrain[j - 1];
+                }
+                current->SetCenter(above->GetCenter().first + current->GetOffsetX(),above->GetCenter().second + current->GetOffsetY());
             }
         }
     }
-    std::cout << "There should be no touching peaks now" << std::endl;
     ConnectTerrain();
     NeighborTerrain();
 
@@ -1418,8 +1459,12 @@ void Move(Piece* piece, Terrain* startingPoint, Terrain* targetTerrain, int& mov
         }
         if (targetTerrain != NULL) targetTerrain->occupants.push_back(piece);
         if (targetTerrain != NULL && targetTerrain->type == GameObject::PEAK) {
+            std::cout << "Refreshing individual claim notif of " << targetTerrain->GetName() << std::endl;
             RefreshClaimNotifs(dynamic_cast<Peak *>(targetTerrain));
-        } else RefreshClaimNotifs();
+        } else {
+            std::cout << "Refreshing individual claim notif of all terrain" << std::endl;
+            RefreshClaimNotifs();
+        }
         if (targetTerrain == NULL)  {
             piece->SetTexture(textures[currentTurn + " piece float"][0]);
             piece->SetSurface(surfaces[currentTurn + " piece float"]);
@@ -1640,6 +1685,7 @@ void RefreshClaimNotifs(Peak* individualPeak) {
                     peaks[i]->GetClaimNotif()->SetRendered(false);
                 }
             }
+            if (peaks[i]->occupants.size() == 0) peaks[i]->GetClaimNotif()->SetRendered(false);
         }
     }
 }
@@ -1724,7 +1770,7 @@ void PeakBattle(Peak* peak, string attackingTeam, string defendingTeam) {
 void Retreat(Peak* peak, string retreatingTeam) {
     for (int i = 0; i < peak->occupants.size(); i++) {
         if (peak->occupants[i]->GetName() == retreatingTeam) {
-            std::cout << peak->occupants[i]->GetName() << std::endl;
+
             int x = (rand() % (int)(SCREEN_WIDTH/1.05)) + SCREEN_WIDTH/2 - SCREEN_WIDTH/2.1;
             int y = (rand() % (int)(SCREEN_HEIGHT/1.05)) + SCREEN_HEIGHT/2 - SCREEN_HEIGHT/2.1;
             while (selectTerrain(x, y) != NULL) {
@@ -1824,18 +1870,32 @@ void GeneratePixels() {
             int width= 4;
             int height = 4;
             pixel->SetPosition(i*4, j*4);
-            while (tempTerrain != NULL && tempTerrain->GetLayer() == pixel->GetHiddenTerrain()->GetLayer()) {
+
+            /*Terrain* topLeftTerrain = selectTerrain(i*4, j*4);
+            Terrain* bottomRightTerrain = selectTerrain(i*4 + 4, j*4 + 4);
+            if (topLeftTerrain == nullptr && bottomRightTerrain == nullptr) {
+                pixel->SetOutline(false);
+            } else if ((topLeftTerrain == nullptr && bottomRightTerrain != nullptr) ||
+                (topLeftTerrain != nullptr && bottomRightTerrain == nullptr) ||
+                (topLeftTerrain->GetLayer() != bottomRightTerrain->GetLayer())) {
+                pixel->SetOutline(true);
+            }*/
+
+            while (tempTerrain != NULL && tempTerrain->GetLayer() == pixel->GetHiddenTerrain()->GetLayer() && !pixel->GetOutline()) {
                 y += 4;
                 tempTerrain = selectTerrain(x, y);
                 height += 4;
                 j++;
 
             }
+
             pixel->SetWidth(width + 1);
             pixel->SetHeight(height + 1);
 
             SDL_Color pixelColor;
-            if (pixel->GetHiddenTerrain()->GetLayer() == 1) {
+            if (pixel->GetOutline()) {
+                pixelColor = {0, 0, 0, 255};
+            } else if (pixel->GetHiddenTerrain()->GetLayer() == 1) {
                 pixelColor = {246, 215, 176, 255};
             } else {
                 pixelColor = {static_cast<Uint8>(200/rules->GetMaxHeight() * pixel->GetHiddenTerrain()->GetLayer()),

@@ -2,6 +2,7 @@
 #include <iostream>
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
+#include <SDL2/SDL_ttf.h>
 #include <utility>
 #include <map>
 #include <vector>
@@ -34,6 +35,8 @@ void renderObjects(SDL_Renderer* gRenderer);
 
 void renderUI();
 
+void renderClaimNotifs();
+
 void renderTerrain();
 
 void renderPieces();
@@ -41,6 +44,8 @@ void renderPieces();
 void renderInventory();
 
 void renderPixels();
+
+void renderText();
 
 void scroll(Input* playerInput);
 
@@ -148,9 +153,13 @@ extern std::vector<UIElement*> uiElements;
 
 extern std::vector<Piece*> pieces;
 
+extern std::vector<Text*> text;
+
 extern GameObject* heldObject;
 
 extern GameRules* rules;
+
+extern int shapeCount;
 
 extern int currentRoll;
 
