@@ -202,7 +202,6 @@ void loadGamePieces()
         string flagName = playerNumber + " flag";
         for (int i = 0; i < peaks.size(); i++) {
             Piece* flag = new Piece(playerNumber, textures[flagName][0], surfaces[flagName], false);
-            flag->SetScale(0.1);
             flag->SetCenter(peaks[i]->GetCenter().first, peaks[i]->GetCenter().second - 20);
             pieces.push_back(flag);
             gameObjects[gameObjects.size() - 2].push_back(flag);
@@ -823,12 +822,12 @@ void HandleEvents(Input* playerInput) {
                             selectedObject = selectPiece(playerInput->currentMousePosition.first, playerInput->currentMousePosition.second);
                             if (selectedObject != nullptr && selectedObject->type == GameObject::PIECE) {
                                 Piece* piece = dynamic_cast<Piece *>(selectedObject);
-                                piece->SetDesignatedLocation(piece->GetCenter().first, piece->GetCenter().second);
                                 int centerX = piece->GetCenter().first;
                                 int centerY = piece->GetCenter().second;
                                 piece->SetScale(piece->GetScale()*2);
                                 piece->SetCenter(centerX, centerY - (piece->GetDimensions().second/2) * piece->GetSize());
-                                std::cout << piece->GetBottomRight().first << ", " << piece->GetBottomRight().second << std::endl;
+                                piece->SetDesignatedLocation(piece->GetCenter().first, piece->GetCenter().second);
+                                std::cout << piece->GetCenter().first << ", " << piece->GetCenter().second << std::endl;
                             } else {
                                 //selectedObject = selectObject(gameObjects, playerInput->currentMousePosition.first, playerInput->currentMousePosition.second);
                             }
@@ -857,13 +856,15 @@ void HandleEvents(Input* playerInput) {
                         Piece* piece = dynamic_cast<Piece *>(selectedObject);
                         int centerX = piece->GetCenter().first;
                         int centerY = piece->GetCenter().second;
+
+
+                        Terrain* startingTerrain = selectTerrain(piece->GetDesignatedLocation().first, piece->GetDesignatedLocation().second + (piece->GetDimensions().second/2) * piece->GetSize() * piece->GetScale());
+                        Terrain* targetTerrain = selectTerrain(piece->GetCenter().first, centerY + (piece->GetDimensions().second/2) * piece->GetSize() * piece->GetScale());
                         piece->SetScale(piece->GetScale()*0.5f);
                         piece->SetCenter(centerX, centerY + (piece->GetDimensions().second/2) * piece->GetSize());
-                        Terrain* startingTerrain = selectTerrain(piece->GetDesignatedLocation().first, piece->GetDesignatedLocation().second);
-                        Terrain* targetTerrain = selectTerrain(piece->GetCenter().first, piece->GetCenter().second + piece->GetDimensions().second/2 * piece->GetSize());
                         Move(piece, startingTerrain, targetTerrain, movesLeft);
-                        std::cout << piece->GetBottomRight().first << ", " << piece->GetBottomRight().second << std::endl;
-
+                        std::cout << piece->GetCenter().first << ", " << piece->GetCenter().second << std::endl;
+                        if (targetTerrain != NULL) std::cout <<targetTerrain->GetName() << std::endl;
 
                     } else if (selectedObject->type == GameObject::ITEM) {
                         std::cout << "item selected: " << selectedObject->GetName() << std::endl;
@@ -1402,10 +1403,10 @@ void Move(Piece* piece, Terrain* startingPoint, Terrain* targetTerrain, int& mov
     bool moveSuccess = MovementAttempt(heightDifference, moveCount, startingPoint, targetTerrain, currentPath, false);
 
     if (!moveSuccess) {
-        piece->SetCenter(piece->GetDesignatedLocation().first, piece->GetDesignatedLocation().second);
+        piece->SetCenter(piece->GetDesignatedLocation().first, piece->GetDesignatedLocation().second + piece->GetDimensions().second/2 * piece->GetSize());
     } else {
         movesLeft = movesLeft - moveCount;
-        piece->SetDesignatedLocation(piece->GetCenter().first, piece->GetCenter().second - piece->GetDimensions().second/2 * piece->GetSize());
+        piece->SetDesignatedLocation(piece->GetCenter().first, piece->GetCenter().second);
         piece->SetOccupyingTerrain(targetTerrain);
         if (startingPoint != NULL) {
             for (int i = 0; i < startingPoint->occupants.size(); i++) {
