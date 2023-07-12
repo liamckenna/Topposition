@@ -36,25 +36,29 @@ int main( int argc, char* args[] )
     Input* playerInput = new Input();
     //While application is running
 
-    int frames_drawn = 0;
-    Uint32 fps_counter = 0;
+
     float fps = 0.0f;
-    Uint32 prev_ticks = SDL_GetTicks64();
+    Uint64 lastUpdate = SDL_GetTicks64();
+    int frame = 0;
+    Uint64 lastFrame = 0;
+    Uint64 start = SDL_GetPerformanceCounter();
     while( !quit )
     {
 
+        Uint64 end = SDL_GetPerformanceCounter();
+        float elapsedMS = (end - start) / (float)SDL_GetPerformanceFrequency() * 1000.0f;
+        float elapsedFrames = (end - start) / (float)SDL_GetPerformanceFrequency();
+        fps = 1.0f/ elapsedFrames;
+        //std::cout << fps << std::endl;
+        start = SDL_GetPerformanceCounter();
         //Handle events on queue
         HandleEvents(playerInput);
+        frame++;
+        AnimationHandler(frame, fps, lastFrame, lastUpdate);
         RenderScreen();
 
 
-        Uint32 ticks_now = SDL_GetTicks64();
-        Uint32 diff = ticks_now - prev_ticks;
-        fps_counter = diff;
-        prev_ticks = ticks_now;
-        fps = 1000.0f/(float)fps_counter;
 
-        std::cout << (int)fps << std::endl;
 
     }
     //Free resources and close SDL

@@ -96,6 +96,13 @@ void GameObject::SetBottomRight() {
     bottomRight.second = position.second + (dimensions.second * size * scale);
 }
 
+void GameObject::CycleAnimation(int frame) {
+    currentFrame = frame;
+    SetTexture(animations[currentAnimation][currentFrame].first);
+    std::cout << currentAnimation << ", " << currentFrame << std::endl;
+    SetSurface(animations[currentAnimation][currentFrame].second);
+}
+
 void Terrain::RenderGameObject(SDL_Renderer *renderer, Terrain* hoveringTerrain) {
     if (this == hoveringTerrain) {
         SDL_SetTextureColorMod(texture, 255, 0, 0);

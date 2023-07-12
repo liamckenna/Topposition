@@ -85,6 +85,8 @@ void ConnectConnectedTerrain(std::vector<Terrain*>& connectedTerrain, Terrain* c
 
 void NeighborTerrain();
 
+void SetTerrainBiome();
+
 int Roll();
 
 void Move(Piece* piece, Terrain* startingPoint, Terrain* targetTerrain, int& movesLeft);
@@ -120,6 +122,8 @@ void GameFinished(string winner);
 void Tiebreaker();
 
 void GeneratePixels();
+
+void AnimationHandler(int& frame, float fps, Uint64& lastFrame, Uint64& lastUpdate);
 
 extern SDL_Window* window;
 //The surface contained by the window

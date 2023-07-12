@@ -223,7 +223,7 @@ void loadGamePieces()
             peaks[i]->flags.push_back(flag);
 
         }
-        string pieceName = playerNumber + " piece float";
+        string pieceName = playerNumber + " piece float 0";
         int x = (rand() % (int)(SCREEN_WIDTH/1.05)) + SCREEN_WIDTH/2 - SCREEN_WIDTH/2.1;
         int y = (rand() % (int)(SCREEN_HEIGHT/1.05)) + SCREEN_HEIGHT/2 - SCREEN_HEIGHT/2.1;
         while (selectTerrain(x, y) != NULL || selectUI(x, y) != NULL) {
@@ -233,10 +233,39 @@ void loadGamePieces()
         for (int i = 0; i < rules->GetPieces(); i++) {
             Piece* piece = new Piece(playerNumber, textures[pieceName][0], surfaces[pieceName], true);
             gameObjects[rules->GetMaxHeight() + 1].push_back(piece);
-            pieces.push_back(piece);
             piece->SetCenter(x, y);
             piece->SetDesignatedLocation(x, y);
             piece->SetSelectable(selectable);
+            std::vector<std::pair<SDL_Texture *, SDL_Surface*>> standingIdleAnimation;
+            std::vector<std::pair<SDL_Texture *, SDL_Surface*>> floatingIdleAnimation;
+
+            piece->animations.push_back(standingIdleAnimation);
+            piece->animations.push_back(floatingIdleAnimation);
+            int blinkFrame = rand() % 23;
+            for (int j = 0; j < 24; j++) {
+                if (j == blinkFrame || j == blinkFrame + 1) {
+                    piece->animations[0].push_back({textures[playerNumber + " piece salute blink"][0], surfaces[playerNumber + " piece salute blink"]});
+                } else {
+                    piece->animations[0].push_back({textures[playerNumber + " piece salute"][0], surfaces[playerNumber + " piece salute"]});
+                    std::cout << piece->animations[0].size() << std::endl;
+                }
+            }
+            for (int j = 0; j < 24; j++) {
+                if (j == 0 || j == 1 || j == 22 || j == 23) {
+                    piece->animations[1].push_back({textures["playerOne piece float 0"][0], surfaces["playerOne piece float 0"]});
+                } else if (j == 2 || j == 3 || j == 20 || j == 21) {
+                    piece->animations[1].push_back({textures["playerOne piece float 1"][0], surfaces["playerOne piece float 1"]});
+                } else if (j == 4 || j == 5 || j == 18 || j == 19) {
+                    piece->animations[1].push_back({textures["playerOne piece float 2"][0], surfaces["playerOne piece float 2"]});
+                } else if (j == 6 || j == 7 || j == 16 || j == 17) {
+                    piece->animations[1].push_back({textures["playerOne piece float 3"][0], surfaces["playerOne piece float 3"]});
+                } else if (j == 8 || j == 9 || j == 14 || j == 15) {
+                    piece->animations[1].push_back({textures["playerOne piece float 4"][0], surfaces["playerOne piece float 4"]});
+                } else if (j == 10 || j == 11 || j == 12 || j == 13) {
+                    piece->animations[1].push_back({textures["playerOne piece float 5"][0], surfaces["playerOne piece float 5"]});
+                }
+            }
+            pieces.push_back(piece);
         }
     }
 
@@ -295,12 +324,12 @@ void loadUI() {
     text.push_back(currentTurnText);
     SDL_Color Red = {255, 0, 0};
 
-    playerOneText = new Text("playerOneText", "Fonts/yoster.ttf", Red, 450, 0, 300, 50, 100, renderer, "Player One");
+    playerOneText = new Text("playerOneText", "Fonts/yoster.ttf", Red, 450, 0, 250, 50, 100, renderer, "Player One");
     text.push_back(playerOneText);
 
     SDL_Color Green = {0, 255, 0};
 
-    playerTwoText = new Text("playerTwoText", "Fonts/yoster.ttf", Green, 450, 0, 300, 50, 100, renderer, "Player Two");
+    playerTwoText = new Text("playerTwoText", "Fonts/yoster.ttf", Green, 450, 0, 250, 50, 100, renderer, "Player Two");
     text.push_back(playerTwoText);
     playerTwoText->SetRendered(false);
 
@@ -312,7 +341,7 @@ void loadUI() {
 
     SDL_Color Yellow = {255, 255, 0};
 
-    playerFourText = new Text("playerFourText", "Fonts/yoster.ttf", Yellow, 450, 0, 300, 50, 100, renderer, "Player Four");
+    playerFourText = new Text("playerFourText", "Fonts/yoster.ttf", Yellow, 450, 0, 275, 50, 100, renderer, "Player Four");
     text.push_back(playerFourText);
     playerFourText->SetRendered(false);
 
@@ -605,6 +634,7 @@ void renderPieces() {
     for (int i = pieces.size() - 1; i >= 0; i--) {
         if (pieces[i]->type != GameObject::ITEM) {
             pieces[i]->RenderGameObject(renderer);
+            std::cout << "rendering pieces" << std::endl;
         }
     }
 }
@@ -911,9 +941,7 @@ void HandleEvents(Input* playerInput) {
                 break;
             case SDL_MOUSEBUTTONUP:
                 if (selectedObject != nullptr) {
-                    std::cout << selectedObject->GetName() << std::endl;
                     if (selectedObject->GetName() == "reset button") {
-                        std::cout << "reset button pressed" << std::endl;
                         ResetMap();
                     } else if ((selectedObject->GetName() == "dieOne" ||
                                 selectedObject->GetName() == "dieTwo") && movesLeft < 1) {
@@ -938,7 +966,7 @@ void HandleEvents(Input* playerInput) {
                         piece->SetCenter(centerX, centerY + (piece->GetDimensions().second/2) * piece->GetSize());
                         Move(piece, startingTerrain, targetTerrain, movesLeft);
                         hoveringTerrain = nullptr;
-                        if (targetTerrain != NULL) std::cout <<targetTerrain->GetName() << std::endl;
+                        if (targetTerrain != NULL) std::cout <<targetTerrain->GetBiome() << std::endl;
 
                     } else if (selectedObject->type == GameObject::ITEM) {
                         std::cout << "item selected: " << selectedObject->GetName() << std::endl;
@@ -1435,7 +1463,7 @@ void GroomTerrain() {
     }
     ConnectTerrain();
     NeighborTerrain();
-
+    SetTerrainBiome();
 
 }
 
@@ -1490,6 +1518,40 @@ void NeighborTerrain() {
     }
 }
 
+void SetTerrainBiome() {
+    for (int i = 0; i < peaks.size(); i++) {
+        if (peaks[i]->GetBiome() != "") continue;
+        int biomeID = rand() % 3;
+        if (peaks[i]->GetLayer() == 1 && peaks[i]->connectedTerrain.size() == 0) biomeID = 0;
+        string biome;
+        switch (biomeID) {
+            case 0:
+                biome = "plains";
+                break;
+            case 1:
+                biome = "stone";
+                break;
+            case 2:
+                biome = "glacier";
+                break;
+            default:
+                biome = "plains";
+                break;
+        }
+        peaks[i]->SetBiome(biome);
+        for (int j = 0; j < peaks[i]->childTerrain.size(); j++) {
+            peaks[i]->childTerrain[j]->SetBiome(biome);
+            for (int k = 0; k < peaks[i]->childTerrain[j]->connectedTerrain.size(); k++) {
+                Terrain* tempTerrain = peaks[i]->childTerrain[j]->connectedTerrain[k];
+                while (tempTerrain != nullptr) {
+                    tempTerrain->SetBiome(biome);
+                    tempTerrain = tempTerrain->GetUpperTerrain();
+                }
+            }
+        }
+    }
+}
+
 //-------------------//
 
 void Move(Piece* piece, Terrain* startingPoint, Terrain* targetTerrain, int& movesLeft) {
@@ -1510,16 +1572,13 @@ void Move(Piece* piece, Terrain* startingPoint, Terrain* targetTerrain, int& mov
             for (int i = 0; i < startingPoint->occupants.size(); i++) {
                 if (startingPoint->occupants[i] == piece) {
                     startingPoint->occupants.erase(startingPoint->occupants.begin() + i);
-                    std::cout << "erased" << std::endl;
                 }
             }
         }
         if (targetTerrain != NULL) targetTerrain->occupants.push_back(piece);
         if (targetTerrain != NULL && targetTerrain->type == GameObject::PEAK) {
-            std::cout << "Refreshing individual claim notif of " << targetTerrain->GetName() << std::endl;
             RefreshClaimNotifs(dynamic_cast<Peak *>(targetTerrain));
         } else {
-            std::cout << "Refreshing individual claim notif of all terrain" << std::endl;
             RefreshClaimNotifs();
         }
         if (targetTerrain == NULL)  {
@@ -1566,8 +1625,9 @@ bool MovementAttempt(int& heightDifference, int& attemptedMoves, Terrain* curren
     if (heightDifference < 0) {
         if (DirectMovementDown(heightDifference, attemptedMoves, currentTerrain, targetTerrain, currentPath) && attemptedMoves <= movesLeft) return true;
     }
-
-    if (AdjacentMovement(heightDifference, attemptedMoves, currentTerrain, targetTerrain, currentPath) && attemptedMoves <= movesLeft) return true;
+    if (!fromAdjacent) {
+        if (AdjacentMovement(heightDifference, attemptedMoves, currentTerrain, targetTerrain, currentPath) && attemptedMoves <= movesLeft) return true;
+    }
 
     if (currentTerrain->GetLowerTerrain() != NULL && !fromAdjacent) {
 
@@ -1643,7 +1703,6 @@ Terrain* GetTargetTerrainBase(Terrain* targetTerrain) {
 }
 
 bool AdjacentMovement(int& heightDifference, int& attemptedMoves, Terrain* currentTerrain, Terrain*& targetTerrain ,std::vector<Terrain*>& currentPath) {
-
     for (int i = 0; i < currentTerrain->connectedTerrain.size(); i++) {
 
         bool alreadyCovered = false;
@@ -1758,9 +1817,7 @@ void RefreshClaimNotifs(Peak* individualPeak) {
 }
 
 void FinishTurn() {
-    std::cout << "finish turn selected" << std::endl;
     RotateTurn();
-    std::cout << "Current turn: " << currentTurn << std::endl;
     movesLeft = 0;
     UpdateMovesLeft();
     RefreshClaimNotifs();
@@ -1972,16 +2029,53 @@ void GeneratePixels() {
             SDL_Color pixelColor;
             if (pixel->GetOutline()) {
                 pixelColor = {0, 0, 0, 255};
-            } else if (pixel->GetHiddenTerrain()->GetLayer() == 1) {
+            } else if (pixel->GetHiddenTerrain()->GetLayer() == 1 && pixel->GetHiddenTerrain()->GetBiome() == "plains") {
                 pixelColor = {246, 215, 176, 255};
             } else {
-                pixelColor = {static_cast<Uint8>(200/rules->GetMaxHeight() * pixel->GetHiddenTerrain()->GetLayer()),
-                              static_cast<Uint8>(std::min(200 / rules->GetMaxHeight() * currentTerrain->GetLayer() * 2, 255)),
-                              static_cast<Uint8>(200 / rules->GetMaxHeight() * currentTerrain->GetLayer()), 255};
+                if (pixel->GetHiddenTerrain()->GetBiome() == "plains") {
+                    pixelColor = {static_cast<Uint8>(200/rules->GetMaxHeight() * pixel->GetHiddenTerrain()->GetLayer()),
+                                  static_cast<Uint8>(std::min(200 / rules->GetMaxHeight() * currentTerrain->GetLayer() * 2, 255)),
+                                  static_cast<Uint8>(200 / rules->GetMaxHeight() * currentTerrain->GetLayer()), 255};
+                } else if (pixel->GetHiddenTerrain()->GetBiome() == "stone") {
+                    pixelColor = {static_cast<Uint8>(200/rules->GetMaxHeight() * pixel->GetHiddenTerrain()->GetLayer()),
+                                  static_cast<Uint8>(200/rules->GetMaxHeight() * pixel->GetHiddenTerrain()->GetLayer()),
+                                  static_cast<Uint8>(200 / rules->GetMaxHeight() * currentTerrain->GetLayer()), 255};
+                } else if (pixel->GetHiddenTerrain()->GetBiome() == "glacier") {
+                    pixelColor = {static_cast<Uint8>(185/rules->GetMaxHeight() * (pixel->GetHiddenTerrain()->GetLayer() - 1)),
+                                  static_cast<Uint8>(std::min(200/rules->GetMaxHeight() * (pixel->GetHiddenTerrain()->GetLayer() - 1) + 100, 255)),
+                                  static_cast<Uint8>(std::min(255 / rules->GetMaxHeight() * (pixel->GetHiddenTerrain()->GetLayer() - 1) + 140, 255)), 255};
+                }
             }
             pixel->SetColor(pixelColor);
             pixels.push_back(pixel);
             gameObjects[pixel->GetHiddenTerrain()->GetLayer()].push_back(pixel);
         }
     }
+}
+
+//-------------------//
+
+void AnimationHandler(int& frame, float fps, Uint64& lastFrame, Uint64& lastUpdate) {
+    Uint32 current = SDL_GetTicks();
+    float dT = (current - lastUpdate) / 1000.0f;
+
+    int framesToUpdate = floor(dT / (1.0f / 24));
+    if (framesToUpdate > 0) {
+        lastFrame += framesToUpdate;
+        lastFrame %= 24;
+        lastUpdate = current;
+    }
+
+    for (int i = 0; i < pieces.size(); i++) {
+        if (pieces[i]->type != GameObject::ITEM) {
+            for (int j = 0; j < pieces[i]->animations.size(); j++) {
+                pieces[i]->CycleAnimation(lastFrame);
+                break;
+            }
+        }
+    }
+
+
+
+
 }

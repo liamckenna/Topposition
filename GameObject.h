@@ -5,6 +5,8 @@
 #include "SDL.h"
 #include <SDL2/SDL_ttf.h>
 #include "GameRules.h"
+#include <math.h>
+
 using namespace std;
 class GameObject {
 public:
@@ -38,6 +40,8 @@ protected:
     pair<float, float> bottomRight;
     float scale = 1;
     bool resizable = true;
+    int currentAnimation = 0;
+    int currentFrame = 0;
 
 public:
     enum objectType type = GENERIC;
@@ -46,10 +50,10 @@ public:
     pair<float, float> GetDimensions(){return dimensions;}
     string GetName(){return name;}
     SDL_Texture* GetTexture(){return texture;}
+    std::vector<std::vector<std::pair<SDL_Texture*, SDL_Surface*>>> animations;
     SDL_Surface* GetSurface(){return surface;}
     bool GetRendered() const {return rendered;}
     bool GetMovable() const {return movable;}
-
     SDL_Rect* GetRenderRect() {return renderRect;}
     pair<float, float> GetCenter() {return center;}
     float GetScale() const {return scale;}
@@ -71,6 +75,7 @@ public:
     virtual void RenderGameObject(SDL_Renderer* renderer);
     void SetBottomRight();
     pair<float, float> GetBottomRight() {return bottomRight;}
+    void CycleAnimation(int frame);
 };
 
 class Peak;
@@ -89,6 +94,7 @@ protected:
     int offsetX;
     int offsetY;
     SDL_Color color;
+    string biome = "";
 
 
 public:
@@ -110,7 +116,9 @@ public:
     GameObject* GetOutline() {return outline;}
     int GetOffsetX() {return offsetX;}
     int GetOffsetY() {return offsetY;}
+    string GetBiome() {return biome;}
     SDL_Color GetColor() {return color;}
+    void SetBiome(string b) {biome = b;}
     void SetColor(SDL_Color c) {color = c;}
     void SetOffsetX(int ox) {offsetX = ox;}
     void SetOffsetY(int oy) {offsetY = oy;}
