@@ -74,6 +74,16 @@ std::vector<Item*> playerFourInventory;
 
 std::vector<Item*> currentInventory = playerOneInventory;
 
+Text* playerOneText;
+
+Text* playerTwoText;
+
+Text* playerThreeText;
+
+Text* playerFourText;
+
+Terrain* hoveringTerrain;
+
 bool init()
 {
     //Initialization flag
@@ -285,13 +295,26 @@ void loadUI() {
     text.push_back(currentTurnText);
     SDL_Color Red = {255, 0, 0};
 
-    Text* currentTurnPlayerOneText = new Text("currentTurnPlayerOneText", "Fonts/yoster.ttf", Red, 450, 0, 300, 50, 100, renderer, "Player One");
-    text.push_back(currentTurnPlayerOneText);
+    playerOneText = new Text("playerOneText", "Fonts/yoster.ttf", Red, 450, 0, 300, 50, 100, renderer, "Player One");
+    text.push_back(playerOneText);
 
     SDL_Color Green = {0, 255, 0};
 
-    Text* currentTurnPlayerTwoText = new Text("currentTurnPlayerTwoText", "Fonts/yoster.ttf", Red, 450, 0, 300, 50, 100, renderer, "Player Two");
-    text.push_back(currentTurnPlayerOneText);
+    playerTwoText = new Text("playerTwoText", "Fonts/yoster.ttf", Green, 450, 0, 300, 50, 100, renderer, "Player Two");
+    text.push_back(playerTwoText);
+    playerTwoText->SetRendered(false);
+
+    SDL_Color Blue = {0, 0, 255};
+
+    playerThreeText = new Text("playerThreeText", "Fonts/yoster.ttf", Red, 450, 0, 300, 50, 100, renderer, "Player Three");
+    text.push_back(playerThreeText);
+    playerThreeText->SetRendered(false);
+
+    SDL_Color Yellow = {255, 255, 0};
+
+    playerFourText = new Text("playerFourText", "Fonts/yoster.ttf", Yellow, 450, 0, 300, 50, 100, renderer, "Player Four");
+    text.push_back(playerFourText);
+    playerFourText->SetRendered(false);
 
 
 }
@@ -497,7 +520,7 @@ void RenderScreen(){
     SDL_RenderClear( renderer );
 
     //Render texture to screen
-    renderTerrain();
+    //renderTerrain();
     renderPixels();
     renderClaimNotifs();
     renderPieces();
@@ -573,7 +596,7 @@ void renderClaimNotifs() {
 void renderTerrain() {
     for (int i = 0; i < terrain.size(); i++) {
         for (int j = 0; j < terrain[i].size(); j++) {
-            terrain[i][j]->RenderGameObject(renderer);
+            terrain[i][j]->RenderGameObject(renderer, hoveringTerrain);
         }
     }
 }
@@ -594,7 +617,7 @@ void renderInventory(){
 
 void renderPixels(){
     for (int i = 0; i < pixels.size(); i++) {
-        pixels[i]->RenderGameObject(renderer);
+        pixels[i]->RenderGameObject(renderer, hoveringTerrain);
     }
 }
 
@@ -800,6 +823,7 @@ void moveSelectedObject(GameObject* gameObject, Input* playerInput) {
     if (gameObject->GetMovable()) {
         gameObject->SetCenter(gameObject->GetCenter().first + playerInput->currentMousePosition.first - playerInput->prevMousePosition.first,
                                 gameObject->GetCenter().second + playerInput->currentMousePosition.second - playerInput->prevMousePosition.second);
+        hoveringTerrain = selectTerrain(gameObject->GetCenter().first, gameObject->GetCenter().second + gameObject->GetDimensions().second/2 * gameObject->GetSize() * gameObject->GetScale());
     }
 }
 
@@ -913,6 +937,7 @@ void HandleEvents(Input* playerInput) {
                         piece->SetScale(piece->GetScale()*0.5f);
                         piece->SetCenter(centerX, centerY + (piece->GetDimensions().second/2) * piece->GetSize());
                         Move(piece, startingTerrain, targetTerrain, movesLeft);
+                        hoveringTerrain = nullptr;
                         if (targetTerrain != NULL) std::cout <<targetTerrain->GetName() << std::endl;
 
                     } else if (selectedObject->type == GameObject::ITEM) {
@@ -992,11 +1017,15 @@ void GeneratePeak() {
             peak->GetItem()->SetCenter(a, b);
         }
     }
+    SDL_Color color;
     if (height == 1) {
         SDL_SetTextureColorMod(peak->GetTexture(), 246, 215, 176);
+        color = {246, 215, 176};
     } else {
         SDL_SetTextureColorMod(peak->GetTexture(), 200/rules->GetMaxHeight() * peak->GetLayer(), std::min(200/rules->GetMaxHeight() * peak->GetLayer() * 2, 255), 200/rules->GetMaxHeight() * peak->GetLayer());
+        color = {static_cast<Uint8>(200/rules->GetMaxHeight() * peak->GetLayer()), static_cast<Uint8>(std::min(200/rules->GetMaxHeight() * peak->GetLayer() * 2, 255)), static_cast<Uint8>(200/rules->GetMaxHeight() * peak->GetLayer())};
     }
+    peak->SetColor(color);
     GenerateTerrain(peak, shape, height);
 }
 
@@ -1036,11 +1065,16 @@ void GenerateTerrain(Peak* peak, int shape, int height) {
         }
         layer->SetOffsetX(offsetX);
         layer->SetOffsetY(offsetY);
+        SDL_Color color;
         if (i == 1) {
             SDL_SetTextureColorMod(layer->GetTexture(), 246, 215, 176);
+            color = {246, 215, 176};
+
         } else {
             SDL_SetTextureColorMod(layer->GetTexture(), 200/rules->GetMaxHeight() * layer->GetLayer(), std::min(200/rules->GetMaxHeight() * layer->GetLayer() * 2, 255), 200/rules->GetMaxHeight() * layer->GetLayer());
+            color = {static_cast<Uint8>(200/rules->GetMaxHeight() * layer->GetLayer()), static_cast<Uint8>(std::min(200/rules->GetMaxHeight() * layer->GetLayer() * 2, 255)), static_cast<Uint8>(200/rules->GetMaxHeight() * layer->GetLayer())};
         }
+        layer->SetColor(color);
         gameObjects[i].push_back(layer);
         terrain[i].push_back(layer);
         peak->childTerrain.push_back(layer);
@@ -1411,7 +1445,30 @@ void ConnectTerrain() {
             terrain[i][j]->connectedTerrain = MergeTerrain(terrain[i][j]);
         }
     }
+    for (int i = 0; i < terrain.size(); i++) {
+        for (int j = 0; j < terrain[i].size(); j++) {
+            std::vector<Terrain*> neighboringTerrain;
+            ConnectConnectedTerrain(neighboringTerrain, terrain[i][j]);
+            terrain[i][j]->connectedTerrain = neighboringTerrain;
+        }
+    }
+}
 
+void ConnectConnectedTerrain(std::vector<Terrain*>& connectedTerrain, Terrain* currentTerrain) {
+    for (int i = 0; i < currentTerrain->connectedTerrain.size(); i++) {
+
+        bool alreadyCovered = false;
+
+        for (int j = 0; j < connectedTerrain.size(); j++) {
+            if (connectedTerrain[j] == currentTerrain->connectedTerrain[i]) {
+                alreadyCovered = true;
+            }
+        }
+        if (alreadyCovered) continue;
+
+        connectedTerrain.push_back(currentTerrain->connectedTerrain[i]);
+        ConnectConnectedTerrain(connectedTerrain, currentTerrain->connectedTerrain[i]);
+    }
 }
 
 void NeighborTerrain() {
@@ -1631,19 +1688,28 @@ int Roll(){
 void RotateTurn() {
 
     if (currentTurn == "playerOne") {
+        playerOneText->SetRendered(false);
         currentTurn = "playerTwo";
+        playerTwoText->SetRendered(true);
         currentInventory = playerTwoInventory;
     }
     else if (currentTurn == "playerTwo") {
+        playerTwoText->SetRendered(false);
         currentTurn = "playerThree";
+        playerThreeText->SetRendered(true);
         currentInventory = playerThreeInventory;
     }
     else if (currentTurn == "playerThree") {
+
+        playerThreeText->SetRendered(false);
         currentTurn = "playerFour";
+        playerFourText->SetRendered(true);
         currentInventory = playerFourInventory;
     }
     else if (currentTurn == "playerFour") {
+        playerFourText->SetRendered(false);
         currentTurn = "playerOne";
+        playerOneText->SetRendered(true);
         currentInventory = playerOneInventory;
     }
 
@@ -1652,6 +1718,7 @@ void RotateTurn() {
             pieces[i]->SetSelectable(true);
         } else pieces[i]->SetSelectable(false);
     }
+
 }
 
 void UpdateMovesLeft() {
@@ -1886,6 +1953,16 @@ void GeneratePixels() {
                 tempTerrain = selectTerrain(x, y);
                 height += 4;
                 j++;
+                if (tempTerrain != pixel->GetHiddenTerrain()) {
+                    bool contin = false;
+                    for (int i = 0; i < pixel->GetHiddenTerrain()->connectedTerrain.size(); i++) {
+                        if (tempTerrain == pixel->GetHiddenTerrain()->connectedTerrain[i]) {
+                            contin = true;
+                            break;
+                        }
+                    }
+                    if (!contin) break;
+                }
 
             }
 

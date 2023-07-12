@@ -88,13 +88,14 @@ protected:
     GameObject* outline = nullptr;
     int offsetX;
     int offsetY;
+    SDL_Color color;
 
 
 public:
     std::vector<Piece*> occupants;
     std::vector<Terrain*> connectedTerrain;
 
-    void RenderGameObject(SDL_Renderer* renderer);
+    void RenderGameObject(SDL_Renderer* renderer, Terrain* hoveringTerrain);
 
     Terrain(string name, SDL_Texture *texture, SDL_Surface *surface, bool m, bool r, int l) : GameObject(name, texture, surface, m, r) {
         layer = l;
@@ -109,6 +110,8 @@ public:
     GameObject* GetOutline() {return outline;}
     int GetOffsetX() {return offsetX;}
     int GetOffsetY() {return offsetY;}
+    SDL_Color GetColor() {return color;}
+    void SetColor(SDL_Color c) {color = c;}
     void SetOffsetX(int ox) {offsetX = ox;}
     void SetOffsetY(int oy) {offsetY = oy;}
     void SetOutline(GameObject* o) {outline = o;}
@@ -209,7 +212,8 @@ public:
     Pixel(string name, SDL_Texture *texture, SDL_Surface *surface, bool m, bool r) : GameObject(name, texture, surface, false, r) {
         type = PIXEL;
     }
-    void RenderGameObject(SDL_Renderer *renderer);
+    void RenderGameObject(SDL_Renderer *renderer, Terrain* hoveringTerrain);
+
     void SetHiddenTerrain(Terrain* ht) {hiddenTerrain = ht;}
     void SetColor(SDL_Color c) {color = c;}
     void SetWidth(int w) {width = w;}

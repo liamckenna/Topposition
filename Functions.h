@@ -81,7 +81,7 @@ void GroomTerrain();
 
 void ConnectTerrain();
 
-void ConnectAllTerrain(Terrain* originalTerrain, Terrain* currentTerrain);
+void ConnectConnectedTerrain(std::vector<Terrain*>& connectedTerrain, Terrain* currentTerrain);
 
 void NeighborTerrain();
 
@@ -182,6 +182,17 @@ extern std::vector<Item*> playerThreeInventory;
 extern std::vector<Item*> playerFourInventory;
 
 extern std::vector<Item*> currentInventory;
+
+extern Text* playerOneText;
+
+extern Text* playerTwoText;
+
+extern Text* playerThreeText;
+
+extern Text* playerFourText;
+
+extern Terrain* hoveringTerrain;
+
 
 enum gameState {
     MAIN_MENU = 0,

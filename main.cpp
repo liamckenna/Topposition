@@ -54,7 +54,7 @@ int main( int argc, char* args[] )
         prev_ticks = ticks_now;
         fps = 1000.0f/(float)fps_counter;
 
-        //std::cout << (int)fps << std::endl;
+        std::cout << (int)fps << std::endl;
 
     }
     //Free resources and close SDL

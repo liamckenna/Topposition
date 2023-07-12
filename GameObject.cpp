@@ -96,7 +96,10 @@ void GameObject::SetBottomRight() {
     bottomRight.second = position.second + (dimensions.second * size * scale);
 }
 
-void Terrain::RenderGameObject(SDL_Renderer *renderer) {
+void Terrain::RenderGameObject(SDL_Renderer *renderer, Terrain* hoveringTerrain) {
+    if (this == hoveringTerrain) {
+        SDL_SetTextureColorMod(texture, 255, 0, 0);
+    }
     if (size == 1) {
         renderRect->x = defaultPosition.first;
         renderRect->y = defaultPosition.second;
@@ -109,9 +112,25 @@ void Terrain::RenderGameObject(SDL_Renderer *renderer) {
     if (rendered) {
         SDL_RenderCopyEx( renderer, texture, NULL, renderRect, 0, NULL, SDL_FLIP_NONE);
     }
+    if (this == hoveringTerrain) {
+        SDL_SetTextureColorMod(texture, color.r, color.g, color.b);
+    }
 }
 
-void Pixel::RenderGameObject(SDL_Renderer *renderer) {
+void Pixel::RenderGameObject(SDL_Renderer *renderer, Terrain* hoveringTerrain) {
+    bool hovering = false;
+    if (hoveringTerrain != nullptr) {
+        if (hiddenTerrain == hoveringTerrain) {
+            hovering = true;
+        } else if (hiddenTerrain != nullptr) {
+            for (int i = 0; i < hiddenTerrain->connectedTerrain.size(); i++) {
+                if (hiddenTerrain->connectedTerrain[i] == hoveringTerrain) {
+                    hovering = true;
+                    break;
+                }
+            }
+        }
+    }
 
     if (size == 1) {
         renderRect->x = defaultPosition.first;
@@ -122,9 +141,16 @@ void Pixel::RenderGameObject(SDL_Renderer *renderer) {
     }
     renderRect->w = (width * size * scale);
     renderRect->h = (height * size * scale);
-    SDL_SetTextureColorMod(texture, color.r, color.g, color.b);
+    if (hovering) {
+        SDL_SetTextureColorMod(texture, color.r/2, color.g/2, color.b/2);
+    } else {
+        SDL_SetTextureColorMod(texture, color.r, color.g, color.b);
+    }
 
     SDL_RenderCopy(renderer, texture, NULL, renderRect);
+    if (hovering) {
+        SDL_SetTextureColorMod(texture, color.r, color.g, color.b);
+    }
 }
 
 Text::Text(string n, const char* fp, SDL_Color c, int x, int y, int w, int h, int s, SDL_Renderer* r, const char* t) {
