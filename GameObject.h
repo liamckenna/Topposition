@@ -6,6 +6,9 @@
 #include <SDL2/SDL_ttf.h>
 #include "GameRules.h"
 #include <math.h>
+#include <map>
+
+class Animation;
 
 using namespace std;
 class GameObject {
@@ -40,8 +43,7 @@ protected:
     pair<float, float> bottomRight;
     float scale = 1;
     bool resizable = true;
-    int currentAnimation = 1;
-    int currentFrame = 0;
+    Animation* currentAnimation = nullptr;
 
 public:
     enum objectType type = GENERIC;
@@ -50,7 +52,7 @@ public:
     pair<float, float> GetDimensions(){return dimensions;}
     string GetName(){return name;}
     SDL_Texture* GetTexture(){return texture;}
-    std::vector<std::vector<std::pair<SDL_Texture*, SDL_Surface*>>> animations;
+    std::map<string, Animation* > animations;
     SDL_Surface* GetSurface(){return surface;}
     bool GetRendered() const {return rendered;}
     bool GetMovable() const {return movable;}
@@ -60,6 +62,8 @@ public:
     bool GetSelectable() const {return selectable;}
     bool GetResizable() const {return resizable;}
     SDL_Rect* GetRectangle() const {return renderRect;}
+    Animation* GetCurrentAnimation() const {return currentAnimation;}
+    void SetCurrentAnimation(Animation* ca) {currentAnimation = ca;}
     void SetRectangle(SDL_Rect* r) {renderRect = r;}
     void SetResizable(bool r) {resizable = r;}
     void SetTexture(SDL_Texture* t) {texture = t;}
@@ -75,7 +79,6 @@ public:
     virtual void RenderGameObject(SDL_Renderer* renderer);
     void SetBottomRight();
     pair<float, float> GetBottomRight() {return bottomRight;}
-    void CycleAnimation(int frame);
 };
 
 class Peak;
@@ -252,4 +255,26 @@ public:
     void RenderText(SDL_Renderer* renderer);
     void SetRendered(bool r) {rendered = r;}
 
+};
+
+class Animation {
+    SDL_Texture* spriteSheet;
+    SDL_Surface* surface;
+    SDL_Rect* rect = new SDL_Rect();
+    float duration;
+    int frameCount;
+    pair<int, int> sheetDimensions;
+    pair<int, int> spriteDimensions;
+    int lastFrame = 0;
+    Uint64 lastUpdate = 0;
+    bool paused = false;
+    int frameOffset;
+
+public:
+    Animation(SDL_Texture* ss, SDL_Surface* s, float d, int fc, pair<int, int> sd, pair<int, int> spd);
+    void CycleFrame(Uint64 current);
+    SDL_Rect* GetRect() {return rect;}
+    SDL_Texture* GetSpriteSheet() {return spriteSheet;}
+    void Pause() {paused = true;}
+    void Unpause() {paused = false;}
 };

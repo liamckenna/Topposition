@@ -123,7 +123,7 @@ void Tiebreaker();
 
 void GeneratePixels();
 
-void AnimationHandler(int& frame, float fps, Uint64& lastFrame, Uint64& lastUpdate);
+void AnimationHandler(float fps, Uint64& lastFrame, Uint64& lastUpdate);
 
 extern SDL_Window* window;
 //The surface contained by the window
@@ -158,6 +158,8 @@ extern std::vector<UIElement*> uiElements;
 extern std::vector<Piece*> pieces;
 
 extern std::vector<Text*> text;
+
+extern std::vector<Animation*> animations;
 
 extern GameObject* heldObject;
 

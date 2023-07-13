@@ -46,6 +46,8 @@ std::vector<Piece*> pieces;
 
 std::vector<Text*> text;
 
+std::vector<Animation*> animations;
+
 GameObject* selectedObject = nullptr;
 
 Item* selectedItem = nullptr;
@@ -223,7 +225,7 @@ void loadGamePieces()
             peaks[i]->flags.push_back(flag);
 
         }
-        string pieceName = playerNumber + " piece float 0";
+        string pieceName = playerNumber + " piece float";
         int x = (rand() % (int)(SCREEN_WIDTH/1.05)) + SCREEN_WIDTH/2 - SCREEN_WIDTH/2.1;
         int y = (rand() % (int)(SCREEN_HEIGHT/1.05)) + SCREEN_HEIGHT/2 - SCREEN_HEIGHT/2.1;
         while (selectTerrain(x, y) != NULL || selectUI(x, y) != NULL) {
@@ -236,35 +238,13 @@ void loadGamePieces()
             piece->SetCenter(x, y);
             piece->SetDesignatedLocation(x, y);
             piece->SetSelectable(selectable);
-            std::vector<std::pair<SDL_Texture *, SDL_Surface*>> standingIdleAnimation;
-            std::vector<std::pair<SDL_Texture *, SDL_Surface*>> floatingIdleAnimation;
-
-            piece->animations.push_back(standingIdleAnimation);
-            piece->animations.push_back(floatingIdleAnimation);
-            int blinkFrame = rand() % 23;
-            for (int j = 0; j < 24; j++) {
-                if (j == blinkFrame || j == blinkFrame + 1) {
-                    piece->animations[0].push_back({textures[playerNumber + " piece salute blink"][0], surfaces[playerNumber + " piece salute blink"]});
-                } else {
-                    piece->animations[0].push_back({textures[playerNumber + " piece salute"][0], surfaces[playerNumber + " piece salute"]});
-                    std::cout << piece->animations[0].size() << std::endl;
-                }
-            }
-            for (int j = 0; j < 24; j++) {
-                if (j == 0 || j == 1 || j == 22 || j == 23) {
-                    piece->animations[1].push_back({textures["playerOne piece float 0"][0], surfaces["playerOne piece float 0"]});
-                } else if (j == 2 || j == 3 || j == 20 || j == 21) {
-                    piece->animations[1].push_back({textures["playerOne piece float 1"][0], surfaces["playerOne piece float 1"]});
-                } else if (j == 4 || j == 5 || j == 18 || j == 19) {
-                    piece->animations[1].push_back({textures["playerOne piece float 2"][0], surfaces["playerOne piece float 2"]});
-                } else if (j == 6 || j == 7 || j == 16 || j == 17) {
-                    piece->animations[1].push_back({textures["playerOne piece float 3"][0], surfaces["playerOne piece float 3"]});
-                } else if (j == 8 || j == 9 || j == 14 || j == 15) {
-                    piece->animations[1].push_back({textures["playerOne piece float 4"][0], surfaces["playerOne piece float 4"]});
-                } else if (j == 10 || j == 11 || j == 12 || j == 13) {
-                    piece->animations[1].push_back({textures["playerOne piece float 5"][0], surfaces["playerOne piece float 5"]});
-                }
-            }
+            Animation* floatIdle = new Animation(textures[playerNumber + " piece float sheet"][0], surfaces[playerNumber + " piece float sheet"], 1, 12, {3, 4}, {48, 48});
+            Animation* saluteIdle = new Animation(textures[playerNumber + " piece salute sheet"][0], surfaces[playerNumber + " piece salute sheet"], 2, 24, {4, 6}, {48, 48});
+            animations.push_back(floatIdle);
+            animations.push_back(saluteIdle);
+            piece->SetCurrentAnimation(floatIdle);
+            piece->animations["floatIdle"] = floatIdle;
+            piece->animations["saluteIdle"] = saluteIdle;
             pieces.push_back(piece);
         }
     }
@@ -398,6 +378,10 @@ void ResetMap() {
         delete text[i];
     }
 
+    for (int i = 0; i < animations.size(); i++) {
+        delete animations[i];
+    }
+
     std::vector<Piece*> newPieces;
     std::vector<std::vector<Terrain*>> newTerrain;
     std::vector<std::vector<GameObject*>> newTerrainOutlines;
@@ -410,6 +394,8 @@ void ResetMap() {
     std::vector<Item*> newPlayerFourInventory;
     std::vector<Pixel*> newPixels;
     std::vector<Text*> newText;
+    std::vector<Animation*> newAnimations;
+    animations = newAnimations;
     text = newText;
     pixels = newPixels;
     uiElements = newUIElements;
@@ -946,6 +932,7 @@ void HandleEvents(Input* playerInput) {
                                 piece->SetScale(piece->GetScale()*2);
                                 piece->SetCenter(centerX, centerY - (piece->GetDimensions().second/2) * piece->GetSize());
                                 piece->SetDesignatedLocation(piece->GetCenter().first, piece->GetCenter().second);
+                                piece->GetCurrentAnimation()->Pause();
                             } else {
                                 //selectedObject = selectObject(gameObjects, playerInput->currentMousePosition.first, playerInput->currentMousePosition.second);
                             }
@@ -978,6 +965,7 @@ void HandleEvents(Input* playerInput) {
                         Terrain* targetTerrain = selectTerrain(piece->GetCenter().first, centerY + (piece->GetDimensions().second/2) * piece->GetSize() * piece->GetScale());
                         piece->SetScale(piece->GetScale()*0.5f);
                         piece->SetCenter(centerX, centerY + (piece->GetDimensions().second/2) * piece->GetSize());
+                        piece->GetCurrentAnimation()->Unpause();
                         Move(piece, startingTerrain, targetTerrain, movesLeft);
                         hoveringTerrain = nullptr;
                         if (targetTerrain != NULL) std::cout <<targetTerrain->GetBiome() << std::endl;
@@ -1596,11 +1584,11 @@ void Move(Piece* piece, Terrain* startingPoint, Terrain* targetTerrain, int& mov
             RefreshClaimNotifs();
         }
         if (targetTerrain == NULL)  {
-            piece->SetTexture(textures[currentTurn + " piece float"][0]);
+            piece->SetCurrentAnimation(piece->animations["floatIdle"]);
             piece->SetSurface(surfaces[currentTurn + " piece float"]);
         }
         else {
-            piece->SetTexture(textures[currentTurn + " piece salute"][0]);
+            piece->SetCurrentAnimation(piece->animations["saluteIdle"]);
             piece->SetSurface(surfaces[currentTurn + " piece salute"]);
         }
     }
@@ -2069,23 +2057,14 @@ void GeneratePixels() {
 
 //-------------------//
 
-void AnimationHandler(int& frame, float fps, Uint64& lastFrame, Uint64& lastUpdate) {
-    Uint32 current = SDL_GetTicks();
-    float dT = (current - lastUpdate) / 1000.0f;
-
-    int framesToUpdate = floor(dT / (1.0f / 24));
-    if (framesToUpdate > 0) {
-        lastFrame += framesToUpdate;
-        lastFrame %= 24;
-        lastUpdate = current;
-    }
-
-    for (int i = 0; i < pieces.size(); i++) {
-        if (pieces[i]->type != GameObject::ITEM) {
-            for (int j = 0; j < pieces[i]->animations.size(); j++) {
-                pieces[i]->CycleAnimation(lastFrame);
-                break;
+void AnimationHandler(float fps, Uint64& lastFrame, Uint64& lastUpdate) {
+    Uint64 current = SDL_GetTicks();
+    for (int i = 0; i < gameObjects.size(); i++) {
+        for (int j = 0; j < gameObjects[i].size(); j++) {
+            if (gameObjects[i][j]->GetCurrentAnimation() != nullptr) {
+                gameObjects[i][j]->GetCurrentAnimation()->CycleFrame(current);
             }
+
         }
     }
 

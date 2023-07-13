@@ -54,7 +54,7 @@ int main( int argc, char* args[] )
         //Handle events on queue
         HandleEvents(playerInput);
         frame++;
-        AnimationHandler(frame, fps, lastFrame, lastUpdate);
+        AnimationHandler(fps, lastFrame, lastUpdate);
         RenderScreen();
 
 

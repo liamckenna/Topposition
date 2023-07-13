@@ -25,7 +25,11 @@ void GameObject::RenderGameObject(SDL_Renderer* renderer) {
     renderRect->w = (float) (dimensions.first * size * scale);
     renderRect->h = (float) (dimensions.second * size * scale);
     if (rendered) {
-        SDL_RenderCopy(renderer, texture, NULL, renderRect);
+        if (currentAnimation == nullptr) {
+            SDL_RenderCopy(renderer, texture, NULL, renderRect);
+        } else {
+            SDL_RenderCopy(renderer, currentAnimation->GetSpriteSheet(), currentAnimation->GetRect(), renderRect);
+        }
     }
 }
 
@@ -94,11 +98,6 @@ void GameObject::SetDefaultPosition(float x, float y) {
 void GameObject::SetBottomRight() {
     bottomRight.first = position.first + (dimensions.first * size * scale);
     bottomRight.second = position.second + (dimensions.second * size * scale);
-}
-
-void GameObject::CycleAnimation(int frame) {
-    currentFrame = frame;
-
 }
 
 void Terrain::RenderGameObject(SDL_Renderer *renderer, Terrain* hoveringTerrain) {
@@ -180,6 +179,37 @@ void Text::RenderText(SDL_Renderer* renderer) {
         rect->w = dimensions.first;
         rect->h = dimensions.second;
         SDL_RenderCopy(renderer, texture, NULL, rect);
+    }
+
+}
+
+Animation::Animation(SDL_Texture *ss, SDL_Surface *s, float d, int fc, pair<int, int> sd, pair<int, int> spd) {
+    spriteSheet = ss;
+    surface = s;
+    duration = d;
+    frameCount = fc;
+    sheetDimensions = sd;
+    spriteDimensions = spd;
+    frameOffset = rand() % frameCount;
+    lastFrame = frameOffset;
+}
+
+void Animation::CycleFrame(Uint64 current) {
+    if (paused) lastUpdate = current;
+    float dT = (current - lastUpdate) / 1000.0f;
+
+
+    int framesToUpdate = floor(dT / (1.0f / (frameCount/duration)));
+    if (framesToUpdate > 0) {
+        lastFrame += framesToUpdate;
+        lastFrame %= frameCount;
+        lastUpdate = current;
+        int row = lastFrame / sheetDimensions.first;
+        int column = lastFrame % sheetDimensions.first;
+        rect->x = spriteDimensions.first * column;
+        rect->y = spriteDimensions.second * row;
+        rect->w = spriteDimensions.first;
+        rect->h = spriteDimensions.second;
     }
 
 }
