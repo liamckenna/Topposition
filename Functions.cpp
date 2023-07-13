@@ -507,9 +507,12 @@ void TextureLoader() {
     //load all textures
     struct dirent *entry = nullptr;
     struct dirent* innerEntry = nullptr;
+    struct dirent* innerx2 = nullptr;
     DIR *odp = nullptr;
     DIR* idp = nullptr;
+    DIR* iidp = nullptr;
     const char* innerDir = "";
+    const char* innerx2Dir = "";
     odp = opendir("Textures");
     int textureCount = 0;
     if (odp != nullptr) {
@@ -522,6 +525,20 @@ void TextureLoader() {
                 if (innerEntry->d_namlen == 1 || innerEntry->d_namlen == 2) continue;
                 string fileName = innerEntry->d_name;
                 size_t pos = fileName.find(".");
+                if (pos == std::string::npos) {
+                    string fpp = fp + (string)innerEntry->d_name + "/";
+                    innerx2Dir = fpp.c_str();
+                    iidp = opendir(innerx2Dir);
+                    while (innerx2 = readdir(iidp)) {
+                        if (innerx2->d_namlen == 1 || innerx2->d_namlen == 2) continue;
+                        string innerFileName = innerx2->d_name;
+                        size_t innerPos = innerFileName.find(".");
+                        string innerShorthand = innerFileName.substr(0, innerPos);
+                        string innerTexturePath = fpp + innerFileName;
+                        textures[innerShorthand][0] = loadTexture(innerTexturePath);
+                        surfaces[innerShorthand] = loadSurface(innerTexturePath);
+                    }
+                }
                 string shorthand = fileName.substr(0,pos);
                 string texturePath = fp + fileName;
                 if ((string)entry->d_name == "Terrain") {
@@ -593,7 +610,6 @@ void zoom(SDL_Event e, Input* playerInput) {
         }
     }
     RecenterScreen(playerInput);
-    //GeneratePixels();
 }
 
 void renderObjects(SDL_Renderer* renderer) {
@@ -634,7 +650,6 @@ void renderPieces() {
     for (int i = pieces.size() - 1; i >= 0; i--) {
         if (pieces[i]->type != GameObject::ITEM) {
             pieces[i]->RenderGameObject(renderer);
-            std::cout << "rendering pieces" << std::endl;
         }
     }
 }
@@ -681,7 +696,6 @@ void scroll(Input* playerInput) {
     }
 
     RecenterScreen(playerInput);
-    //GeneratePixels();
 }
 
 GameObject* selectObject(int x, int y) {

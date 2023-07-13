@@ -40,7 +40,7 @@ protected:
     pair<float, float> bottomRight;
     float scale = 1;
     bool resizable = true;
-    int currentAnimation = 0;
+    int currentAnimation = 1;
     int currentFrame = 0;
 
 public:

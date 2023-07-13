@@ -98,9 +98,7 @@ void GameObject::SetBottomRight() {
 
 void GameObject::CycleAnimation(int frame) {
     currentFrame = frame;
-    SetTexture(animations[currentAnimation][currentFrame].first);
-    std::cout << currentAnimation << ", " << currentFrame << std::endl;
-    SetSurface(animations[currentAnimation][currentFrame].second);
+
 }
 
 void Terrain::RenderGameObject(SDL_Renderer *renderer, Terrain* hoveringTerrain) {
