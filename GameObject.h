@@ -5,6 +5,7 @@
 #include "SDL.h"
 #include <SDL2/SDL_ttf.h>
 #include "GameRules.h"
+
 #include <math.h>
 #include <map>
 
@@ -98,6 +99,7 @@ protected:
     int offsetY;
     SDL_Color color;
     string biome = "";
+    SDL_Texture* pixels;
 
 
 public:
@@ -106,13 +108,20 @@ public:
 
     void RenderGameObject(SDL_Renderer* renderer, Terrain* hoveringTerrain);
 
-    Terrain(string name, SDL_Texture *texture, SDL_Surface *surface, bool m, bool r, int l) : GameObject(name, texture, surface, m, r) {
+    Terrain(string name, SDL_Texture *texture, SDL_Surface *surface, bool m, bool r, int l, SDL_Renderer* renderer) : GameObject(name, texture, surface, m, r) {
         layer = l;
         scale = 1;
         type = TERRAIN;
+        pixels = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA8888,SDL_TEXTUREACCESS_TARGET, 1920, 1080);
+        SDL_SetRenderTarget(renderer, pixels);
+        SDL_RenderClear(renderer);
+        SDL_SetTextureBlendMode(pixels, SDL_BLENDMODE_BLEND);
+        SDL_SetRenderDrawColor(renderer, 0, 0, 0, 0);
+        SDL_SetRenderTarget(renderer, NULL);
     }
     void SetPeak(Peak* p) {peak = p;}
     Peak* GetPeak() const {return peak;}
+    SDL_Texture* GetPixels() const {return pixels;}
     double GetRotation() const {return rotation;}
     Terrain* GetUpperTerrain() {return upperTerrain;}
     Terrain* GetLowerTerrain() {return lowerTerrain;}
@@ -158,7 +167,7 @@ public:
     std::vector<Terrain*> childTerrain;
     std::vector<Piece*> flags;
 
-    Peak(string name, SDL_Texture *texture, SDL_Surface *surface, bool m, bool r, int l) : Terrain(name, texture, surface, m, r, l) {
+    Peak(string name, SDL_Texture *texture, SDL_Surface *surface, bool m, bool r, int l, SDL_Renderer* renderer) : Terrain(name, texture, surface, m, r, l, renderer) {
         type = PEAK;
         peak = this;
     }

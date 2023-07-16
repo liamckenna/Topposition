@@ -7,6 +7,7 @@ GameObject::GameObject(string name, SDL_Texture *texture, SDL_Surface* surface, 
     this->surface = surface;
     size = 1;
     SDL_QueryTexture(texture, nullptr, nullptr, &dimensions.first, &dimensions.second);
+
     SetPosition(0,0, true);
     SetCenter();
     SetDefaultPosition(0, 0);
@@ -22,6 +23,9 @@ void GameObject::RenderGameObject(SDL_Renderer* renderer) {
         renderRect->x = position.first;
         renderRect->y = position.second;
     }
+    SDL_QueryTexture(texture, nullptr, NULL, &dimensions.first, &dimensions.second);
+    //std::cout << dimensions.first << ", " << dimensions.second << std::endl;
+
     renderRect->w = (float) (dimensions.first * size * scale);
     renderRect->h = (float) (dimensions.second * size * scale);
     if (rendered) {
@@ -101,8 +105,23 @@ void GameObject::SetBottomRight() {
 }
 
 void Terrain::RenderGameObject(SDL_Renderer *renderer, Terrain* hoveringTerrain) {
-    if (this == hoveringTerrain) {
-        SDL_SetTextureColorMod(texture, 255, 0, 0);
+    bool hovering = false;
+    if (hoveringTerrain != nullptr) {
+        if (this == hoveringTerrain) {
+            hovering = true;
+        } else if (this != nullptr) {
+            for (int i = 0; i < connectedTerrain.size(); i++) {
+                if (connectedTerrain[i] == hoveringTerrain) {
+                    hovering = true;
+                    break;
+                }
+            }
+        }
+    }
+    if (hovering) {
+        SDL_SetTextureColorMod(texture, color.r/2, color.g/2, color.b/2);
+    } else {
+        SDL_SetTextureColorMod(texture, color.r, color.g, color.b);
     }
     if (size == 1) {
         renderRect->x = defaultPosition.first;
@@ -115,18 +134,24 @@ void Terrain::RenderGameObject(SDL_Renderer *renderer, Terrain* hoveringTerrain)
     renderRect->h = (dimensions.second * size * scale);
     if (rendered) {
         SDL_RenderCopyEx( renderer, texture, NULL, renderRect, 0, NULL, SDL_FLIP_NONE);
+        std::cout << center.first << ", " << center.second << std::endl;
     }
-    if (this == hoveringTerrain) {
+
+    if (hovering) {
         SDL_SetTextureColorMod(texture, color.r, color.g, color.b);
     }
 }
 
 void Pixel::RenderGameObject(SDL_Renderer *renderer, Terrain* hoveringTerrain) {
+
+
+    //SDL_SetRenderTarget(renderer, hiddenTerrain->GetPixels());
+
     bool hovering = false;
     if (hoveringTerrain != nullptr) {
         if (hiddenTerrain == hoveringTerrain) {
             hovering = true;
-        } else if (hiddenTerrain != nullptr) {
+        } else if (this != nullptr) {
             for (int i = 0; i < hiddenTerrain->connectedTerrain.size(); i++) {
                 if (hiddenTerrain->connectedTerrain[i] == hoveringTerrain) {
                     hovering = true;
@@ -134,6 +159,11 @@ void Pixel::RenderGameObject(SDL_Renderer *renderer, Terrain* hoveringTerrain) {
                 }
             }
         }
+    }
+    if (hovering) {
+        SDL_SetTextureColorMod(texture, color.r/2, color.g/2, color.b/2);
+    } else {
+        SDL_SetTextureColorMod(texture, color.r, color.g, color.b);
     }
 
     if (size == 1) {
@@ -143,18 +173,12 @@ void Pixel::RenderGameObject(SDL_Renderer *renderer, Terrain* hoveringTerrain) {
         renderRect->x = position.first;
         renderRect->y = position.second;
     }
-    renderRect->w = (width * size * scale);
+    renderRect->w = (width* size * scale);
     renderRect->h = (height * size * scale);
-    if (hovering) {
-        SDL_SetTextureColorMod(texture, color.r/2, color.g/2, color.b/2);
-    } else {
-        SDL_SetTextureColorMod(texture, color.r, color.g, color.b);
-    }
 
+    SDL_SetTextureColorMod(texture, color.r, color.g, color.b);
     SDL_RenderCopy(renderer, texture, NULL, renderRect);
-    if (hovering) {
-        SDL_SetTextureColorMod(texture, color.r, color.g, color.b);
-    }
+
 }
 
 Text::Text(string n, const char* fp, SDL_Color c, int x, int y, int w, int h, int s, SDL_Renderer* r, const char* t) {
@@ -180,7 +204,6 @@ void Text::RenderText(SDL_Renderer* renderer) {
         rect->h = dimensions.second;
         SDL_RenderCopy(renderer, texture, NULL, rect);
     }
-
 }
 
 Animation::Animation(SDL_Texture *ss, SDL_Surface *s, float d, int fc, pair<int, int> sd, pair<int, int> spd) {

@@ -161,11 +161,10 @@ bool loadMap()
     bool success = true;
 
     //Load splash image
-    GameObject* map = new GameObject("map", textures["map"][0], surfaces["map"], false, true);
+    GameObject* water = new GameObject("water", textures["water"][0], surfaces["water"], false, true);
 
 
-    SDL_SetTextureColorMod(map->GetTexture(), 0, 0, 0);
-    map->SetPosition(0, 0);
+    water->SetPosition(0, 0);
 
 
     for (int i = 0; i < rules->GetMaxHeight() + 1; i++) {
@@ -175,7 +174,7 @@ bool loadMap()
         //generate map layers
     }
 
-    gameObjects[0].push_back(map);
+    gameObjects[0].push_back(water);
     rules->SetRemainingPoints(rules->GetMaxPoints());
     rules->SetRemainingItems(rules->GetMaxItems());
     while (rules->GetRemainingPoints() > 0) {
@@ -315,7 +314,7 @@ void loadUI() {
 
     SDL_Color Blue = {0, 0, 255};
 
-    playerThreeText = new Text("playerThreeText", "Fonts/yoster.ttf", Red, 450, 0, 300, 50, 100, renderer, "Player Three");
+    playerThreeText = new Text("playerThreeText", "Fonts/yoster.ttf", Blue, 450, 0, 300, 50, 100, renderer, "Player Three");
     text.push_back(playerThreeText);
     playerThreeText->SetRendered(false);
 
@@ -412,8 +411,12 @@ void ResetMap() {
     loadUI();
     loadGamePieces();
     GeneratePixels();
+
     currentTurn = "playerOne";
 
+
+    renderPixels();
+    SDL_SetRenderTarget(renderer, NULL);
 }
 
 void close()
@@ -548,10 +551,10 @@ void TextureLoader() {
 }
 
 void RenderScreen(){
-    SDL_SetRenderDrawColor( renderer, 75, 150, 255, 100 );
+    SDL_SetRenderDrawColor( renderer, 51, 169, 255, 100 );
     SDL_RenderClear( renderer );
-
     //Render texture to screen
+    //refreshClaimNotifs();
     //renderTerrain();
     renderPixels();
     renderClaimNotifs();
@@ -1001,7 +1004,7 @@ void GeneratePeak() {
     if (rules->GetRemainingPoints() <= rules->GetMaxHeight()) height = rules->GetRemainingPoints();
     rules->SetRemainingPoints(rules->GetRemainingPoints() - height);
     string name = to_string(height) + ", " + to_string(peaks.size() + 1);
-    Peak* peak = new Peak(name, textures[to_string(shape)][height], surfaces[to_string(shape)], false, true, height);
+    Peak* peak = new Peak(name, textures[to_string(shape)][height], surfaces[to_string(shape)], false, true, height, renderer);
     double rotation = rand() % 360;
     peak->SetRotation(rotation);
     peak->SetScale(0.1);
@@ -1065,7 +1068,7 @@ void GenerateTerrain(Peak* peak, int shape, int height) {
         //shape = rand() % (int)(15);
 
 
-        Terrain* layer = new Terrain(name, textures[to_string(shape)][i], surfaces[to_string(shape)], false, true, i);
+        Terrain* layer = new Terrain(name, textures[to_string(shape)][i], surfaces[to_string(shape)], false, true, i, renderer);
         layer->SetScale(peak->GetScale() + 0.1 * (height - i));
         layer->SetRotation(peak->GetRotation());
         layer->SetPeak(peak);
@@ -2007,7 +2010,7 @@ void GeneratePixels() {
                 pixel->SetOutline(true);
             }*/
 
-            while (tempTerrain != NULL && tempTerrain->GetLayer() == pixel->GetHiddenTerrain()->GetLayer() && !pixel->GetOutline()) {
+            /*while (tempTerrain != NULL && tempTerrain->GetLayer() == pixel->GetHiddenTerrain()->GetLayer() && !pixel->GetOutline()) {
                 y += 4;
                 tempTerrain = selectTerrain(x, y);
                 height += 4;
@@ -2023,25 +2026,30 @@ void GeneratePixels() {
                     if (!contin) break;
                 }
 
-            }
+            }*/
 
             pixel->SetWidth(width + 1);
             pixel->SetHeight(height + 1);
 
             SDL_Color pixelColor;
-            if (pixel->GetOutline()) {
-                pixelColor = {0, 0, 0, 255};
-            } else if (pixel->GetHiddenTerrain()->GetLayer() == 1 && pixel->GetHiddenTerrain()->GetBiome() == "plains") {
-                pixelColor = {246, 215, 176, 255};
+            if (pixel->GetHiddenTerrain()->GetLayer() == 1 && pixel->GetHiddenTerrain()->GetBiome() == "plains") {
+                Uint8 randR = rand() % 56 + 200;
+                Uint8 randG = randR - 8;
+                Uint8 randB = randR - 50;
+                pixelColor = {randR, randG, randB, 255};
             } else {
+                Uint8 randR = rand() % 11;
+                Uint8 randG = rand() % 11;
+                Uint8 randB = rand() % 11;
+                Uint8 randT = rand() % 2;
                 if (pixel->GetHiddenTerrain()->GetBiome() == "plains") {
-                    pixelColor = {static_cast<Uint8>(200/rules->GetMaxHeight() * pixel->GetHiddenTerrain()->GetLayer()),
-                                  static_cast<Uint8>(std::min(200 / rules->GetMaxHeight() * currentTerrain->GetLayer() * 2, 255)),
-                                  static_cast<Uint8>(200 / rules->GetMaxHeight() * currentTerrain->GetLayer()), 255};
+                    pixelColor = {static_cast<Uint8>(200/rules->GetMaxHeight() * pixel->GetHiddenTerrain()->GetLayer() + (randR * randT)),
+                                  static_cast<Uint8>(std::min(200 / rules->GetMaxHeight() * currentTerrain->GetLayer() * 2 + (randG * randT), 255)),
+                                  static_cast<Uint8>(200 / rules->GetMaxHeight() * currentTerrain->GetLayer() + (randB * randT)), 255};
                 } else if (pixel->GetHiddenTerrain()->GetBiome() == "stone") {
-                    pixelColor = {static_cast<Uint8>(200/rules->GetMaxHeight() * pixel->GetHiddenTerrain()->GetLayer()),
-                                  static_cast<Uint8>(200/rules->GetMaxHeight() * pixel->GetHiddenTerrain()->GetLayer()),
-                                  static_cast<Uint8>(200 / rules->GetMaxHeight() * currentTerrain->GetLayer()), 255};
+                    pixelColor = {static_cast<Uint8>(200/rules->GetMaxHeight() * pixel->GetHiddenTerrain()->GetLayer() + (randR * randT)),
+                                  static_cast<Uint8>(200/rules->GetMaxHeight() * pixel->GetHiddenTerrain()->GetLayer() + (randG * randT)),
+                                  static_cast<Uint8>(200 / rules->GetMaxHeight() * currentTerrain->GetLayer() + (randB * randT)), 255};
                 } else if (pixel->GetHiddenTerrain()->GetBiome() == "glacier") {
                     pixelColor = {static_cast<Uint8>(185/rules->GetMaxHeight() * (pixel->GetHiddenTerrain()->GetLayer() - 1)),
                                   static_cast<Uint8>(std::min(200/rules->GetMaxHeight() * (pixel->GetHiddenTerrain()->GetLayer() - 1) + 100, 255)),
