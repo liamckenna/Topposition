@@ -10,7 +10,12 @@
 #include "GameObject.h"
 #include "Input.h"
 #include "GameRules.h"
-#include "Functions.h"
+#include "GlobalVars.h"
+#include "Rendering.h"
+#include "ProgramInitialization.h"
+#include "GameInitialization.h"
+#include "EventHandler.h"
+#include "AnimationHandler.h"
 #include <random>
 
 

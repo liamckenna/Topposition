@@ -5,11 +5,13 @@
 #include "SDL.h"
 #include <SDL2/SDL_ttf.h>
 #include "GameRules.h"
+#include "Player.h"
 
 #include <math.h>
 #include <map>
 
 class Animation;
+class Player;
 
 using namespace std;
 class GameObject {
@@ -163,7 +165,7 @@ class Peak : public Terrain {
     int peakID;
     UIElement* claimNotif;
     Item* item = nullptr;
-    string claimedBy = "";
+    Player* claimedBy = nullptr;
 
 public:
     std::vector<Terrain*> childTerrain;
@@ -179,10 +181,10 @@ public:
     UIElement* GetClaimNotif() {return claimNotif;}
     void SetItem(Item* i) {item = i;}
     Item* GetItem() {return item;}
-    void Claim(string team) {
-        claimedBy = team;
+    void Claim(Player* player) {
+        claimedBy = player;
     }
-    string GetClaimedBy() {return claimedBy;}
+    Player* GetClaimedBy() {return claimedBy;}
 
 };
 
@@ -191,6 +193,7 @@ private:
     int altitude;
     pair<int, int> designatedLocation;
     Terrain* occupyingTerrain;
+    Player* player;
 
 public:
     Piece(string name, SDL_Texture* texture, SDL_Surface* surface, bool r) : GameObject(name, texture, surface, true, r) {
@@ -204,6 +207,8 @@ public:
     pair<int, int> GetDesignatedLocation() {return designatedLocation;}
     void SetAltitude(int a) {altitude = a;}
     int GetAltitude() {return altitude;}
+    Player* GetPlayer() {return player;}
+    void SetPlayer(Player* p) {player = p;}
     void SetOccupyingTerrain(Terrain* ot) {occupyingTerrain = ot;}
     Terrain* GetOccupyingTerrain() {return occupyingTerrain;}
 
@@ -211,7 +216,7 @@ public:
 
 class Item : public Piece {
     bool used = false;
-    string owner = "";
+    Player* owner = nullptr;
 
 public:
     Item(string name, SDL_Texture* texture, SDL_Surface* surface, bool r) : Piece(name, texture, surface, r) {
@@ -219,9 +224,9 @@ public:
         movable = false;
     }
     void SetUsed(bool u) {used = u;}
-    void SetOwner(string o) {owner = o;}
+    void SetOwner(Player* o) {owner = o;}
     bool Getused() {return used;}
-    string GetOwner() {return owner;}
+    Player* GetOwner() {return owner;}
 };
 
 class Pixel : public GameObject {
