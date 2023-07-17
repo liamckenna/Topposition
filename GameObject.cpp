@@ -119,9 +119,9 @@ void Terrain::RenderGameObject(SDL_Renderer *renderer, Terrain* hoveringTerrain)
         }
     }
     if (hovering) {
-        SDL_SetTextureColorMod(texture, color.r/2, color.g/2, color.b/2);
+        SDL_SetTextureColorMod(pixels, 255/2, 255/2, 255/2);
     } else {
-        SDL_SetTextureColorMod(texture, color.r, color.g, color.b);
+        //SDL_SetTextureColorMod(texture, color.r, color.g, color.b);
     }
     if (size == 1) {
         renderRect->x = defaultPosition.first;
@@ -130,22 +130,21 @@ void Terrain::RenderGameObject(SDL_Renderer *renderer, Terrain* hoveringTerrain)
         renderRect->x = position.first;
         renderRect->y = position.second;
     }
-    renderRect->w = (dimensions.first * size * scale);
-    renderRect->h = (dimensions.second * size * scale);
+    renderRect->w = (dimensions.first * size);
+    renderRect->h = (dimensions.second * size);
     if (rendered) {
-        SDL_RenderCopyEx( renderer, texture, NULL, renderRect, 0, NULL, SDL_FLIP_NONE);
-        std::cout << center.first << ", " << center.second << std::endl;
+        SDL_RenderCopyEx( renderer, pixels, NULL, renderRect, 0, NULL, SDL_FLIP_NONE);
     }
 
     if (hovering) {
-        SDL_SetTextureColorMod(texture, color.r, color.g, color.b);
+        SDL_SetTextureColorMod(pixels, 255, 255, 255);
     }
 }
 
 void Pixel::RenderGameObject(SDL_Renderer *renderer, Terrain* hoveringTerrain) {
 
 
-    //SDL_SetRenderTarget(renderer, hiddenTerrain->GetPixels());
+    SDL_SetRenderTarget(renderer, hiddenTerrain->GetPixels());
 
     bool hovering = false;
     if (hoveringTerrain != nullptr) {
@@ -167,18 +166,19 @@ void Pixel::RenderGameObject(SDL_Renderer *renderer, Terrain* hoveringTerrain) {
     }
 
     if (size == 1) {
-        renderRect->x = defaultPosition.first;
-        renderRect->y = defaultPosition.second;
+        renderRect->x = defaultPosition.first - hiddenTerrain->GetPosition().first;
+        renderRect->y = defaultPosition.second - hiddenTerrain->GetPosition().second;
     } else {
-        renderRect->x = position.first;
-        renderRect->y = position.second;
+        renderRect->x = position.first - hiddenTerrain->GetPosition().first;
+        renderRect->y = position.second - hiddenTerrain->GetPosition().second;
     }
-    renderRect->w = (width* size * scale);
-    renderRect->h = (height * size * scale);
+    renderRect->w = (width);
+    renderRect->h = (height);
 
-    SDL_SetTextureColorMod(texture, color.r, color.g, color.b);
     SDL_RenderCopy(renderer, texture, NULL, renderRect);
-
+    if (hovering) {
+        SDL_SetTextureColorMod(texture, color.r, color.g, color.b);
+    }
 }
 
 Text::Text(string n, const char* fp, SDL_Color c, int x, int y, int w, int h, int s, SDL_Renderer* r, const char* t) {

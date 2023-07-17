@@ -112,11 +112,13 @@ public:
         layer = l;
         scale = 1;
         type = TERRAIN;
-        pixels = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA8888,SDL_TEXTUREACCESS_TARGET, 1920, 1080);
+        pixels = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA8888,SDL_TEXTUREACCESS_TARGET, dimensions.first, dimensions.second);
+        SDL_SetRenderDrawColor(renderer, 0, 0, 0, 0);
+        SDL_SetTextureBlendMode(pixels, SDL_BLENDMODE_BLEND);
         SDL_SetRenderTarget(renderer, pixels);
         SDL_RenderClear(renderer);
-        SDL_SetTextureBlendMode(pixels, SDL_BLENDMODE_BLEND);
-        SDL_SetRenderDrawColor(renderer, 0, 0, 0, 0);
+
+
         SDL_SetRenderTarget(renderer, NULL);
     }
     void SetPeak(Peak* p) {peak = p;}

@@ -364,7 +364,7 @@ void ResetMap() {
     }
 
     for (int i = 0; i < pixels.size(); i++) {
-        pixels[i] = nullptr;
+        delete pixels[i];
     }
 
     for (int i = 0; i < gameObjects.size(); i++) {
@@ -413,7 +413,7 @@ void ResetMap() {
     GeneratePixels();
 
     currentTurn = "playerOne";
-
+    currentInventory = playerOneInventory;
 
     renderPixels();
     SDL_SetRenderTarget(renderer, NULL);
@@ -555,8 +555,9 @@ void RenderScreen(){
     SDL_RenderClear( renderer );
     //Render texture to screen
     //refreshClaimNotifs();
-    //renderTerrain();
-    renderPixels();
+    //gameObjects[0][0]->RenderGameObject(renderer);
+    renderTerrain();
+    //renderPixels();
     renderClaimNotifs();
     renderPieces();
     renderUI();
@@ -935,7 +936,7 @@ void HandleEvents(Input* playerInput) {
                                 piece->SetScale(piece->GetScale()*2);
                                 piece->SetCenter(centerX, centerY - (piece->GetDimensions().second/2) * piece->GetSize());
                                 piece->SetDesignatedLocation(piece->GetCenter().first, piece->GetCenter().second);
-                                piece->GetCurrentAnimation()->Pause();
+                                if (piece->GetCurrentAnimation() != NULL) piece->GetCurrentAnimation()->Pause();
                             } else {
                                 //selectedObject = selectObject(gameObjects, playerInput->currentMousePosition.first, playerInput->currentMousePosition.second);
                             }
@@ -968,7 +969,7 @@ void HandleEvents(Input* playerInput) {
                         Terrain* targetTerrain = selectTerrain(piece->GetCenter().first, centerY + (piece->GetDimensions().second/2) * piece->GetSize() * piece->GetScale());
                         piece->SetScale(piece->GetScale()*0.5f);
                         piece->SetCenter(centerX, centerY + (piece->GetDimensions().second/2) * piece->GetSize());
-                        piece->GetCurrentAnimation()->Unpause();
+                        if (piece->GetCurrentAnimation() != NULL) piece->GetCurrentAnimation()->Unpause();
                         Move(piece, startingTerrain, targetTerrain, movesLeft);
                         hoveringTerrain = nullptr;
                         if (targetTerrain != NULL) std::cout <<targetTerrain->GetBiome() << std::endl;
@@ -1907,6 +1908,7 @@ void Retreat(Peak* peak, string retreatingTeam) {
                 y = (rand() % (int)(SCREEN_HEIGHT/1.05)) + SCREEN_HEIGHT/2 - SCREEN_HEIGHT/2.1;
             }
             peak->occupants[i]->SetCenter(x, y);
+            peak->occupants[i]->SetCurrentAnimation(peak->occupants[i]->animations["floatIdle"]);
             peak->occupants.erase(peak->occupants.begin() + i);
         }
     }
@@ -1977,28 +1979,23 @@ void Tiebreaker() {
 }
 
 void GeneratePixels() {
-    for (int i = 0; i < pixels.size(); i++) {
-        delete pixels[i];
-    }
 
-    std::vector<Pixel*> newPixels;
-    pixels = newPixels;
 
-    for (int i = 0; i < SCREEN_WIDTH/4; i++) {
-        for (int j = 0; j < SCREEN_HEIGHT/4; j++) {
-            int x = i*4 + 2;
-            int y = j*4 + 2;
+    for (int i = 0; i < SCREEN_WIDTH/2; i++) {
+        for (int j = 0; j < SCREEN_HEIGHT/2; j++) {
+            int x = i*2 + 1;
+            int y = j*2 + 1;
             Terrain* currentTerrain = selectTerrain(x, y);
             if (currentTerrain == nullptr) continue;
 
             Pixel* pixel = new Pixel("pixel", textures["pixel"][0], surfaces["pixel"], false, true);
             pixel->SetHiddenTerrain(selectTerrain(x, y));
 
-            y += 4;
+            y += 2;
             Terrain* tempTerrain = selectTerrain(x, y);
-            int width= 4;
-            int height = 4;
-            pixel->SetPosition(i*4, j*4);
+            int width= 2;
+            int height = 2;
+            pixel->SetPosition(i*2, j*2);
 
             /*Terrain* topLeftTerrain = selectTerrain(i*4, j*4);
             Terrain* bottomRightTerrain = selectTerrain(i*4 + 4, j*4 + 4);
@@ -2043,9 +2040,9 @@ void GeneratePixels() {
                 Uint8 randB = rand() % 11;
                 Uint8 randT = rand() % 2;
                 if (pixel->GetHiddenTerrain()->GetBiome() == "plains") {
-                    pixelColor = {static_cast<Uint8>(200/rules->GetMaxHeight() * pixel->GetHiddenTerrain()->GetLayer() + (randR * randT)),
-                                  static_cast<Uint8>(std::min(200 / rules->GetMaxHeight() * currentTerrain->GetLayer() * 2 + (randG * randT), 255)),
-                                  static_cast<Uint8>(200 / rules->GetMaxHeight() * currentTerrain->GetLayer() + (randB * randT)), 255};
+                    pixelColor = {static_cast<Uint8>(125 /rules->GetMaxHeight() * pixel->GetHiddenTerrain()->GetLayer() + (randR * randT)),
+                                  static_cast<Uint8>(std::min(125 / rules->GetMaxHeight() * currentTerrain->GetLayer() * 2 + (randG * randT), 255)),
+                                  static_cast<Uint8>(125 / rules->GetMaxHeight() * currentTerrain->GetLayer() + (randB * randT)), 255};
                 } else if (pixel->GetHiddenTerrain()->GetBiome() == "stone") {
                     pixelColor = {static_cast<Uint8>(200/rules->GetMaxHeight() * pixel->GetHiddenTerrain()->GetLayer() + (randR * randT)),
                                   static_cast<Uint8>(200/rules->GetMaxHeight() * pixel->GetHiddenTerrain()->GetLayer() + (randG * randT)),
@@ -2058,7 +2055,7 @@ void GeneratePixels() {
             }
             pixel->SetColor(pixelColor);
             pixels.push_back(pixel);
-            gameObjects[pixel->GetHiddenTerrain()->GetLayer()].push_back(pixel);
+            //gameObjects[pixel->GetHiddenTerrain()->GetLayer()].push_back(pixel);
         }
     }
 }
