@@ -1,7 +1,7 @@
 CMakeFiles/Topposition.dir/PlayerMovement.cpp.obj: \
  C:\Users\LMckenna\CLionProjects\Topposition\PlayerMovement.cpp \
  C:\Users\LMckenna\CLionProjects\Topposition\PlayerMovement.h \
- C:\Users\LMckenna\CLionProjects\Topposition\Functions.h \
+ C:\Users\LMckenna\CLionProjects\Topposition\GlobalVars.h \
  C:/Program\ Files/JetBrains/CLion\ 2023.1.3/bin/mingw/lib/gcc/x86_64-w64-mingw32/11.2.0/include/c++/iostream \
  C:/Program\ Files/JetBrains/CLion\ 2023.1.3/bin/mingw/lib/gcc/x86_64-w64-mingw32/11.2.0/include/c++/x86_64-w64-mingw32/bits/c++config.h \
  C:/Program\ Files/JetBrains/CLion\ 2023.1.3/bin/mingw/lib/gcc/x86_64-w64-mingw32/11.2.0/include/c++/x86_64-w64-mingw32/bits/os_defines.h \
@@ -333,4 +333,6 @@ CMakeFiles/Topposition.dir/PlayerMovement.cpp.obj: \
  C:\Users\LMckenna\CLionProjects\Topposition\GameLogic.h \
  C:\Users\LMckenna\CLionProjects\Topposition\MouseLogic.h \
  C:\Users\LMckenna\CLionProjects\Topposition\MultiPurposeFunctions.h \
- C:\Users\LMckenna\CLionProjects\Topposition\Input.h
+ C:\Users\LMckenna\CLionProjects\Topposition\Input.h \
+ C:\Users\LMckenna\CLionProjects\Topposition\GameInitialization.h \
+ C:\Users\LMckenna\CLionProjects\Topposition\TerrainGeneration.h

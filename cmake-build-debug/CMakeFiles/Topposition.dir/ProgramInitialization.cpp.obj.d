@@ -1,7 +1,7 @@
 CMakeFiles/Topposition.dir/ProgramInitialization.cpp.obj: \
  C:\Users\LMckenna\CLionProjects\Topposition\ProgramInitialization.cpp \
  C:\Users\LMckenna\CLionProjects\Topposition\ProgramInitialization.h \
- C:\Users\LMckenna\CLionProjects\Topposition\Functions.h \
+ C:\Users\LMckenna\CLionProjects\Topposition\GlobalVars.h \
  C:/Program\ Files/JetBrains/CLion\ 2023.1.3/bin/mingw/lib/gcc/x86_64-w64-mingw32/11.2.0/include/c++/iostream \
  C:/Program\ Files/JetBrains/CLion\ 2023.1.3/bin/mingw/lib/gcc/x86_64-w64-mingw32/11.2.0/include/c++/x86_64-w64-mingw32/bits/c++config.h \
  C:/Program\ Files/JetBrains/CLion\ 2023.1.3/bin/mingw/lib/gcc/x86_64-w64-mingw32/11.2.0/include/c++/x86_64-w64-mingw32/bits/os_defines.h \

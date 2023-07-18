@@ -83,6 +83,7 @@ void loadGamePieces()
         }
         for (int i = 0; i < rules->GetPieces(); i++) {
             Piece* piece = new Piece(playerNumber, textures[pieceName][0], surfaces[pieceName], true);
+            piece->SetScale(2);
             gameObjects[rules->GetMaxHeight() + 1].push_back(piece);
             piece->SetCenter(x, y);
             piece->SetDesignatedLocation(x, y);
@@ -270,8 +271,8 @@ void GeneratePixels() {
 
     for (int i = 0; i < SCREEN_WIDTH/2; i++) {
         for (int j = 0; j < SCREEN_HEIGHT/2; j++) {
-            int x = i*2 + 1;
-            int y = j*2 + 1;
+            int x = i*2 + 0;
+            int y = j*2 + 0;
             Terrain* currentTerrain = selectTerrain(x, y);
             if (currentTerrain == nullptr) continue;
 

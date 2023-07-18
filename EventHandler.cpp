@@ -30,7 +30,7 @@ void HandleEvents(Input* playerInput) {
                                 int centerX = piece->GetCenter().first;
                                 int centerY = piece->GetCenter().second;
                                 piece->SetScale(piece->GetScale()*2);
-                                piece->SetCenter(centerX, centerY - (piece->GetDimensions().second/2) * piece->GetSize());
+                                piece->SetCenter(centerX, centerY - (piece->GetDimensions().second/2) * piece->GetSize() * (piece->GetScale()/2));
                                 piece->SetDesignatedLocation(piece->GetCenter().first, piece->GetCenter().second);
                                 if (piece->GetCurrentAnimation() != NULL) piece->GetCurrentAnimation()->Pause();
                             } else {
@@ -64,7 +64,7 @@ void HandleEvents(Input* playerInput) {
                         Terrain* startingTerrain = selectTerrain(piece->GetDesignatedLocation().first, piece->GetDesignatedLocation().second + (piece->GetDimensions().second/2) * piece->GetSize() * piece->GetScale());
                         Terrain* targetTerrain = selectTerrain(piece->GetCenter().first, centerY + (piece->GetDimensions().second/2) * piece->GetSize() * piece->GetScale());
                         piece->SetScale(piece->GetScale()*0.5f);
-                        piece->SetCenter(centerX, centerY + (piece->GetDimensions().second/2) * piece->GetSize());
+                        piece->SetCenter(centerX, centerY + (piece->GetDimensions().second/2) * piece->GetSize() * piece->GetScale());
                         if (piece->GetCurrentAnimation() != NULL) piece->GetCurrentAnimation()->Unpause();
                         Move(piece, startingTerrain, targetTerrain, movesLeft);
                         hoveringTerrain = nullptr;

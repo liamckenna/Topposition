@@ -70,6 +70,7 @@ void UpdateScore() {
 
     int peaksLeft = peaks.size();
     for (int i = 0; i < players.size(); i++) {
+        players[i]->SetScore(0);
         for (int j = 0; j < players[i]->peaks.size(); j++) {
             peaksLeft--;
             players[i]->SetScore(players[i]->GetScore() + players[i]->peaks[j]->GetLayer());

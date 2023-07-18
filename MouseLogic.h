@@ -2,6 +2,7 @@
 #include "GlobalVars.h"
 #include "MultiPurposeFunctions.h"
 #include "Input.h"
+#include "GameInitialization.h"
 
 void zoom(SDL_Event e, Input* playerInput);
 

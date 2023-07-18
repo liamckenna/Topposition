@@ -328,7 +328,7 @@ CMakeFiles/Topposition.dir/main.cpp.obj: \
  C:\Users\LMckenna\CLionProjects\Topposition\GameRules.h \
  C:\Users\LMckenna\CLionProjects\Topposition\Player.h \
  C:\Users\LMckenna\CLionProjects\Topposition\Input.h \
- C:\Users\LMckenna\CLionProjects\Topposition\Functions.h \
+ C:\Users\LMckenna\CLionProjects\Topposition\GlobalVars.h \
  C:\Users\LMckenna\CLionProjects\Topposition\Rendering.h \
  C:\Users\LMckenna\CLionProjects\Topposition\ProgramInitialization.h \
  C:\Users\LMckenna\CLionProjects\Topposition\GameInitialization.h \
