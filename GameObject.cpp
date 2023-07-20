@@ -130,12 +130,9 @@ void Terrain::RenderGameObject(SDL_Renderer *renderer, Terrain* hoveringTerrain)
         renderRect->x = position.first;
         renderRect->y = position.second;
     }
-    renderRect->w = (dimensions.first * size * scale);
-    renderRect->h = (dimensions.second * size * scale);
-    SDL_RenderCopyEx( renderer, texture, NULL, renderRect, 0, NULL, SDL_FLIP_NONE);
 
-    renderRect->w = (dimensions.first * size);
-    renderRect->h = (dimensions.second * size);
+    renderRect->w = ceil(dimensions.first * size * 2);
+    renderRect->h = ceil(dimensions.second * size * 2);
     if (rendered) {
         SDL_RenderCopyEx( renderer, pixels, NULL, renderRect, 0, NULL, SDL_FLIP_NONE);
     }
@@ -177,8 +174,8 @@ void Pixel::RenderGameObject(SDL_Renderer *renderer, Terrain* hoveringTerrain) {
         renderRect->x = position.first - hiddenTerrain->GetPosition().first;
         renderRect->y = position.second - hiddenTerrain->GetPosition().second;
     }
-    renderRect->w = (width);
-    renderRect->h = (height);
+    renderRect->w = (width + 2);
+    renderRect->h = (height + 2);
 
     SDL_RenderCopy(renderer, texture, NULL, renderRect);
     if (hovering) {

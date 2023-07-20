@@ -67,7 +67,8 @@ void loadGamePieces()
         string flagName = playerNumber + " flag";
         for (int i = 0; i < peaks.size(); i++) {
             Piece* flag = new Piece(playerNumber, textures[flagName][0], surfaces[flagName], false);
-            flag->SetCenter(peaks[i]->GetCenter().first, peaks[i]->GetCenter().second - 20);
+            flag->SetScale(2);
+            flag->SetCenter(peaks[i]->GetCenter().first, peaks[i]->GetCenter().second - 40);
             pieces.push_back(flag);
             gameObjects[gameObjects.size() - 2].push_back(flag);
             peaks[i]->flags.push_back(flag);
@@ -268,10 +269,10 @@ void ResetMap() {
 void GeneratePixels() {
 
 
-    for (int i = 0; i < SCREEN_WIDTH; i++) {
-        for (int j = 0; j < SCREEN_HEIGHT; j++) {
-            int x = i*2 + 0;
-            int y = j*2 + 0;
+    for (int i = -500; i < SCREEN_WIDTH + 500; i++) {
+        for (int j = -500; j < SCREEN_HEIGHT + 500; j++) {
+            int x = i*2 + 1;
+            int y = j*2 + 1;
             Terrain* currentTerrain = selectTerrain(x, y);
             if (currentTerrain == nullptr) continue;
 
@@ -312,8 +313,8 @@ void GeneratePixels() {
 
             }*/
 
-            pixel->SetWidth(width + 1);
-            pixel->SetHeight(height + 1);
+            pixel->SetWidth(width);
+            pixel->SetHeight(height);
 
             SDL_Color pixelColor;
             if (pixel->GetHiddenTerrain()->GetLayer() == 1 && pixel->GetHiddenTerrain()->GetBiome() == "plains") {

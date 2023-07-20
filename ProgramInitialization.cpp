@@ -37,7 +37,7 @@ bool init()
                 printf( "Warning: Fullscreen Failed! SDL Error: %s\n", SDL_GetError() );
             }*/
             //Create renderer for window
-            renderer = SDL_CreateRenderer( window, -1, SDL_RENDERER_ACCELERATED );
+            renderer = SDL_CreateRenderer( window, -1, SDL_RENDERER_ACCELERATED);
             if( renderer == NULL )
             {
                 printf( "Renderer could not be created! SDL Error: %s\n", SDL_GetError() );
