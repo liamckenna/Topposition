@@ -72,7 +72,6 @@ void loadGamePieces()
             gameObjects[gameObjects.size() - 2].push_back(flag);
             peaks[i]->flags.push_back(flag);
             flag->SetPlayer(player);
-
         }
         string pieceName = playerNumber + " piece float";
         int x = (rand() % (int)(SCREEN_WIDTH/1.05)) + SCREEN_WIDTH/2 - SCREEN_WIDTH/2.1;
@@ -269,8 +268,8 @@ void ResetMap() {
 void GeneratePixels() {
 
 
-    for (int i = 0; i < SCREEN_WIDTH/2; i++) {
-        for (int j = 0; j < SCREEN_HEIGHT/2; j++) {
+    for (int i = 0; i < SCREEN_WIDTH; i++) {
+        for (int j = 0; j < SCREEN_HEIGHT; j++) {
             int x = i*2 + 0;
             int y = j*2 + 0;
             Terrain* currentTerrain = selectTerrain(x, y);
@@ -279,7 +278,7 @@ void GeneratePixels() {
             Pixel* pixel = new Pixel("pixel", textures["pixel"][0], surfaces["pixel"], false, true);
             pixel->SetHiddenTerrain(selectTerrain(x, y));
 
-            y += 2;
+            //y += 2;
             Terrain* tempTerrain = selectTerrain(x, y);
             int width= 2;
             int height = 2;

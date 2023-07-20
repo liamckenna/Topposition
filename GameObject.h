@@ -114,7 +114,7 @@ public:
         layer = l;
         scale = 1;
         type = TERRAIN;
-        pixels = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA8888,SDL_TEXTUREACCESS_TARGET, dimensions.first, dimensions.second);
+        pixels = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA8888,SDL_TEXTUREACCESS_TARGET, 700, 700);
         SDL_SetRenderDrawColor(renderer, 0, 0, 0, 0);
         SDL_SetTextureBlendMode(pixels, SDL_BLENDMODE_BLEND);
         SDL_SetRenderTarget(renderer, pixels);

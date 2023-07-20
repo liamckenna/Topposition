@@ -38,7 +38,11 @@ void HandleEvents(Input* playerInput) {
                             }
                         }
                     }
+                } else if (playerInput->GetMouseButtonDown("Right")) {
+                    SDL_GetMouseState(&playerInput->currentMousePosition.first, &playerInput->currentMousePosition.second);
+                    std::cout << playerInput->currentMousePosition.first << ", " << playerInput->currentMousePosition.second << std::endl;
                 }
+
                 break;
             case SDL_MOUSEBUTTONUP:
                 if (selectedObject != nullptr) {

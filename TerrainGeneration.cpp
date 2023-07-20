@@ -2,8 +2,11 @@
 
 
 void GeneratePeak() {
-    int x = (rand() % (int)(SCREEN_WIDTH/1.2)) + SCREEN_WIDTH/2 - SCREEN_WIDTH/2.4;
-    int y = (rand() % (int)(SCREEN_HEIGHT/1.2)) + SCREEN_HEIGHT/2 - SCREEN_HEIGHT/2.4;
+    //int x = (rand() % (int)(SCREEN_WIDTH/1.2)) + SCREEN_WIDTH/2 - SCREEN_WIDTH/2.4;
+    int x = (rand() % SCREEN_WIDTH) * 2;
+    //int y = (rand() % (int)(SCREEN_HEIGHT/1.2)) + SCREEN_HEIGHT/2 - SCREEN_HEIGHT/2.4;
+    int y = (rand() % SCREEN_HEIGHT) * 2;
+
     int shape = rand() % (int)(shapeCount);
     int height = (rand() % rules->GetMaxHeight()) + 1;
     if (rules->GetRemainingPoints() <= rules->GetMaxHeight()) height = rules->GetRemainingPoints();
@@ -13,6 +16,7 @@ void GeneratePeak() {
     double rotation = rand() % 360;
     peak->SetRotation(rotation);
     peak->SetScale(0.1);
+    peak->SetScale(peak->GetScale() * 2);
     peak->SetCenter(x, y);
     peaks.push_back(peak);
     peak->SetPeakID(peaks.size());
@@ -47,8 +51,11 @@ void GeneratePeak() {
     }
 
     while (MergeTerrain(peak).size() != 0) {
-        int a = (rand() % (int)(SCREEN_WIDTH/1.2)) + SCREEN_WIDTH/2 - SCREEN_WIDTH/2.4;
-        int b = (rand() % (int)(SCREEN_HEIGHT/1.2)) + SCREEN_HEIGHT/2 - SCREEN_HEIGHT/2.4;
+        //int a = ((rand() % (int)(SCREEN_WIDTH/1.2)) + SCREEN_WIDTH/2 - SCREEN_WIDTH/2.4) * 2;
+        int a = (rand() % SCREEN_WIDTH) * 2;
+        //int b = ((rand() % (int)(SCREEN_HEIGHT/1.2)) + SCREEN_HEIGHT/2 - SCREEN_HEIGHT/2.4) * 2;
+        int b = (rand() % SCREEN_HEIGHT) * 2;
+
         peak->SetCenter(a, b);
         outline->SetCenter(a, b);
         if (peak->GetItem() != nullptr) {
@@ -74,7 +81,7 @@ void GenerateTerrain(Peak* peak, int shape, int height) {
 
 
         Terrain* layer = new Terrain(name, textures[to_string(shape)][i], surfaces[to_string(shape)], false, true, i, renderer);
-        layer->SetScale(peak->GetScale() + 0.1 * (height - i));
+        layer->SetScale((peak->GetScale() + 0.1 * (height - i)) * 2);
         layer->SetRotation(peak->GetRotation());
         layer->SetPeak(peak);
 
@@ -450,13 +457,17 @@ void GroomTerrain() {
         moveCount = 0;
         for (int i = 0; i < peaks.size(); i++) {
             while (MergeTerrain(peaks[i]).size() != 0) {
-                int a = (rand() % (int)(SCREEN_WIDTH/1.2)) + SCREEN_WIDTH/2 - SCREEN_WIDTH/2.4;
-                int b = (rand() % (int)(SCREEN_HEIGHT/1.2)) + SCREEN_HEIGHT/2 - SCREEN_HEIGHT/2.4;
+                //int a = ((rand() % (int)(SCREEN_WIDTH/1.2)) + SCREEN_WIDTH/2 - SCREEN_WIDTH/2.4) * 2;
+                int a = (rand() % SCREEN_WIDTH) * 2;
+                //int b = ((rand() % (int)(SCREEN_HEIGHT/1.2)) + SCREEN_HEIGHT/2 - SCREEN_HEIGHT/2.4) * 2;
+                int b = (rand() % SCREEN_HEIGHT) * 2;
+
                 peaks[i]->SetCenter(a, b);
                 if (peaks[i]->GetItem() != nullptr) {
                     peaks[i]->GetItem()->SetCenter(a, b);
                 }
                 moveCount++;
+
             }
             Terrain* above = nullptr;
             Terrain* current = nullptr;

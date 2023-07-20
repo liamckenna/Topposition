@@ -130,11 +130,16 @@ void Terrain::RenderGameObject(SDL_Renderer *renderer, Terrain* hoveringTerrain)
         renderRect->x = position.first;
         renderRect->y = position.second;
     }
+    renderRect->w = (dimensions.first * size * scale);
+    renderRect->h = (dimensions.second * size * scale);
+    SDL_RenderCopyEx( renderer, texture, NULL, renderRect, 0, NULL, SDL_FLIP_NONE);
+
     renderRect->w = (dimensions.first * size);
     renderRect->h = (dimensions.second * size);
     if (rendered) {
         SDL_RenderCopyEx( renderer, pixels, NULL, renderRect, 0, NULL, SDL_FLIP_NONE);
     }
+
 
     if (hovering) {
         SDL_SetTextureColorMod(pixels, 255, 255, 255);
@@ -166,8 +171,8 @@ void Pixel::RenderGameObject(SDL_Renderer *renderer, Terrain* hoveringTerrain) {
     }
 
     if (size == 1) {
-        renderRect->x = defaultPosition.first - hiddenTerrain->GetPosition().first;
-        renderRect->y = defaultPosition.second - hiddenTerrain->GetPosition().second;
+        renderRect->x = position.first - hiddenTerrain->GetPosition().first;
+        renderRect->y = position.second - hiddenTerrain->GetPosition().second;
     } else {
         renderRect->x = position.first - hiddenTerrain->GetPosition().first;
         renderRect->y = position.second - hiddenTerrain->GetPosition().second;

@@ -8,7 +8,7 @@ void zoom(SDL_Event e, Input* playerInput) {
     for (int i = 0; i < gameObjects.size(); i++) {
         for (int j = 0; j < gameObjects[i].size(); j++) {
             if (gameObjects[i][j]->GetResizable()) {
-                if ((e.wheel.preciseY < 0 && gameObjects[i][j]->GetSize() <= 1) || (e.wheel.preciseY > 0 && gameObjects[i][j]->GetSize() >= 3.5)) {
+                if ((e.wheel.preciseY < 0 && gameObjects[i][j]->GetSize() <= 0.4) || (e.wheel.preciseY > 0 && gameObjects[i][j]->GetSize() >= 3.5)) {
                     continue;
                 } else {
 
@@ -29,7 +29,7 @@ void zoom(SDL_Event e, Input* playerInput) {
 
         }
     }
-    RecenterScreen(playerInput);
+    //RecenterScreen(playerInput);
 }
 
 void scroll(Input* playerInput) {
@@ -37,16 +37,16 @@ void scroll(Input* playerInput) {
     for (int i = 0; i < gameObjects.size(); i++) {
         for (int j = 0; j < gameObjects[i].size(); j++) {
             if (i == 0) {
-                if (gameObjects[i][j]->GetSize() <= 1 ||
+                /*if (gameObjects[i][j]->GetSize() <= 0.5f ||
                     (gameObjects[i][j]->GetPosition().first > 0 && ((playerInput->currentMousePosition.first - playerInput->prevMousePosition.first) > 0)) ||
-                    ((gameObjects[i][j]->GetPosition().first + (gameObjects[i][j]->GetSize() * gameObjects[i][j]->GetDimensions().first)) < SCREEN_WIDTH && ((playerInput->currentMousePosition.first - playerInput->prevMousePosition.first) < 0)) ||
+                    ((gameObjects[i][j]->GetPosition().first + (gameObjects[i][j]->GetSize() * gameObjects[i][j]->GetDimensions().first)) < SCREEN_WIDTH * 2 && ((playerInput->currentMousePosition.first - playerInput->prevMousePosition.first) < 0)) ||
                     (gameObjects[i][j]->GetPosition().second > 0 && ((playerInput->currentMousePosition.second - playerInput->prevMousePosition.second) > 0)) ||
-                    ((gameObjects[i][j]->GetPosition().second + (gameObjects[i][j]->GetSize() * gameObjects[i][j]->GetDimensions().second)) < SCREEN_HEIGHT && ((playerInput->currentMousePosition.second - playerInput->prevMousePosition.second) < 0))) {
+                    ((gameObjects[i][j]->GetPosition().second + (gameObjects[i][j]->GetSize() * gameObjects[i][j]->GetDimensions().second)) < SCREEN_HEIGHT * 2 && ((playerInput->currentMousePosition.second - playerInput->prevMousePosition.second) < 0))) {
                     enabled = false;
                     continue;
                 } else {
                     enabled = true;
-                }
+                }*/
             }
             if (enabled && gameObjects[i][j]->GetResizable()){
                 gameObjects[i][j]->SetPosition(gameObjects[i][j]->GetPosition().first + playerInput->currentMousePosition.first - playerInput->prevMousePosition.first,
@@ -55,7 +55,7 @@ void scroll(Input* playerInput) {
         }
     }
 
-    RecenterScreen(playerInput);
+    //RecenterScreen(playerInput);
 }
 
 GameObject* selectObject(int x, int y) {
