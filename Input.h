@@ -1,7 +1,7 @@
 #pragma once
 #include <string>
 #include <utility>
-#include <SDL.h>
+#include <SDL2/SDL.h>
 class Input {
     bool mouseButtonDown_Left = false;
     bool mouseButtonDown_Right = false;

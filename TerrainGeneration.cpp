@@ -12,7 +12,7 @@ void GeneratePeak() {
     if (rules->GetRemainingPoints() <= rules->GetMaxHeight()) height = rules->GetRemainingPoints();
     rules->SetRemainingPoints(rules->GetRemainingPoints() - height);
     string name = to_string(height) + ", " + to_string(peaks.size() + 1);
-    Peak* peak = new Peak(name, textures[to_string(shape)][height], surfaces[to_string(shape)], false, true, height, renderer);
+    Peak* peak = new Peak(name, textures[to_string(shape)][height], surfaces[to_string(shape)], false, true, height, window);
     double rotation = rand() % 360;
     peak->SetRotation(rotation);
     peak->SetScale(0.1);
@@ -64,10 +64,10 @@ void GeneratePeak() {
     }
     SDL_Color color;
     if (height == 1) {
-        SDL_SetTextureColorMod(peak->GetTexture(), 246, 215, 176);
+        GPU_SetRGB(peak->GetTexture(), 246, 215, 176);
         color = {246, 215, 176};
     } else {
-        SDL_SetTextureColorMod(peak->GetTexture(), 200/rules->GetMaxHeight() * peak->GetLayer(), std::min(200/rules->GetMaxHeight() * peak->GetLayer() * 2, 255), 200/rules->GetMaxHeight() * peak->GetLayer());
+        GPU_SetRGB(peak->GetTexture(), 200/rules->GetMaxHeight() * peak->GetLayer(), std::min(200/rules->GetMaxHeight() * peak->GetLayer() * 2, 255), 200/rules->GetMaxHeight() * peak->GetLayer());
         color = {static_cast<Uint8>(200/rules->GetMaxHeight() * peak->GetLayer()), static_cast<Uint8>(std::min(200/rules->GetMaxHeight() * peak->GetLayer() * 2, 255)), static_cast<Uint8>(200/rules->GetMaxHeight() * peak->GetLayer())};
     }
     peak->SetColor(color);
@@ -80,7 +80,7 @@ void GenerateTerrain(Peak* peak, int shape, int height) {
         //shape = rand() % (int)(15);
 
 
-        Terrain* layer = new Terrain(name, textures[to_string(shape)][i], surfaces[to_string(shape)], false, true, i, renderer);
+        Terrain* layer = new Terrain(name, textures[to_string(shape)][i], surfaces[to_string(shape)], false, true, i, window);
         layer->SetScale((peak->GetScale() + 0.1 * (height - i)) * 2);
         layer->SetRotation(peak->GetRotation());
         layer->SetPeak(peak);
@@ -112,11 +112,11 @@ void GenerateTerrain(Peak* peak, int shape, int height) {
         layer->SetOffsetY(offsetY);
         SDL_Color color;
         if (i == 1) {
-            SDL_SetTextureColorMod(layer->GetTexture(), 246, 215, 176);
+            GPU_SetRGB(layer->GetTexture(), 246, 215, 176);
             color = {246, 215, 176};
 
         } else {
-            SDL_SetTextureColorMod(layer->GetTexture(), 200/rules->GetMaxHeight() * layer->GetLayer(), std::min(200/rules->GetMaxHeight() * layer->GetLayer() * 2, 255), 200/rules->GetMaxHeight() * layer->GetLayer());
+            GPU_SetRGB(layer->GetTexture(), 200/rules->GetMaxHeight() * layer->GetLayer(), std::min(200/rules->GetMaxHeight() * layer->GetLayer() * 2, 255), 200/rules->GetMaxHeight() * layer->GetLayer());
             color = {static_cast<Uint8>(200/rules->GetMaxHeight() * layer->GetLayer()), static_cast<Uint8>(std::min(200/rules->GetMaxHeight() * layer->GetLayer() * 2, 255)), static_cast<Uint8>(200/rules->GetMaxHeight() * layer->GetLayer())};
         }
         layer->SetColor(color);

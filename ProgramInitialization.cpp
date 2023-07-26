@@ -24,7 +24,8 @@ bool init()
 
 
         //Create window
-        window = SDL_CreateWindow( "Topposition", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN );
+        window = GPU_Init(SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN);
+
         if( window == NULL )
         {
             printf( "Window could not be created! SDL Error: %s\n", SDL_GetError() );
@@ -36,31 +37,20 @@ bool init()
             if (SDL_SetWindowFullscreen(gWindow,SDL_WINDOW_FULLSCREEN_DESKTOP) < 0) {
                 printf( "Warning: Fullscreen Failed! SDL Error: %s\n", SDL_GetError() );
             }*/
-            //Create renderer for window
-            renderer = SDL_CreateRenderer( window, -1, SDL_RENDERER_ACCELERATED);
-            if( renderer == NULL )
+
+            //Initialize renderer color
+
+            //Initialize PNG loading
+            int imgFlags = IMG_INIT_PNG;
+
+            if( !( IMG_Init( imgFlags ) & imgFlags ) )
             {
-                printf( "Renderer could not be created! SDL Error: %s\n", SDL_GetError() );
+                printf( "SDL_image could not initialize! SDL_image Error: %s\n", IMG_GetError() );
                 success = false;
             }
-            else
-            {
-                //Initialize renderer color
-                SDL_SetRenderDrawColor( renderer, 0xFF, 0xFF, 0xFF, 0xFF );
-
-                //Initialize PNG loading
-                int imgFlags = IMG_INIT_PNG;
-
-                if( !( IMG_Init( imgFlags ) & imgFlags ) )
-                {
-                    printf( "SDL_image could not initialize! SDL_image Error: %s\n", IMG_GetError() );
-                    success = false;
-                }
-                else {
-                    screenSurface = SDL_GetWindowSurface( window );
-                    TextureLoader();
-                    TTF_Init();
-                }
+            else {
+                TextureLoader();
+                TTF_Init();
             }
         }
     }
@@ -76,10 +66,9 @@ void close()
         i.second = NULL;
     }*/
     //Destroy window
-    SDL_DestroyRenderer( renderer );
-    SDL_DestroyWindow( window );
+
+    GPU_FreeTarget(window);
     window = NULL;
-    renderer = NULL;
 
     //Quit SDL subsystems
     IMG_Quit();
@@ -89,56 +78,23 @@ void close()
 SDL_Surface* loadSurface( std::string path )
 {
     //The final optimized image
-    SDL_Surface* optimizedSurface = NULL;
 
     //Load image at specified path
-    SDL_Surface* loadedSurface = IMG_Load( path.c_str() );
-    if( loadedSurface == NULL )
-    {
-        printf( "Unable to load image %s! SDL Error: %s\n", path.c_str(), SDL_GetError() );
-    }
-    else
-    {
-        //Convert surface to screen format
-        optimizedSurface = SDL_ConvertSurface( loadedSurface, screenSurface->format, 0 );
-        if( optimizedSurface == NULL )
-        {
-            printf( "Unable to optimize image %s! SDL Error: %s\n", path.c_str(), SDL_GetError() );
-        }
+    SDL_Surface* loadedSurface = GPU_LoadSurface(path.c_str());
 
-        //Get rid of old loaded surface
-        SDL_FreeSurface(loadedSurface);
-
-    }
-    return optimizedSurface;
+    return loadedSurface;
 }
 
-SDL_Texture* loadTexture( std::string path )
+GPU_Image* loadTexture( std::string path )
 {
     //The final texture
     SDL_SetHint( SDL_HINT_RENDER_SCALE_QUALITY, "0" );
     SDL_Texture* newTexture = NULL;
 
     //Load image at specified path
-    SDL_Surface* loadedSurface = IMG_Load( path.c_str() );
-    if( loadedSurface == NULL )
-    {
-        printf( "Unable to load image %s! SDL_image Error: %s\n", path.c_str(), IMG_GetError() );
-    }
-    else
-    {
-        //Create texture from surface pixels
-        newTexture = SDL_CreateTextureFromSurface( renderer, loadedSurface );
-        if( newTexture == NULL )
-        {
-            printf( "Unable to create texture from %s! SDL Error: %s\n", path.c_str(), SDL_GetError() );
-        }
+    GPU_Image* loadedImage = GPU_LoadImage(path.c_str());
 
-        //Get rid of old loaded surface
-        SDL_FreeSurface( loadedSurface );
-    }
-
-    return newTexture;
+    return loadedImage;
 }
 
 void TextureLoader() {

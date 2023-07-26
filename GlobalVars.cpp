@@ -1,10 +1,10 @@
 #include "GlobalVars.h"
 
-SDL_Window* window = NULL;
+GPU_Target* window = NULL;
 
 SDL_Surface* screenSurface = NULL;
 
-SDL_Renderer* renderer = NULL;
+
 
 SDL_Texture* texture = NULL;
 
@@ -21,7 +21,7 @@ int movesLeft = 3;
 
 gameState currentState = MAIN_MENU;
 
-std::map<std::string, std::map<int, SDL_Texture*>> textures;
+std::map<std::string, std::map<int, GPU_Image*>> textures;
 
 std::map<std::string, SDL_Surface*> surfaces;
 

@@ -364,6 +364,7 @@ Topposition.exe: CMakeFiles/Topposition.dir/EventHandler.cpp.obj
 Topposition.exe: CMakeFiles/Topposition.dir/MultiPurposeFunctions.cpp.obj
 Topposition.exe: CMakeFiles/Topposition.dir/AnimationHandler.cpp.obj
 Topposition.exe: CMakeFiles/Topposition.dir/build.make
+Topposition.exe: C:/Program\ Files/JetBrains/CLion\ 2023.1.3/bin/mingw/lib/SDL2_gpu.lib
 Topposition.exe: CMakeFiles/Topposition.dir/linkLibs.rsp
 Topposition.exe: CMakeFiles/Topposition.dir/objects1
 Topposition.exe: CMakeFiles/Topposition.dir/link.txt

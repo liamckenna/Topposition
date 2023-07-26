@@ -2,6 +2,7 @@
 #include <iostream>
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
+#include <SDL2/SDL_gpu.h>
 #include <SDL2/SDL_ttf.h>
 #include <utility>
 #include <map>
@@ -11,11 +12,9 @@
 #include "GameObject.h"
 
 
-extern SDL_Window* window;
+extern GPU_Target* window;
 //The surface contained by the window
 extern SDL_Surface* screenSurface;
-//The window renderer
-extern SDL_Renderer* renderer;
 //Current displayed texture
 extern SDL_Texture* texture;
 
@@ -25,7 +24,7 @@ extern int SCREEN_HEIGHT;
 
 extern bool quit;
 
-extern std::map<std::string, map<int,  SDL_Texture*>> textures;
+extern std::map<std::string, map<int,  GPU_Image*>> textures;
 
 extern std::map<std::string, SDL_Surface*> surfaces;
 

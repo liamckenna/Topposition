@@ -1,12 +1,13 @@
 #include "GameObject.h"
 #include <iostream>
 
-GameObject::GameObject(string name, SDL_Texture *texture, SDL_Surface* surface, bool m, bool r) {
+GameObject::GameObject(string name, GPU_Image *texture, SDL_Surface* surface, bool m, bool r) {
     this->name = name;
     this->texture = texture;
     this->surface = surface;
     size = 1;
-    SDL_QueryTexture(texture, nullptr, nullptr, &dimensions.first, &dimensions.second);
+    dimensions.first = texture->w;
+    dimensions.second = texture->h;
 
     SetPosition(0,0, true);
     SetCenter();
@@ -15,7 +16,7 @@ GameObject::GameObject(string name, SDL_Texture *texture, SDL_Surface* surface, 
     rendered = r;
 }
 
-void GameObject::RenderGameObject(SDL_Renderer* renderer) {
+void GameObject::RenderGameObject(GPU_Target* window) {
     if (size == 1) {
         renderRect->x = defaultPosition.first;
         renderRect->y = defaultPosition.second;
@@ -23,16 +24,17 @@ void GameObject::RenderGameObject(SDL_Renderer* renderer) {
         renderRect->x = position.first;
         renderRect->y = position.second;
     }
-    SDL_QueryTexture(texture, nullptr, NULL, &dimensions.first, &dimensions.second);
+    dimensions.first = texture->w;
+    dimensions.second = texture->h;
     //std::cout << dimensions.first << ", " << dimensions.second << std::endl;
 
     renderRect->w = (float) (dimensions.first * size * scale);
     renderRect->h = (float) (dimensions.second * size * scale);
     if (rendered) {
         if (currentAnimation == nullptr) {
-            SDL_RenderCopy(renderer, texture, NULL, renderRect);
+            GPU_BlitRect(texture, NULL, window, renderRect);
         } else {
-            SDL_RenderCopy(renderer, currentAnimation->GetSpriteSheet(), currentAnimation->GetRect(), renderRect);
+            GPU_BlitRect(currentAnimation->GetSpriteSheet(), currentAnimation->GetRect(), window, renderRect);
         }
     }
 }
@@ -104,7 +106,7 @@ void GameObject::SetBottomRight() {
     bottomRight.second = position.second + (dimensions.second * size * scale);
 }
 
-void Terrain::RenderGameObject(SDL_Renderer *renderer, Terrain* hoveringTerrain) {
+void Terrain::RenderGameObject(GPU_Target* window, Terrain* hoveringTerrain) {
     bool hovering = false;
     if (hoveringTerrain != nullptr) {
         if (this == hoveringTerrain) {
@@ -119,7 +121,7 @@ void Terrain::RenderGameObject(SDL_Renderer *renderer, Terrain* hoveringTerrain)
         }
     }
     if (hovering) {
-        SDL_SetTextureColorMod(pixels, 255/2, 255/2, 255/2);
+        GPU_SetRGBA(pixels, 255/2, 255/2, 255/2, 255);
     } else {
         //SDL_SetTextureColorMod(texture, color.r, color.g, color.b);
     }
@@ -134,19 +136,19 @@ void Terrain::RenderGameObject(SDL_Renderer *renderer, Terrain* hoveringTerrain)
     renderRect->w = ceil(dimensions.first * size * 2);
     renderRect->h = ceil(dimensions.second * size * 2);
     if (rendered) {
-        SDL_RenderCopyEx( renderer, pixels, NULL, renderRect, 0, NULL, SDL_FLIP_NONE);
+        GPU_BlitRect(pixels, NULL, window, renderRect);
     }
 
 
     if (hovering) {
-        SDL_SetTextureColorMod(pixels, 255, 255, 255);
+        GPU_SetRGBA(pixels, 255, 255, 255, 255);
     }
 }
 
-void Pixel::RenderGameObject(SDL_Renderer *renderer, Terrain* hoveringTerrain) {
+void Pixel::RenderGameObject(GPU_Target* window, Terrain* hoveringTerrain) {
 
 
-    SDL_SetRenderTarget(renderer, hiddenTerrain->GetPixels());
+    GPU_LoadTarget(hiddenTerrain->GetPixels());
 
     bool hovering = false;
     if (hoveringTerrain != nullptr) {
@@ -162,9 +164,9 @@ void Pixel::RenderGameObject(SDL_Renderer *renderer, Terrain* hoveringTerrain) {
         }
     }
     if (hovering) {
-        SDL_SetTextureColorMod(texture, color.r/2, color.g/2, color.b/2);
+        GPU_SetRGBA(texture, color.r/2, color.g/2, color.b/2, color.a);
     } else {
-        SDL_SetTextureColorMod(texture, color.r, color.g, color.b);
+        GPU_SetRGBA(texture, color.r, color.g, color.b, color.a);
     }
 
     if (size == 1) {
@@ -177,13 +179,13 @@ void Pixel::RenderGameObject(SDL_Renderer *renderer, Terrain* hoveringTerrain) {
     renderRect->w = (width + 2);
     renderRect->h = (height + 2);
 
-    SDL_RenderCopy(renderer, texture, NULL, renderRect);
+    GPU_BlitRect(texture, NULL, window, renderRect);
     if (hovering) {
-        SDL_SetTextureColorMod(texture, color.r, color.g, color.b);
+        GPU_SetRGBA(texture, color.r, color.g, color.b, color.a);
     }
 }
 
-Text::Text(string n, const char* fp, SDL_Color c, int x, int y, int w, int h, int s, SDL_Renderer* r, const char* t) {
+Text::Text(string n, const char* fp, SDL_Color c, int x, int y, int w, int h, int s, const char* t) {
     name = n;
     fontPath = fp;
     color = c;
@@ -195,20 +197,20 @@ Text::Text(string n, const char* fp, SDL_Color c, int x, int y, int w, int h, in
     dimensions.second = h;
     font = TTF_OpenFont(fontPath, size);
     surface = TTF_RenderText_Solid(font, text, color);
-    texture = SDL_CreateTextureFromSurface(r, surface);
+    texture = GPU_CopyImageFromSurface(surface);
 }
 
-void Text::RenderText(SDL_Renderer* renderer) {
+void Text::RenderText(GPU_Target* window) {
     if (rendered) {
         rect->x = position.first;
         rect->y = position.second;
         rect->w = dimensions.first;
         rect->h = dimensions.second;
-        SDL_RenderCopy(renderer, texture, NULL, rect);
+        GPU_BlitRect(texture, NULL, window, rect);
     }
 }
 
-Animation::Animation(SDL_Texture *ss, SDL_Surface *s, float d, int fc, pair<int, int> sd, pair<int, int> spd) {
+Animation::Animation(GPU_Image *ss, SDL_Surface *s, float d, int fc, pair<int, int> sd, pair<int, int> spd) {
     spriteSheet = ss;
     surface = s;
     duration = d;

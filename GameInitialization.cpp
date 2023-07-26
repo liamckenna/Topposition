@@ -102,17 +102,17 @@ void loadGamePieces()
     }
     SDL_Color White = {255, 255, 255};
 
-    Text* currentTurnText = new Text("currentTurnText", "Fonts/yoster.ttf", White, 150, 0, 300, 50, 100, renderer, "Current Turn: ");
+    Text* currentTurnText = new Text("currentTurnText", "Fonts/yoster.ttf", White, 150, 0, 300, 50, 100, "Current Turn: ");
     text.push_back(currentTurnText);
     SDL_Color Red = {255, 0, 0};
 
-    playerOneText = new Text("playerOneText", "Fonts/yoster.ttf", Red, 450, 0, 250, 50, 100, renderer, "Player One");
+    playerOneText = new Text("playerOneText", "Fonts/yoster.ttf", Red, 450, 0, 250, 50, 100, "Player One");
     text.push_back(playerOneText);
     if (rules->GetPlayerCount() > 0) players[0]->SetTurnText(playerOneText);
 
     SDL_Color Green = {0, 255, 0};
 
-    playerTwoText = new Text("playerTwoText", "Fonts/yoster.ttf", Green, 450, 0, 250, 50, 100, renderer, "Player Two");
+    playerTwoText = new Text("playerTwoText", "Fonts/yoster.ttf", Green, 450, 0, 250, 50, 100, "Player Two");
     text.push_back(playerTwoText);
     playerTwoText->SetRendered(false);
 
@@ -120,14 +120,14 @@ void loadGamePieces()
 
     SDL_Color Blue = {0, 0, 255};
 
-    playerThreeText = new Text("playerThreeText", "Fonts/yoster.ttf", Blue, 450, 0, 300, 50, 100, renderer, "Player Three");
+    playerThreeText = new Text("playerThreeText", "Fonts/yoster.ttf", Blue, 450, 0, 300, 50, 100, "Player Three");
     text.push_back(playerThreeText);
     playerThreeText->SetRendered(false);
     if (rules->GetPlayerCount() > 2) players[2]->SetTurnText(playerThreeText);
 
     SDL_Color Yellow = {255, 255, 0};
 
-    playerFourText = new Text("playerFourText", "Fonts/yoster.ttf", Yellow, 450, 0, 275, 50, 100, renderer, "Player Four");
+    playerFourText = new Text("playerFourText", "Fonts/yoster.ttf", Yellow, 450, 0, 275, 50, 100, "Player Four");
     text.push_back(playerFourText);
     playerFourText->SetRendered(false);
     if (rules->GetPlayerCount() > 3) players[3]->SetTurnText(playerFourText);
@@ -263,7 +263,7 @@ void ResetMap() {
     GeneratePixels();
 
     renderPixels();
-    SDL_SetRenderTarget(renderer, NULL);
+    GPU_LoadTarget(NULL);
 }
 
 void GeneratePixels() {
@@ -351,6 +351,6 @@ void GeneratePixels() {
 
 void renderPixels(){
     for (int i = 0; i < pixels.size(); i++) {
-        pixels[i]->RenderGameObject(renderer, hoveringTerrain);
+        pixels[i]->RenderGameObject(window, hoveringTerrain);
     }
 }

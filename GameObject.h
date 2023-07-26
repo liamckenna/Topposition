@@ -2,8 +2,9 @@
 #include <utility>
 #include <string>
 #include <vector>
-#include "SDL.h"
+#include "SDL2/SDL.h"
 #include <SDL2/SDL_ttf.h>
+#include <SDL2/SDL_gpu.h>
 #include "GameRules.h"
 #include "Player.h"
 
@@ -32,12 +33,12 @@ protected:
 
 
     string name;
-    SDL_Texture* texture;
+    GPU_Image* texture;
     SDL_Surface* surface;
     bool movable = false;
     bool selectable = false;
     bool rendered = true;
-    SDL_Rect* renderRect = new SDL_Rect();
+    GPU_Rect* renderRect = new GPU_Rect();
     float size;
     pair<float, float> defaultPosition;
     pair<float, float> position;
@@ -50,26 +51,26 @@ protected:
 
 public:
     enum objectType type = GENERIC;
-    GameObject(string name, SDL_Texture* texture, SDL_Surface *surface, bool m, bool r);
+    GameObject(string name, GPU_Image* texture, SDL_Surface *surface, bool m, bool r);
     pair<float, float> GetPosition(){return position;}
     pair<float, float> GetDimensions(){return dimensions;}
     string GetName(){return name;}
-    SDL_Texture* GetTexture(){return texture;}
+    GPU_Image* GetTexture(){return texture;}
     std::map<string, Animation* > animations;
     SDL_Surface* GetSurface(){return surface;}
     bool GetRendered() const {return rendered;}
     bool GetMovable() const {return movable;}
-    SDL_Rect* GetRenderRect() {return renderRect;}
+    GPU_Rect* GetRenderRect() {return renderRect;}
     pair<float, float> GetCenter() {return center;}
     float GetScale() const {return scale;}
     bool GetSelectable() const {return selectable;}
     bool GetResizable() const {return resizable;}
-    SDL_Rect* GetRectangle() const {return renderRect;}
+    GPU_Rect* GetRectangle() const {return renderRect;}
     Animation* GetCurrentAnimation() const {return currentAnimation;}
     void SetCurrentAnimation(Animation* ca) {currentAnimation = ca;}
-    void SetRectangle(SDL_Rect* r) {renderRect = r;}
+    void SetRectangle(GPU_Rect* r) {renderRect = r;}
     void SetResizable(bool r) {resizable = r;}
-    void SetTexture(SDL_Texture* t) {texture = t;}
+    void SetTexture(GPU_Image* t) {texture = t;}
     void SetSurface (SDL_Surface* s) {surface = s;}
     void SetSelectable(bool s) {selectable = s;}
     void SetScale(float s) {scale = s;}
@@ -79,7 +80,7 @@ public:
     void SetMovable(bool m);
     void SetRendered(bool r);
     void AdjustSize(float multiplier = 1, int w = 0, int h = 0);
-    virtual void RenderGameObject(SDL_Renderer* renderer);
+    virtual void RenderGameObject(GPU_Target* window);
     void SetBottomRight();
     pair<float, float> GetBottomRight() {return bottomRight;}
 };
@@ -101,31 +102,29 @@ protected:
     int offsetY;
     SDL_Color color;
     string biome = "";
-    SDL_Texture* pixels;
+    GPU_Image* pixels;
 
 
 public:
     std::vector<Piece*> occupants;
     std::vector<Terrain*> connectedTerrain;
 
-    void RenderGameObject(SDL_Renderer* renderer, Terrain* hoveringTerrain);
+    void RenderGameObject(GPU_Target* window, Terrain* hoveringTerrain);
 
-    Terrain(string name, SDL_Texture *texture, SDL_Surface *surface, bool m, bool r, int l, SDL_Renderer* renderer) : GameObject(name, texture, surface, m, r) {
+    Terrain(string name, GPU_Image *texture, SDL_Surface *surface, bool m, bool r, int l, GPU_Target* window) : GameObject(name, texture, surface, m, r) {
         layer = l;
         scale = 1;
         type = TERRAIN;
-        pixels = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA8888,SDL_TEXTUREACCESS_TARGET, 1400, 1400);
-        SDL_SetRenderDrawColor(renderer, 0, 0, 0, 0);
-        SDL_SetTextureBlendMode(pixels, SDL_BLENDMODE_BLEND);
-        SDL_SetRenderTarget(renderer, pixels);
-        SDL_RenderClear(renderer);
+        pixels = GPU_CreateImage(1400, 1400, GPU_FORMAT_RGBA);
+        GPU_SetBlendMode(pixels, GPU_BLEND_NORMAL);
+        GPU_LoadTarget(pixels);
+        GPU_Clear(window);
 
-
-        SDL_SetRenderTarget(renderer, NULL);
+        GPU_LoadTarget(NULL);
     }
     void SetPeak(Peak* p) {peak = p;}
     Peak* GetPeak() const {return peak;}
-    SDL_Texture* GetPixels() const {return pixels;}
+    GPU_Image* GetPixels() const {return pixels;}
     double GetRotation() const {return rotation;}
     Terrain* GetUpperTerrain() {return upperTerrain;}
     Terrain* GetLowerTerrain() {return lowerTerrain;}
@@ -151,7 +150,7 @@ public:
 class UIElement : public GameObject {
     Peak* associatedPeak;
 public:
-    UIElement(string name, SDL_Texture *texture, SDL_Surface *surface, bool r, Peak* ap = nullptr) : GameObject(name, texture, surface, false, r) {
+    UIElement(string name, GPU_Image *texture, SDL_Surface *surface, bool r, Peak* ap = nullptr) : GameObject(name, texture, surface, false, r) {
     type = UI_ELEMENT;
     associatedPeak = ap;
     resizable = false;
@@ -171,7 +170,7 @@ public:
     std::vector<Terrain*> childTerrain;
     std::vector<Piece*> flags;
 
-    Peak(string name, SDL_Texture *texture, SDL_Surface *surface, bool m, bool r, int l, SDL_Renderer* renderer) : Terrain(name, texture, surface, m, r, l, renderer) {
+    Peak(string name, GPU_Image *texture, SDL_Surface *surface, bool m, bool r, int l, GPU_Target* window) : Terrain(name, texture, surface, m, r, l, window) {
         type = PEAK;
         peak = this;
     }
@@ -196,7 +195,7 @@ private:
     Player* player;
 
 public:
-    Piece(string name, SDL_Texture* texture, SDL_Surface* surface, bool r) : GameObject(name, texture, surface, true, r) {
+    Piece(string name, GPU_Image* texture, SDL_Surface* surface, bool r) : GameObject(name, texture, surface, true, r) {
     type = PIECE;
     occupyingTerrain = nullptr;
     }
@@ -219,7 +218,7 @@ class Item : public Piece {
     Player* owner = nullptr;
 
 public:
-    Item(string name, SDL_Texture* texture, SDL_Surface* surface, bool r) : Piece(name, texture, surface, r) {
+    Item(string name, GPU_Image* texture, SDL_Surface* surface, bool r) : Piece(name, texture, surface, r) {
         type = ITEM;
         movable = false;
     }
@@ -236,10 +235,10 @@ class Pixel : public GameObject {
     int height;
     bool outline = false;
 public:
-    Pixel(string name, SDL_Texture *texture, SDL_Surface *surface, bool m, bool r) : GameObject(name, texture, surface, false, r) {
+    Pixel(string name, GPU_Image *texture, SDL_Surface *surface, bool m, bool r) : GameObject(name, texture, surface, false, r) {
         type = PIXEL;
     }
-    void RenderGameObject(SDL_Renderer *renderer, Terrain* hoveringTerrain);
+    void RenderGameObject(GPU_Target* window, Terrain* hoveringTerrain);
 
     void SetHiddenTerrain(Terrain* ht) {hiddenTerrain = ht;}
     void SetColor(SDL_Color c) {color = c;}
@@ -261,22 +260,22 @@ class Text {
     const char* text;
     std::pair<int, int> position;
     std::pair<int, int> dimensions;
-    SDL_Rect* rect = new SDL_Rect();
+    GPU_Rect* rect = new GPU_Rect();
     SDL_Surface* surface;
-    SDL_Texture* texture;
+    GPU_Image* texture;
     int size;
     bool rendered = true;
 public:
-    Text(string n, const char* fp, SDL_Color c, int x, int y, int w, int h, int s, SDL_Renderer* r, const char* t);
-    void RenderText(SDL_Renderer* renderer);
+    Text(string n, const char* fp, SDL_Color c, int x, int y, int w, int h, int s, const char* t);
+    void RenderText(GPU_Target* window);
     void SetRendered(bool r) {rendered = r;}
 
 };
 
 class Animation {
-    SDL_Texture* spriteSheet;
+    GPU_Image* spriteSheet;
     SDL_Surface* surface;
-    SDL_Rect* rect = new SDL_Rect();
+    GPU_Rect* rect = new GPU_Rect();
     float duration;
     int frameCount;
     pair<int, int> sheetDimensions;
@@ -287,10 +286,10 @@ class Animation {
     int frameOffset;
 
 public:
-    Animation(SDL_Texture* ss, SDL_Surface* s, float d, int fc, pair<int, int> sd, pair<int, int> spd);
+    Animation(GPU_Image* ss, SDL_Surface* s, float d, int fc, pair<int, int> sd, pair<int, int> spd);
     void CycleFrame(Uint64 current);
-    SDL_Rect* GetRect() {return rect;}
-    SDL_Texture* GetSpriteSheet() {return spriteSheet;}
+    GPU_Rect* GetRect() {return rect;}
+    GPU_Image* GetSpriteSheet() {return spriteSheet;}
     void Pause() {paused = true;}
     void Unpause() {paused = false;}
 };
