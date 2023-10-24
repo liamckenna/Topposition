@@ -4,7 +4,7 @@
 #include <vector>
 #include "SDL2/SDL.h"
 #include <SDL2/SDL_ttf.h>
-#include <SDL2/SDL_gpu.h>
+#include <SDL_gpu.h>
 #include "GameRules.h"
 #include "Player.h"
 

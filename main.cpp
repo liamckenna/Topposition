@@ -1,7 +1,7 @@
 #include <iostream>
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
-#include <SDL2/SDL_gpu.h>
+#include <SDL_gpu.h>
 #include <sys/types.h>
 #include <dirent.h>
 #include <vector>

@@ -1,6 +1,6 @@
 #pragma once
 #include "GlobalVars.h"
-#include "SDL2/SDL_gpu.h"
+#include "SDL_gpu.h"
 
 bool init();
 
