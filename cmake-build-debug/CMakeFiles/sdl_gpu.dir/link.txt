@@ -1,0 +1,3 @@
+"C:\Program Files\JetBrains\CLion 2022.2.1\bin\cmake\win\bin\cmake.exe" -E rm -f CMakeFiles\sdl_gpu.dir/objects.a
+"C:\PROGRA~1\JetBrains\CLion 2022.2.1\bin\mingw\bin\ar.exe" qc CMakeFiles\sdl_gpu.dir/objects.a @CMakeFiles\sdl_gpu.dir\objects1.rsp
+"C:\PROGRA~1\JetBrains\CLion 2022.2.1\bin\mingw\bin\g++.exe" -g -shared -o libsdl_gpu.dll -Wl,--out-implib,libsdl_gpu.dll.a -Wl,--major-image-version,0,--minor-image-version,0 -Wl,--whole-archive CMakeFiles\sdl_gpu.dir/objects.a -Wl,--no-whole-archive @CMakeFiles\sdl_gpu.dir\linklibs.rsp
