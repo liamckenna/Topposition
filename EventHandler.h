@@ -5,5 +5,6 @@
 #include "GameInitialization.h"
 #include "PlayerMovement.h"
 #include "MouseLogic.h"
+#include "MultiPurposeFunctions.h"
 
 void HandleEvents(Input* playerInput);

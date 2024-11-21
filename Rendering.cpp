@@ -1,22 +1,24 @@
 #include "Rendering.h"
 
 void RenderScreen(){
-    SDL_SetRenderDrawColor( renderer, 51, 169, 255, 100 );
+    SDL_SetRenderDrawColor(renderer, 51, 169, 255, 100);
     SDL_RenderClear( renderer );
     //Render texture to screen
-    //refreshClaimNotifs();
-    //gameObjects[0][0]->RenderGameObject(renderer);
-    renderTerrain();
-    //renderPixels();
-    renderClaimNotifs();
-    renderPieces();
-    renderUI();
-    renderText();
-    renderInventory();
+    if (state == MAIN_MENU) {
+        renderUI();
+    }
+    else if (state == GAME) {
+        renderTerrain();
+        renderClaimNotifs();
+        renderPieces();
+        renderUI();
+        renderText();
+        renderInventory();
+    }
 
 
     //Update screen
-    SDL_RenderPresent( renderer);
+    SDL_RenderPresent(renderer);
 
 }
 
@@ -49,7 +51,7 @@ void renderClaimNotifs() {
 void renderTerrain() {
     for (int i = 0; i < terrain.size(); i++) {
         for (int j = 0; j < terrain[i].size(); j++) {
-            terrain[i][j]->RenderGameObject(renderer, hoveringTerrain);
+            terrain[i][j]->RenderGameObject(renderer, hoveringTerrain, validMove);
         }
     }
 }

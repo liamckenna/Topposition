@@ -13,6 +13,7 @@ class Player {
     int score = 0;
     std::string name = "";
     Text* turnText;
+    std::string color;
 
 public:
     std::vector<Peak*> peaks;
@@ -25,5 +26,7 @@ public:
     void SetScore(int s) {score = s;}
     Text* GetTurnText() {return turnText;}
     void SetTurnText(Text* tt) {turnText = tt;}
+    std::string GetColor() {return color;}
+    void SetColor(std::string c) {color = c;}
 
 };

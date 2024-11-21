@@ -32,10 +32,10 @@ bool init()
         }
         else
         {
-            /*Set Fullscreen
-            if (SDL_SetWindowFullscreen(gWindow,SDL_WINDOW_FULLSCREEN_DESKTOP) < 0) {
-                printf( "Warning: Fullscreen Failed! SDL Error: %s\n", SDL_GetError() );
-            }*/
+            //Set Fullscreen
+//            if (SDL_SetWindowFullscreen(window, SDL_WINDOW_FULLSCREEN_DESKTOP) < 0) {
+//                printf( "Warning: Fullscreen Failed! SDL Error: %s\n", SDL_GetError() );
+//            }
             //Create renderer for window
             renderer = SDL_CreateRenderer( window, -1, SDL_RENDERER_ACCELERATED);
             if( renderer == NULL )
@@ -154,7 +154,7 @@ void TextureLoader() {
     odp = opendir("Textures");
     int textureCount = 0;
     if (odp != nullptr) {
-        while (entry = readdir(odp)) {
+        while ((entry = readdir(odp))) {
             if (entry->d_namlen == 1 || entry->d_namlen == 2) continue;
             string fp = "Textures/" + (string)entry->d_name + "/";
             innerDir = fp.c_str();
@@ -167,7 +167,7 @@ void TextureLoader() {
                     string fpp = fp + (string)innerEntry->d_name + "/";
                     innerx2Dir = fpp.c_str();
                     iidp = opendir(innerx2Dir);
-                    while (innerx2 = readdir(iidp)) {
+                    while ((innerx2 = readdir(iidp))) {
                         if (innerx2->d_namlen == 1 || innerx2->d_namlen == 2) continue;
                         string innerFileName = innerx2->d_name;
                         size_t innerPos = innerFileName.find(".");
@@ -176,6 +176,7 @@ void TextureLoader() {
                         textures[innerShorthand][0] = loadTexture(innerTexturePath);
                         surfaces[innerShorthand] = loadSurface(innerTexturePath);
                     }
+                    closedir(iidp);
                 }
                 string shorthand = fileName.substr(0,pos);
                 string texturePath = fp + fileName;
@@ -191,10 +192,8 @@ void TextureLoader() {
             }
             closedir(idp);
         }
-
+        closedir(odp);
     }
-
-    closedir(odp);
     printf("There are %d unique terrain shapes.\n", shapeCount);
     printf("There's %d files in the current directory.\n", textureCount);
 }

@@ -66,8 +66,7 @@ void GameObject::SetCenter(float x, float y, bool centerOnly){
     if (x == 0 && y == 0) {
         center.first = position.first + (dimensions.first * size * scale)/2;
         center.second = position.second + (dimensions.second * size * scale)/2;
-    }
-    else {
+    } else {
         if (!centerOnly) {
             center.first = x;
             center.second = y;
@@ -99,12 +98,51 @@ void GameObject::SetDefaultPosition(float x, float y) {
 
 
 
-void GameObject::SetBottomRight() {
-    bottomRight.first = position.first + (dimensions.first * size * scale);
-    bottomRight.second = position.second + (dimensions.second * size * scale);
+void GameObject::SetBottomRight(float x, float y, bool brOnly) {
+
+    if (x == 0 && y == 0) {
+        bottomRight.first = position.first + (dimensions.first * size * scale);
+        bottomRight.second = position.second + (dimensions.second * size * scale);
+    } else {
+        if (!brOnly) {
+            bottomRight.first = x;
+            bottomRight.second = y;
+            position.first = bottomRight.first - (dimensions.first * size * scale);
+            position.second = bottomRight.second - (dimensions.second * size * scale);
+
+            SetCenter();
+            if (size == 1) SetDefaultPosition(position.first, position.second);
+        } else {
+            bottomRight.first = x;
+            bottomRight.second = y;
+        }
+    }
 }
 
-void Terrain::RenderGameObject(SDL_Renderer *renderer, Terrain* hoveringTerrain) {
+void GameObject::SetBottomMiddle(float x, float y, bool bmOnly) {
+
+    if (x == 0 && y == 0) {
+        center.first = position.first + (dimensions.first * size * scale)/2;
+        bottomRight.second = position.second + (dimensions.second * size * scale);
+    } else {
+        if (!bmOnly) {
+            center.first = x;
+            bottomRight.second = y;
+            position.first = center.first - (dimensions.first * size * scale) / 2;
+            position.second = bottomRight.second - (dimensions.second * size * scale);
+
+            SetCenter();
+            SetBottomRight();
+            if (size == 1) SetDefaultPosition(position.first, position.second);
+        } else {
+            center.first = x;
+            bottomRight.second = y;
+        }
+    }
+}
+
+
+    void Terrain::RenderGameObject(SDL_Renderer *renderer, Terrain* hoveringTerrain, bool validHover) {
     bool hovering = false;
     if (hoveringTerrain != nullptr) {
         if (this == hoveringTerrain) {
@@ -119,10 +157,13 @@ void Terrain::RenderGameObject(SDL_Renderer *renderer, Terrain* hoveringTerrain)
         }
     }
     if (hovering) {
-        SDL_SetTextureColorMod(pixels, 255/2, 255/2, 255/2);
-    } else {
-        //SDL_SetTextureColorMod(texture, color.r, color.g, color.b);
+        if (validHover) {
+            SDL_SetTextureColorMod(pixels, 255/2, 255/2, 255/2);
+        } else {
+            SDL_SetTextureColorMod(pixels, 255, 0, 0);
+        }
     }
+
     if (size == 1) {
         renderRect->x = defaultPosition.first;
         renderRect->y = defaultPosition.second;
@@ -176,7 +217,9 @@ void Pixel::RenderGameObject(SDL_Renderer *renderer, Terrain* hoveringTerrain) {
     }
     renderRect->w = (width + 2);
     renderRect->h = (height + 2);
-
+    //std::cout << "Renderer: " << &renderer << std::endl;
+    //std::cout << "Texture: " << &texture << std::endl;
+    //std::cout << "RenderRect: " << &renderRect << std::endl;
     SDL_RenderCopy(renderer, texture, NULL, renderRect);
     if (hovering) {
         SDL_SetTextureColorMod(texture, color.r, color.g, color.b);

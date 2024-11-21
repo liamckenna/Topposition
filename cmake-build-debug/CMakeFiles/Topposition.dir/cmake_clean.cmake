@@ -17,6 +17,8 @@ file(REMOVE_RECURSE
   "CMakeFiles/Topposition.dir/GlobalVars.cpp.obj.d"
   "CMakeFiles/Topposition.dir/Input.cpp.obj"
   "CMakeFiles/Topposition.dir/Input.cpp.obj.d"
+  "CMakeFiles/Topposition.dir/MenuInitialization.cpp.obj"
+  "CMakeFiles/Topposition.dir/MenuInitialization.cpp.obj.d"
   "CMakeFiles/Topposition.dir/MouseLogic.cpp.obj"
   "CMakeFiles/Topposition.dir/MouseLogic.cpp.obj.d"
   "CMakeFiles/Topposition.dir/MultiPurposeFunctions.cpp.obj"

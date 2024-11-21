@@ -3,6 +3,7 @@
 #include "MultiPurposeFunctions.h"
 #include "Input.h"
 #include "GameInitialization.h"
+#include "PlayerMovement.h"
 
 void zoom(SDL_Event e, Input* playerInput);
 

@@ -4,7 +4,7 @@ SDL_Window* window = NULL;
 
 SDL_Surface* screenSurface = NULL;
 
-SDL_Renderer* renderer = NULL;
+std::atomic<SDL_Renderer*> renderer = NULL;
 
 SDL_Texture* texture = NULL;
 
@@ -18,8 +18,7 @@ int currentRoll = 3;
 
 int movesLeft = 3;
 
-
-gameState currentState = MAIN_MENU;
+gameState state = MAIN_MENU;
 
 std::map<std::string, std::map<int, SDL_Texture*>> textures;
 
@@ -31,7 +30,7 @@ std::vector<Peak*> peaks;
 
 std::vector<std::vector<Terrain*>> terrain;
 
-std::vector<Pixel*> pixels;
+std::vector<std::vector<Pixel*>> pixels;
 
 std::vector<std::vector<GameObject*>> terrainOutlines;
 
@@ -65,4 +64,6 @@ Text* playerFourText;
 
 Terrain* hoveringTerrain;
 
+bool validMove;
 
+Player* first_place;

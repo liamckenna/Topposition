@@ -30,46 +30,46 @@ void RefreshClaimNotifs(Peak* individualPeak) {
 void ClaimPeak(UIElement* peakNotif) {
     Peak* peak = peakNotif->GetAssociatedPeak();
 
-    for (int i = 0; i < peak->occupants.size(); i++) {
-        if (peak->occupants[i]->GetPlayer() != currentTurn) {
-            PeakBattle(peak, currentTurn, peak->occupants[i]->GetPlayer());
+    while ((IsOccupyingPeak(peak, currentTurn) && !LastPlayerStanding(peak, currentTurn))|| !IsOccupyingPeak(peak, currentTurn)) {
+        for (int i = 0; i < peak->occupants.size(); i++) {
+            if (peak->occupants[i]->GetPlayer() != currentTurn) {
+                Player* winner = PeakBattle(peak, currentTurn, peak->occupants[i]->GetPlayer());
+                break;
+            }
         }
     }
-    for (int i = 0; i < peak->occupants.size(); i++) {
-        if (peak->occupants[i]->GetPlayer() == currentTurn) {
-            currentTurn->peaks.push_back(peak);
-            std::cout << currentTurn->peaks.size() << std::endl;
-            std::cout << players[0]->peaks.size() << std::endl;
+    if (LastPlayerStanding(peak, currentTurn)) {
+        currentTurn->peaks.push_back(peak);
+        if (currentTurn->peaks.size() > 1) {
+            std::cout << "You now hold " << currentTurn->peaks.size() << " peaks!" << std::endl;
+        } else {
+            std::cout << "You now hold " << currentTurn->peaks.size() << " peak!" << std::endl;
+        }
+        peak->Claim(currentTurn);
+        if (peak->GetItem() != nullptr) {
+            peak->GetItem()->SetOwner(currentTurn);
+            peak->GetItem()->SetResizable(false);
+            peak->GetItem()->SetSelectable(true);
+            currentTurn->inventory.push_back(peak->GetItem());
 
-            peak->Claim(currentTurn);
-            if (peak->GetItem() != nullptr) {
-                peak->GetItem()->SetOwner(currentTurn);
-                peak->GetItem()->SetResizable(false);
-                peak->GetItem()->SetSelectable(true);
-                currentTurn->inventory.push_back(peak->GetItem());
-
-                peak->SetItem(nullptr);
-                for (int j = 0; j < currentTurn->inventory.size(); j++) {
-                    currentTurn->inventory[j]->SetScale(0.1);
-                    currentTurn->inventory[j]->SetPosition(100 + 70*j, 10);
-                }
+            peak->SetItem(nullptr);
+            for (int j = 0; j < currentTurn->inventory.size(); j++) {
+                currentTurn->inventory[j]->SetScale(0.1);
+                currentTurn->inventory[j]->SetPosition(100 + 70*j, 10);
             }
-            for (int j = 0; j < peak->flags.size(); j++) {
-                if (peak->flags[j]->GetPlayer() == currentTurn) {
-                    peak->flags[j]->SetRendered(true);
-                } else {
-                    peak->flags[j]->SetRendered(false);
-                }
+        }
+        for (int j = 0; j < peak->flags.size(); j++) {
+            if (peak->flags[j]->GetPlayer() == currentTurn) {
+                peak->flags[j]->SetRendered(true);
+            } else {
+                peak->flags[j]->SetRendered(false);
             }
-            break;
         }
     }
-
     UpdateScore();
-
 }
 
-void PeakBattle(Peak* peak, Player* attacker, Player* defender) {
+Player* PeakBattle(Peak* peak, Player* attacker, Player* defender) {
     int attackers = 0;
     int attackPower = 0;
     int defenders = 0;
@@ -87,13 +87,20 @@ void PeakBattle(Peak* peak, Player* attacker, Player* defender) {
     for (int i = 0; i < defenders; i++) {
         defensePower += rand() % 6 + 1;
     }
+    std::cout << attacker->GetName() << " attacks " << defender->GetName() << "!" << std::endl;
     std::cout << "Attack power: " << attackPower << std::endl;
     std::cout << "Defense power: " << defensePower << std::endl;
     if (attackPower >= defensePower) {
+        for (int i = 0; i < defender->peaks.size(); i++) {
+            if (defender->peaks[i] == peak) defender->peaks.erase(defender->peaks.begin() + i);
+        }
         Retreat(peak, defender);
+        return attacker;
     } else {
         Retreat(peak, attacker);
+        return defender;
     }
+
 }
 
 void Retreat(Peak* peak, Player* player) {
@@ -106,7 +113,7 @@ void Retreat(Peak* peak, Player* player) {
                 x = (rand() % (int)(SCREEN_WIDTH/1.05)) + SCREEN_WIDTH/2 - SCREEN_WIDTH/2.1;
                 y = (rand() % (int)(SCREEN_HEIGHT/1.05)) + SCREEN_HEIGHT/2 - SCREEN_HEIGHT/2.1;
             }
-            peak->occupants[i]->SetCenter(x, y);
+            peak->occupants[i]->SetBottomMiddle(x, y);
             peak->occupants[i]->SetCurrentAnimation(peak->occupants[i]->animations["floatIdle"]);
             for (int j = 0; j < peak->occupants[i]->GetPlayer()->peaks.size(); j++) {
                 if (peak->occupants[i]->GetPlayer()->peaks[j] == peak) {
@@ -117,4 +124,18 @@ void Retreat(Peak* peak, Player* player) {
         }
     }
 
+}
+
+bool LastPlayerStanding(Peak* peak, Player* player) {
+    for (int i = 0; i < peak->occupants.size(); i++) {
+        if (peak->occupants[i]->GetPlayer() != player) return false;
+    }
+    return true;
+}
+
+bool IsOccupyingPeak(Peak* peak, Player* player) {
+    for (int i = 0; i < peak->occupants.size(); i++) {
+        if (peak->occupants[i]->GetPlayer() == player) return true;
+    }
+    return false;
 }

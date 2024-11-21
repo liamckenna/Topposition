@@ -76,23 +76,44 @@ void UpdateScore() {
             players[i]->SetScore(players[i]->GetScore() + players[i]->peaks[j]->GetLayer());
         }
     }
-    /*if (peaksLeft == 0) {
-        if (playerOneScore > playerTwoScore && playerOneScore > playerThreeScore && playerOneScore > playerFourScore) {
-            GameFinished("playerOne");
-        } else if (playerTwoScore > playerOneScore && playerTwoScore > playerThreeScore && playerTwoScore > playerFourScore) {
-            GameFinished("playerTwo");
-        } else if (playerThreeScore > playerOneScore && playerThreeScore > playerTwoScore && playerThreeScore > playerFourScore) {
-            GameFinished("playerThree");
-        } else if (playerFourScore > playerOneScore && playerFourScore > playerTwoScore && playerFourScore > playerThreeScore) {
-            GameFinished("playerFour");
-        } else {
-            Tiebreaker();
-        }
-
-    }*/
+    first_place = nullptr;
     for (int i = 0; i < players.size(); i++) {
-        std::cout << "Player " << i + 1 << ": " << players[i]->GetScore() << endl;
+        if (first_place == nullptr || players[i]->GetScore() > first_place->GetScore()) {
+            first_place = players[i];
+        }
     }
+    for (int i = 0; i < players.size(); i++) {
+        if (players[i]->GetScore() == first_place->GetScore()) {
+            if (first_place->GetColor() != players[i]->GetColor()) {
+                first_place = nullptr;
+                break;
+            }
+        }
+    }
+    for (int i = 0; i < players.size(); i++) {
+        std::cout << "Player " << i + 1 << ": " << players[i]->GetScore();
+        if (players[i] == first_place) {
+            std::cout << " (First Place!)" << std::endl;
+        } else {
+            std::cout << std::endl;
+        }
+    }
+    if (peaksLeft == 0) {
+//        if (playerOneScore > playerTwoScore && playerOneScore > playerThreeScore && playerOneScore > playerFourScore) {
+//            GameFinished("playerOne");
+//        } else if (playerTwoScore > playerOneScore && playerTwoScore > playerThreeScore && playerTwoScore > playerFourScore) {
+//            GameFinished("playerTwo");
+//        } else if (playerThreeScore > playerOneScore && playerThreeScore > playerTwoScore && playerThreeScore > playerFourScore) {
+//            GameFinished("playerThree");
+//        } else if (playerFourScore > playerOneScore && playerFourScore > playerTwoScore && playerFourScore > playerThreeScore) {
+//            GameFinished("playerFour");
+//        } else {
+//            Tiebreaker();
+//        }
+            if (first_place != nullptr) GameFinished(first_place);
+    }
+
+
 
 
 }
@@ -109,7 +130,7 @@ void GameFinished(Player* winner) {
         winnerColor = "winnerYellow";
     }
 
-    UIElement* winnerMessage = new UIElement("winner message", textures[winnerColor][0], surfaces[winnerColor], true);
+    UIElement* winnerMessage = new UIElement("winner message", textures[winnerColor][0], surfaces[winnerColor], true, false);
     winnerMessage->SetCenter(SCREEN_WIDTH/2, SCREEN_HEIGHT/2);
     uiElements.push_back(winnerMessage);
     gameObjects[gameObjects.size()-1].push_back(winnerMessage);

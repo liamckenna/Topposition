@@ -10,8 +10,10 @@ void loadGamePieces();
 
 void loadUI();
 
-void GeneratePixels();
+void GeneratePixels(int thread, int thread_count);
 
-void renderPixels();
+void renderPixels(int thread);
 
 void ResetMap();
+
+void loadGame();

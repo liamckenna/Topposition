@@ -6,9 +6,9 @@
 #include <SDL2/SDL_ttf.h>
 #include "GameRules.h"
 #include "Player.h"
-
 #include <math.h>
 #include <map>
+#include <iostream>
 
 class Animation;
 class Player;
@@ -66,6 +66,8 @@ public:
     bool GetResizable() const {return resizable;}
     SDL_Rect* GetRectangle() const {return renderRect;}
     Animation* GetCurrentAnimation() const {return currentAnimation;}
+    pair<float, float> GetBottomRight() {return bottomRight;}
+    pair<float, float> GetBottomMiddle() {std::pair<float, float> bm; bm.first = center.first; bm.second = bottomRight.second; return bm;}
     void SetCurrentAnimation(Animation* ca) {currentAnimation = ca;}
     void SetRectangle(SDL_Rect* r) {renderRect = r;}
     void SetResizable(bool r) {resizable = r;}
@@ -80,13 +82,15 @@ public:
     void SetRendered(bool r);
     void AdjustSize(float multiplier = 1, int w = 0, int h = 0);
     virtual void RenderGameObject(SDL_Renderer* renderer);
-    void SetBottomRight();
-    pair<float, float> GetBottomRight() {return bottomRight;}
+    void SetBottomRight(float x = 0, float y = 0, bool brOnly = false);
+    void SetBottomMiddle(float x = 0, float y = 0, bool bmOnly = false);
 };
 
 class Peak;
 class Piece;
 class Item;
+
+
 
 class Terrain : public GameObject
 {
@@ -108,7 +112,7 @@ public:
     std::vector<Piece*> occupants;
     std::vector<Terrain*> connectedTerrain;
 
-    void RenderGameObject(SDL_Renderer* renderer, Terrain* hoveringTerrain);
+    void RenderGameObject(SDL_Renderer* renderer, Terrain* hoveringTerrain, bool validHover);
 
     Terrain(string name, SDL_Texture *texture, SDL_Surface *surface, bool m, bool r, int l, SDL_Renderer* renderer) : GameObject(name, texture, surface, m, r) {
         layer = l;
@@ -148,13 +152,16 @@ public:
 
 };
 
+bool CheckMovePossibility(Piece* piece, Terrain* targetTerrain);
+
 class UIElement : public GameObject {
     Peak* associatedPeak;
 public:
-    UIElement(string name, SDL_Texture *texture, SDL_Surface *surface, bool r, Peak* ap = nullptr) : GameObject(name, texture, surface, false, r) {
+    UIElement(string name, SDL_Texture *texture, SDL_Surface *surface, bool r, bool s, Peak* ap = nullptr) : GameObject(name, texture, surface, false, r) {
     type = UI_ELEMENT;
     associatedPeak = ap;
     resizable = false;
+    selectable = s;
     }
     Peak* GetAssociatedPeak() {return associatedPeak;}
     void SetAssociatedPeak(Peak* ap) {associatedPeak = ap;}

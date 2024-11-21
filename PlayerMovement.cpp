@@ -1,6 +1,6 @@
 #include "PlayerMovement.h"
 
-void Move(Piece* piece, Terrain* startingPoint, Terrain* targetTerrain, int& movesLeft) {
+bool Move(Piece* piece, Terrain* startingPoint, Terrain* targetTerrain, int& movesLeft) {
 
     int moveCount = 0;
     int heightDifference;
@@ -9,10 +9,11 @@ void Move(Piece* piece, Terrain* startingPoint, Terrain* targetTerrain, int& mov
     bool moveSuccess = MovementAttempt(heightDifference, moveCount, startingPoint, targetTerrain, currentPath, false);
 
     if (!moveSuccess) {
-        piece->SetCenter(piece->GetDesignatedLocation().first, piece->GetDesignatedLocation().second + piece->GetDimensions().second/2 * piece->GetSize());
+        piece->SetCenter(piece->GetDesignatedLocation().first, piece->GetCenter().second);
+        piece->SetBottomRight(piece->GetBottomRight().first, piece->GetDesignatedLocation().second);
     } else {
         movesLeft = movesLeft - moveCount;
-        piece->SetDesignatedLocation(piece->GetCenter().first, piece->GetCenter().second);
+        piece->SetDesignatedLocation(piece->GetCenter().first, piece->GetBottomRight().second);
         piece->SetOccupyingTerrain(targetTerrain);
         if (startingPoint != NULL) {
             for (int i = 0; i < startingPoint->occupants.size(); i++) {
@@ -41,6 +42,8 @@ void Move(Piece* piece, Terrain* startingPoint, Terrain* targetTerrain, int& mov
 
 
     UpdateMovesLeft();
+
+    return moveSuccess;
 
 }
 
@@ -94,6 +97,21 @@ bool MovementAttempt(int& heightDifference, int& attemptedMoves, Terrain* curren
     }
 
     return false;
+
+}
+
+bool CheckMovementPossibility(Piece* piece, Terrain* targetTerrain) {
+
+    int moveCount = 0;
+    int heightDifference;
+    std::vector<Terrain*> currentPath;
+    Terrain* currentTerrain = selectTerrain(piece->GetDesignatedLocation().first, piece->GetDesignatedLocation().second);
+
+    if (MovementAttempt(heightDifference, moveCount, currentTerrain, targetTerrain, currentPath, false)) {
+        return true;
+    } else {
+        return false;
+    }
 
 }
 

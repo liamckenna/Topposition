@@ -7,6 +7,10 @@ void RefreshClaimNotifs(Peak* individualPeak = NULL);
 
 void ClaimPeak(UIElement* claimNotif);
 
-void PeakBattle(Peak* peak, Player* attacker, Player* defender);
+Player* PeakBattle(Peak* peak, Player* attacker, Player* defender);
 
 void Retreat(Peak* peak, Player* player);
+
+bool LastPlayerStanding(Peak* peak, Player* player);
+
+bool IsOccupyingPeak(Peak* peak, Player* player);

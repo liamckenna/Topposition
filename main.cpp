@@ -14,11 +14,42 @@
 #include "Rendering.h"
 #include "ProgramInitialization.h"
 #include "GameInitialization.h"
+#include "MenuInitialization.h"
 #include "EventHandler.h"
 #include "AnimationHandler.h"
 #include <random>
 
+float last_fps_time = 0.f;
+int frame_count = 0;
 
+void CalculateFrameRate()
+{
+    static Uint32 startTime = SDL_GetTicks(); // Time when we started counting
+    static int frameCount = 0;                // Frame counter
+    static int fps = 0;                       // The FPS value
+
+    frameCount++;
+
+    // Get the current time in milliseconds
+    Uint32 currentTime = SDL_GetTicks();
+
+    // Calculate the elapsed time (in milliseconds) since we started counting
+    Uint32 elapsedTime = currentTime - startTime;
+
+    // Check if a second has passed
+    if (elapsedTime >= 1000)
+    {
+        // Calculate frames per second (FPS)
+        fps = frameCount;
+
+        // Print the FPS count
+        //std::cout << "FPS: " << fps << std::endl;
+
+        // Reset for the next second
+        frameCount = 0;
+        startTime = currentTime;
+    }
+}
 //hi
 
 int main( int argc, char* args[] )
@@ -31,9 +62,8 @@ int main( int argc, char* args[] )
         return 1;
     }
 
-
-    ResetMap();
-
+    //ResetMap();
+    LoadMenu();
 
 
     //Event handler
@@ -49,13 +79,7 @@ int main( int argc, char* args[] )
     Uint64 start = SDL_GetPerformanceCounter();
     while( !quit )
     {
-
-        Uint64 end = SDL_GetPerformanceCounter();
-        float elapsedMS = (end - start) / (float)SDL_GetPerformanceFrequency() * 1000.0f;
-        float elapsedFrames = (end - start) / (float)SDL_GetPerformanceFrequency();
-        fps = 1.0f/ elapsedFrames;
-        //std::cout << fps << std::endl;
-        start = SDL_GetPerformanceCounter();
+        CalculateFrameRate();
         //Handle events on queue
         HandleEvents(playerInput);
         frame++;

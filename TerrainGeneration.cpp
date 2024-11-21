@@ -3,9 +3,9 @@
 
 void GeneratePeak() {
     //int x = (rand() % (int)(SCREEN_WIDTH/1.2)) + SCREEN_WIDTH/2 - SCREEN_WIDTH/2.4;
-    int x = (rand() % SCREEN_WIDTH) * 2;
+    int x = ( rand() % SCREEN_WIDTH ) * 2;
     //int y = (rand() % (int)(SCREEN_HEIGHT/1.2)) + SCREEN_HEIGHT/2 - SCREEN_HEIGHT/2.4;
-    int y = (rand() % SCREEN_HEIGHT) * 2;
+    int y = ( rand() % SCREEN_HEIGHT ) * 2;
 
     int shape = rand() % (int)(shapeCount);
     int height = (rand() % rules->GetMaxHeight()) + 1;

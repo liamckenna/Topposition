@@ -88,20 +88,25 @@ GameObject* selectObject(int x, int y) {
 }
 
 UIElement* selectUI(int x, int y) {
+    Print(to_string(uiElements.size()));
     for (int i = 0; i < uiElements.size(); i++) {
+        if (!uiElements[i]->GetSelectable()) {
+            continue;
+        }
         int width_LowerBound = uiElements[i]->GetPosition().first;
         int width_UpperBound = uiElements[i]->GetBottomRight().first;
         int height_LowerBound = uiElements[i]->GetPosition().second;
         int height_UpperBound = uiElements[i]->GetBottomRight().second;
         if (x >= width_LowerBound && x <= width_UpperBound) {
             if (y >= height_LowerBound && y <= height_UpperBound) {
-
                 SDL_Color color = GetPixelColor(uiElements[i]->GetSurface(),
                                                 (x - width_LowerBound)/(uiElements[i]->GetSize() * uiElements[i]->GetScale()),
                                                 (y - height_LowerBound)/(uiElements[i]->GetSize() * uiElements[i]->GetScale()));
-                if (color.r == 0 && color.g == 0 && color.b == 0) {
+                //std::cout << uiElements[i]->GetName() << std::endl;
+                if (color.r == 0 && color.g == 0 && color.b == 0 && uiElements[i]->GetName() == "claim peak button") {
                     continue;
-                } else if (uiElements[i]->GetRendered()){
+                }
+                if (uiElements[i]->GetRendered()){
                     return uiElements[i];
                 }
 
@@ -201,7 +206,11 @@ void moveSelectedObject(GameObject* gameObject, Input* playerInput) {
     if (gameObject->GetMovable()) {
         gameObject->SetCenter(gameObject->GetCenter().first + playerInput->currentMousePosition.first - playerInput->prevMousePosition.first,
                               gameObject->GetCenter().second + playerInput->currentMousePosition.second - playerInput->prevMousePosition.second);
-        hoveringTerrain = selectTerrain(gameObject->GetCenter().first, gameObject->GetCenter().second + gameObject->GetDimensions().second/2 * gameObject->GetSize() * gameObject->GetScale());
+        Terrain* terrain_under = selectTerrain(gameObject->GetBottomMiddle().first, gameObject->GetBottomMiddle().second);
+        if (hoveringTerrain != terrain_under) {
+            hoveringTerrain = terrain_under;
+            validMove = CheckMovementPossibility(dynamic_cast<Piece*>(gameObject), hoveringTerrain);
+        }
     }
 }
 

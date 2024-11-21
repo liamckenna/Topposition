@@ -23,3 +23,7 @@ SDL_Color GetPixelColor(const SDL_Surface * surface, const int X, const int Y)
 
     return Color;
 }
+
+void Print(string s) {
+    //std::cout << s << std::endl;
+}

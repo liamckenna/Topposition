@@ -1,5 +1,117 @@
 #include "GameInitialization.h"
 
+void ResetMap() {
+    for (int i = 0; i < peaks.size(); i++) {
+        peaks[i] = nullptr;
+    }
+
+    for (int i = 0; i < terrain.size(); i++) {
+        for (int j = 0; j < terrain[i].size(); j++) {
+            terrain[i][j] = nullptr;
+            terrainOutlines[i][j] = nullptr;
+        }
+    }
+
+    for (int i = 0; i < pieces.size(); i++) {
+        pieces[i] = nullptr;
+    }
+
+    for (int i = 0; i < uiElements.size(); i++) {
+        uiElements[i] = nullptr;
+    }
+
+    for (int i = 0; i < players.size(); i++) {
+        for (int j = 0; j < players[i]->soldiers.size(); j++) {
+            players[i]->soldiers[j] = nullptr;
+        }
+        for (int j = 0; j < players[i]->peaks.size(); j++) {
+            players[i]->peaks[j] = nullptr;
+        }
+        for (int j = 0; j < players[i]->inventory.size(); j++) {
+            players[i]->inventory[j] = nullptr;
+        }
+        delete players[i];
+    }
+
+    for (int i = 0; i < pixels.size(); i++) {
+        for (int j = 0; j < pixels[i].size(); j++) {
+            delete pixels[i][j];
+        }
+    }
+
+    for (int i = 0; i < gameObjects.size(); i++) {
+        for (int j = 0; j < gameObjects[i].size(); j++) {
+            delete gameObjects[i][j];
+        }
+    }
+
+    for (int i = 0; i < text.size(); i++) {
+        delete text[i];
+    }
+
+    for (int i = 0; i < animations.size(); i++) {
+        delete animations[i];
+    }
+
+    std::vector<Piece*> newPieces;
+    std::vector<std::vector<Terrain*>> newTerrain;
+    std::vector<std::vector<GameObject*>> newTerrainOutlines;
+    std::vector<std::vector<GameObject*>> newGameObjects;
+    std::vector<Peak*> newPeaks;
+    std::vector<UIElement*> newUIElements;
+    std::vector<Player*> newPlayers;
+    std::vector<std::vector<Pixel*>> newPixels;
+    std::vector<Text*> newText;
+    std::vector<Animation*> newAnimations;
+    animations = newAnimations;
+    players = newPlayers;
+    text = newText;
+    pixels = newPixels;
+    uiElements = newUIElements;
+    pieces = newPieces;
+    terrain = newTerrain;
+    terrainOutlines = newTerrainOutlines;
+    gameObjects = newGameObjects;
+    peaks = newPeaks;
+    if (state == GAME) {
+        loadGame();
+    }
+}
+
+void loadGame() {
+
+    std::cout << "Loading Map..." << std::endl;
+    loadMap();
+    std::cout << "Loading UI..." << std::endl;
+    loadUI();
+    std::cout << "Loading Game Pieces..." << std::endl;
+    loadGamePieces();
+
+    std::cout << "Generating Pixels..." << std::endl;
+    std::vector<std::thread> threads;
+    int thread = 0;
+    int thread_count = 8;
+    for (int i = 0; i < thread_count; i++) {
+        std::vector<Pixel*> thread_vec;
+        pixels.push_back(thread_vec);
+    }
+    for (int i = 0; i < thread_count; i++) {
+        int unique_thread_count = thread_count;
+        threads.push_back(std::thread([thread, unique_thread_count] {
+            GeneratePixels(thread, unique_thread_count);
+        }));
+        thread++;
+    }
+
+    for (int i = 0; i < thread_count; i++) {
+        threads[i].join();
+        renderPixels(i);
+        std::cout << "thread " << i << " joined..." << std::endl;
+    }
+
+    SDL_SetRenderTarget(renderer, NULL);
+
+}
 
 bool loadMap()
 {
@@ -10,9 +122,7 @@ bool loadMap()
     //Load splash image
     GameObject* water = new GameObject("water", textures["water"][0], surfaces["water"], false, true);
 
-
     water->SetPosition(0, 0);
-
 
     for (int i = 0; i < rules->GetMaxHeight() + 1; i++) {
         gameObjects.push_back(vector<GameObject *>());
@@ -64,28 +174,31 @@ void loadGamePieces()
                 break;
         }
         player->SetName(playerNumber);
+        player->SetColor(color);
         string flagName = playerNumber + " flag";
         for (int i = 0; i < peaks.size(); i++) {
             Piece* flag = new Piece(playerNumber, textures[flagName][0], surfaces[flagName], false);
-            flag->SetScale(2);
-            flag->SetCenter(peaks[i]->GetCenter().first, peaks[i]->GetCenter().second - 40);
+            flag->SetScale(3);
+            flag->SetBottomMiddle(peaks[i]->GetCenter().first, peaks[i]->GetCenter().second);
             pieces.push_back(flag);
             gameObjects[gameObjects.size() - 2].push_back(flag);
             peaks[i]->flags.push_back(flag);
             flag->SetPlayer(player);
         }
         string pieceName = playerNumber + " piece float";
-        int x = (rand() % (int)(SCREEN_WIDTH/1.05)) + SCREEN_WIDTH/2 - SCREEN_WIDTH/2.1;
-        int y = (rand() % (int)(SCREEN_HEIGHT/1.05)) + SCREEN_HEIGHT/2 - SCREEN_HEIGHT/2.1;
-        while (selectTerrain(x, y) != NULL || selectUI(x, y) != NULL) {
-            x = (rand() % (int)(SCREEN_WIDTH/1.05)) + SCREEN_WIDTH/2 - SCREEN_WIDTH/2.1;
-            y = (rand() % (int)(SCREEN_HEIGHT/1.05)) + SCREEN_HEIGHT/2 - SCREEN_HEIGHT/2.1;
-        }
+
         for (int i = 0; i < rules->GetPieces(); i++) {
+            int x;
+            int y;
+            do {
+                x = (rand() % (int)(SCREEN_WIDTH*1.5f)) - SCREEN_WIDTH/4;
+                y = (rand() % (int)(SCREEN_HEIGHT*1.5f)) - SCREEN_HEIGHT/4;
+            } while (selectTerrain(x, y) != NULL || selectUI(x, y) != NULL);
+
             Piece* piece = new Piece(playerNumber, textures[pieceName][0], surfaces[pieceName], true);
-            piece->SetScale(2);
+            piece->SetScale(3);
             gameObjects[rules->GetMaxHeight() + 1].push_back(piece);
-            piece->SetCenter(x, y);
+            piece->SetBottomMiddle(x, y);
             piece->SetDesignatedLocation(x, y);
             piece->SetSelectable(selectable);
             Animation* floatIdle = new Animation(textures[playerNumber + " piece float sheet"][0], surfaces[playerNumber + " piece float sheet"], 1, 12, {3, 4}, {48, 48});
@@ -137,31 +250,31 @@ void loadGamePieces()
 
 void loadUI() {
 
-    UIElement* resetButton = new UIElement("reset button", textures["reset"][0], surfaces["reset"], true);
+    UIElement* resetButton = new UIElement("reset button", textures["reset"][0], surfaces["reset"], true, true);
     uiElements.push_back(resetButton);
     gameObjects[gameObjects.size() - 1].push_back(resetButton);
     resetButton->SetPosition(0,0);
-    UIElement* die1 = new UIElement("dieOne", textures["die 1"][0], surfaces["die 1"], true);
+    UIElement* die1 = new UIElement("dieOne", textures["die 1"][0], surfaces["die 1"], true, true);
     die1->SetScale(0.1);
     uiElements.push_back(die1);
     gameObjects[gameObjects.size() - 1].push_back(die1);
     die1->SetPosition(SCREEN_WIDTH - (die1->GetDimensions().first * die1->GetScale() * die1->GetSize()) - 10, 10);
-    UIElement* die2 = new UIElement("dieTwo", textures["die 2"][0], surfaces["die 2"], true);
+    UIElement* die2 = new UIElement("dieTwo", textures["die 2"][0], surfaces["die 2"], true, true);
     die2->SetScale(0.1);
     uiElements.push_back(die2);
     gameObjects[gameObjects.size() - 1].push_back(die2);
     die2->SetPosition(SCREEN_WIDTH - ((die1->GetDimensions().first * die1->GetScale() * die1->GetSize()) + 10 )*2, 10);
-    UIElement* movesLeftText = new UIElement("movesLeftText", textures["moves left"][0], surfaces["moves left"], true);
+    UIElement* movesLeftText = new UIElement("movesLeftText", textures["moves left"][0], surfaces["moves left"], true, false);
     movesLeftText->SetScale(0.1);
     uiElements.push_back(movesLeftText);
     gameObjects[gameObjects.size() - 1].push_back(movesLeftText);
     movesLeftText->SetPosition(0, SCREEN_HEIGHT - (movesLeftText->GetDimensions().second * movesLeftText->GetScale() * movesLeftText->GetSize()));
-    UIElement* movesLeftCount = new UIElement("movesLeftCount", textures["moves left 3"][0], surfaces["moves left 3"], true);
+    UIElement* movesLeftCount = new UIElement("movesLeftCount", textures["moves left 3"][0], surfaces["moves left 3"], true, false);
     movesLeftCount->SetScale(0.1);
     uiElements.push_back(movesLeftCount);
     gameObjects[gameObjects.size() - 1].push_back(movesLeftCount);
     movesLeftCount->SetPosition(0, SCREEN_HEIGHT - (movesLeftCount->GetDimensions().second * movesLeftCount->GetScale() * movesLeftCount->GetSize()));
-    UIElement* finishTurnButton = new UIElement("finish turn button", textures["finish turn"][0], surfaces["finish turn"], true);
+    UIElement* finishTurnButton = new UIElement("finish turn button", textures["finish turn"][0], surfaces["finish turn"], true, true);
     finishTurnButton->SetScale(0.1);
     finishTurnButton->SetPosition(SCREEN_WIDTH - (finishTurnButton->GetDimensions().first * finishTurnButton->GetScale() * finishTurnButton->GetSize()) - 10,
                                   SCREEN_HEIGHT - (finishTurnButton->GetDimensions().second * finishTurnButton->GetScale() * finishTurnButton->GetSize()) - 10);
@@ -170,7 +283,7 @@ void loadUI() {
 
 
     for(int i = 0; i < peaks.size(); i++) {
-        UIElement* claimPeakButton = new UIElement("claim peak button", textures["claim peak"][0], surfaces["claim peak"], false, peaks[i]);
+        UIElement* claimPeakButton = new UIElement("claim peak button", textures["claim peak"][0], surfaces["claim peak"], false, true, peaks[i]);
         claimPeakButton->SetScale(0.1);
         claimPeakButton->SetCenter(peaks[i]->GetCenter().first + 50, peaks[i]->GetCenter().second - 50);
         claimPeakButton->SetResizable(true);
@@ -185,94 +298,19 @@ void loadUI() {
 
 }
 
-void ResetMap() {
-    for (int i = 0; i < peaks.size(); i++) {
-        peaks[i] = nullptr;
-    }
 
-    for (int i = 0; i < terrain.size(); i++) {
-        for (int j = 0; j < terrain[i].size(); j++) {
-            terrain[i][j] = nullptr;
-            terrainOutlines[i][j] = nullptr;
-        }
-    }
+void GeneratePixels(int thread, int thread_count) {
 
-    for (int i = 0; i < pieces.size(); i++) {
-        pieces[i] = nullptr;
-    }
+    int totalColumns = SCREEN_WIDTH + SCREEN_WIDTH/2;
+    int startPos = totalColumns / thread_count * thread - SCREEN_WIDTH/4;
+    int endPos = startPos + totalColumns /  thread_count;
+    for (int i = startPos; i < endPos; i++) {
+        for (int j = -SCREEN_HEIGHT/4; j < SCREEN_HEIGHT + SCREEN_HEIGHT/4; j++) {
+            int width = 12;
+            int height = 12;
 
-    for (int i = 0; i < uiElements.size(); i++) {
-        uiElements[i] = nullptr;
-    }
-
-    for (int i = 0; i < players.size(); i++) {
-        for (int j = 0; j < players[i]->soldiers.size(); j++) {
-            players[i]->soldiers[j] = nullptr;
-        }
-        for (int j = 0; j < players[i]->peaks.size(); j++) {
-            players[i]->peaks[j] = nullptr;
-        }
-        for (int j = 0; j < players[i]->inventory.size(); j++) {
-            players[i]->inventory[j] = nullptr;
-        }
-        delete players[i];
-    }
-
-    for (int i = 0; i < pixels.size(); i++) {
-        delete pixels[i];
-    }
-
-    for (int i = 0; i < gameObjects.size(); i++) {
-        for (int j = 0; j < gameObjects[i].size(); j++) {
-            delete gameObjects[i][j];
-        }
-    }
-
-    for (int i = 0; i < text.size(); i++) {
-        delete text[i];
-    }
-
-    for (int i = 0; i < animations.size(); i++) {
-        delete animations[i];
-    }
-
-    std::vector<Piece*> newPieces;
-    std::vector<std::vector<Terrain*>> newTerrain;
-    std::vector<std::vector<GameObject*>> newTerrainOutlines;
-    std::vector<std::vector<GameObject*>> newGameObjects;
-    std::vector<Peak*> newPeaks;
-    std::vector<UIElement*> newUIElements;
-    std::vector<Player*> newPlayers;
-    std::vector<Pixel*> newPixels;
-    std::vector<Text*> newText;
-    std::vector<Animation*> newAnimations;
-    animations = newAnimations;
-    players = newPlayers;
-    text = newText;
-    pixels = newPixels;
-    uiElements = newUIElements;
-    pieces = newPieces;
-    terrain = newTerrain;
-    terrainOutlines = newTerrainOutlines;
-    gameObjects = newGameObjects;
-    peaks = newPeaks;
-
-    loadMap();
-    loadUI();
-    loadGamePieces();
-    GeneratePixels();
-
-    renderPixels();
-    SDL_SetRenderTarget(renderer, NULL);
-}
-
-void GeneratePixels() {
-
-
-    for (int i = -500; i < SCREEN_WIDTH + 500; i++) {
-        for (int j = -500; j < SCREEN_HEIGHT + 500; j++) {
-            int x = i*2 + 1;
-            int y = j*2 + 1;
+            int x = i*width + width/2;
+            int y = j*height + height/2;
             Terrain* currentTerrain = selectTerrain(x, y);
             if (currentTerrain == nullptr) continue;
 
@@ -280,10 +318,8 @@ void GeneratePixels() {
             pixel->SetHiddenTerrain(selectTerrain(x, y));
 
             //y += 2;
-            Terrain* tempTerrain = selectTerrain(x, y);
-            int width= 2;
-            int height = 2;
-            pixel->SetPosition(i*2, j*2);
+            //Terrain* tempTerrain = selectTerrain(x, y);
+            pixel->SetPosition(x-width/2, y-height/2);
 
             /*Terrain* topLeftTerrain = selectTerrain(i*4, j*4);
             Terrain* bottomRightTerrain = selectTerrain(i*4 + 4, j*4 + 4);
@@ -342,15 +378,16 @@ void GeneratePixels() {
                 }
             }
             pixel->SetColor(pixelColor);
-            pixels.push_back(pixel);
-            //gameObjects[pixel->GetHiddenTerrain()->GetLayer()].push_back(pixel);
+            pixels[thread].push_back(pixel);
         }
     }
 }
 
 
-void renderPixels(){
-    for (int i = 0; i < pixels.size(); i++) {
-        pixels[i]->RenderGameObject(renderer, hoveringTerrain);
+void renderPixels(int thread){
+
+    for (int i = 0; i < pixels[thread].size(); i++) {
+        pixels[thread][i]->RenderGameObject(renderer, hoveringTerrain);
     }
+
 }
