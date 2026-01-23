@@ -1,6 +1,6 @@
 #include <iostream>
-#include <SDL2/SDL.h>
-#include <SDL2/SDL_image.h>
+#include <SDL3/SDL.h>
+#include <SDL3_image/SDL_image.h>
 #include <sys/types.h>
 #include <dirent.h>
 #include <vector>
@@ -21,6 +21,44 @@
 
 float last_fps_time = 0.f;
 int frame_count = 0;
+
+void CalculateFrameRate();
+
+int main(int argc, char *args[])
+{
+    // Start up SDL and create window
+
+    if (!init())
+    {
+        printf("Failed to initialize!\n");
+        return 1;
+    }
+
+    LoadMenu();
+    // Event handler
+
+    Input *playerInput = new Input();
+    // While application is running
+
+    float fps = 0.0f;
+    Uint64 lastUpdate = SDL_GetTicks();
+    int frame = 0;
+    Uint64 lastFrame = 0;
+    Uint64 start = SDL_GetPerformanceCounter();
+    while (!quit)
+    {
+        CalculateFrameRate();
+        // Handle events on queue
+        HandleEvents(playerInput);
+        frame++;
+        AnimationHandler(fps, lastFrame, lastUpdate);
+        RenderScreen();
+    }
+    // Free resources and close SDL
+    close();
+
+    return 0;
+}
 
 void CalculateFrameRate()
 {
@@ -43,55 +81,10 @@ void CalculateFrameRate()
         fps = frameCount;
 
         // Print the FPS count
-        //std::cout << "FPS: " << fps << std::endl;
+        // std::cout << "FPS: " << fps << std::endl;
 
         // Reset for the next second
         frameCount = 0;
         startTime = currentTime;
     }
-}
-//hi
-
-int main( int argc, char* args[] )
-{
-    //Start up SDL and create window
-
-    if( !init() )
-    {
-        printf( "Failed to initialize!\n" );
-        return 1;
-    }
-
-    //ResetMap();
-    LoadMenu();
-
-
-    //Event handler
-
-    Input* playerInput = new Input();
-    //While application is running
-
-
-    float fps = 0.0f;
-    Uint64 lastUpdate = SDL_GetTicks64();
-    int frame = 0;
-    Uint64 lastFrame = 0;
-    Uint64 start = SDL_GetPerformanceCounter();
-    while( !quit )
-    {
-        CalculateFrameRate();
-        //Handle events on queue
-        HandleEvents(playerInput);
-        frame++;
-        AnimationHandler(fps, lastFrame, lastUpdate);
-        RenderScreen();
-
-
-
-
-    }
-    //Free resources and close SDL
-    close();
-
-    return 0;
 }
