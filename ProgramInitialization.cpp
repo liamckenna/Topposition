@@ -36,23 +36,17 @@ bool init()
             }
             else
             {
-                // Initialize renderer color
                 SDL_SetRenderDrawColor(renderer, 0xFF, 0xFF, 0xFF, 0xFF);
 
-                // Initialize PNG loading
-                // int imgFlags = IMG_isPNG;
-
-                // if (!(IMG_Init(imgFlags) & imgFlags))
-                //{
-                //     printf("SDL_image could not initialize! SDL_image Error: %s\n", IMG_GetError());
-                //     success = false;
-                // }
-                // else
-                //{
                 screenSurface = SDL_GetWindowSurface(window);
+
                 TextureLoader();
-                TTF_Init();
-                //}
+
+                if (!TTF_Init())
+                {
+                    printf("TTF_Init failed! Error: %s\n", SDL_GetError());
+                    success = false;
+                }
             }
         }
     }

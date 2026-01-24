@@ -35,7 +35,6 @@ int main(int argc, char *args[])
     }
 
     LoadMenu();
-    // Event handler
 
     Input *playerInput = new Input();
     // While application is running
