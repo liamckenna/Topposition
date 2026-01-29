@@ -24,6 +24,10 @@ extern int SCREEN_WIDTH;
 
 extern int SCREEN_HEIGHT;
 
+extern int MAP_WIDTH;
+
+extern int MAP_HEIGHT;
+
 extern bool quit;
 
 extern std::map<std::string, std::map<int, SDL_Texture *>> textures;
@@ -76,11 +80,15 @@ extern Terrain *hoveringTerrain;
 
 extern bool validMove;
 
-extern Uint32 currentTime;
+extern Uint64 currentTime;
 
-extern Uint32 prevTime;
+extern Uint64 prevTime;
 
-extern Uint32 deltaTime;
+extern Uint64 deltaTime;
+
+extern Uint64 frameCountTime;
+
+extern int frameCounter;
 
 enum gameState
 {

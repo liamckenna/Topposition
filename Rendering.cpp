@@ -105,8 +105,8 @@ void renderOcean()
         deltaTime = 5;
     for (int i = 0; i < ocean.size(); i++)
     {
-        float dxf = 0.05;
-        float dyf = 0.025;
+        float dxf = 1 * deltaTime / 1000.f;
+        float dyf = 1 * deltaTime / 1000.f;
 
         ocean[i]->SetPosition(ocean[i]->GetPosition().first + dxf, ocean[i]->GetPosition().second + dyf);
         ocean[i]->CheckTimer();

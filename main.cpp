@@ -46,12 +46,12 @@ int main(int argc, char *args[])
     Uint64 start = SDL_GetPerformanceCounter();
     while (!quit)
     {
-        CalculateFrameRate();
         // Handle events on queue
         HandleEvents(playerInput);
         frame++;
         AnimationHandler(fps, lastFrame, lastUpdate);
         RenderScreen();
+        CalculateFrameRate();
     }
     // Free resources and close SDL
     close();
@@ -65,32 +65,13 @@ void CalculateFrameRate()
     currentTime = SDL_GetTicks();
     deltaTime = currentTime - prevTime;
 
-    static Uint32 startTime = SDL_GetTicks(); // Time when we started counting
-    static int frameCount = 0;                // Frame counter
-    static int fps = 0;                       // The FPS value
-
-    frameCount++;
-
-    // Get the current time in milliseconds
-    Uint32 currentTime = SDL_GetTicks();
-
-    // Calculate the elapsed time (in milliseconds) since we started counting
-    Uint32 elapsedTime = currentTime - startTime;
-
-    // Check if a second has passed
-    if (elapsedTime >= 1000)
+    frameCounter++;
+    frameCountTime += deltaTime;
+    if (frameCountTime >= 1000)
     {
-        // Calculate frames per second (FPS)
-        fps = frameCount;
-
-        // Print the FPS count
-        std::cout << "FPS: " << fps << std::endl;
-
-        // Reset for the next second
-        frameCount = 0;
-        startTime = currentTime;
-        // std::cout << "deltaTime: " << deltaTime << std::endl;
-        std::cout << "ocean size: " << ocean.size() << std::endl;
+        std::cout << "FPS: " << frameCounter << std::endl;
+        frameCounter = 0;
+        frameCountTime = 0;
     }
 
     prevTime = currentTime;

@@ -12,6 +12,10 @@ int SCREEN_WIDTH = 2560;
 
 int SCREEN_HEIGHT = 1440;
 
+int MAP_WIDTH = 2560;
+
+int MAP_HEIGHT = 1440;
+
 bool quit = false;
 
 int currentRoll = 3;
@@ -70,8 +74,12 @@ bool validMove;
 
 Player *first_place;
 
-Uint32 currentTime = 0;
+Uint64 currentTime = 0;
 
-Uint32 prevTime = 0;
+Uint64 prevTime = 0;
 
-Uint32 deltaTime = 1;
+Uint64 deltaTime = 1;
+
+Uint64 frameCountTime = 0;
+
+int frameCounter = 0;

@@ -208,29 +208,29 @@ void loadGamePieces()
 
             do
             {
-                x = (rand() % (int)(SCREEN_WIDTH * 2 / 9));
-                y = (rand() % (int)(SCREEN_HEIGHT * 2 / 9));
+                x = (rand() % (int)(MAP_WIDTH * 2 / 9));
+                y = (rand() % (int)(MAP_HEIGHT * 2 / 9));
                 switch (j % 4)
                 {
                 case 0:
-                    x += SCREEN_WIDTH / 9 * 8;
-                    y -= SCREEN_HEIGHT / 9 * 2;
+                    x += MAP_WIDTH / 9 * 8;
+                    y -= MAP_HEIGHT / 9 * 2;
                     break;
                 case 1:
-                    x += SCREEN_WIDTH / 9 * 8;
-                    y += SCREEN_HEIGHT / 9 * 18;
+                    x += MAP_WIDTH / 9 * 8;
+                    y += MAP_HEIGHT / 9 * 18;
                     break;
                 case 2:
-                    x -= SCREEN_WIDTH / 9 * 2;
-                    y += SCREEN_HEIGHT / 9 * 8;
+                    x -= MAP_WIDTH / 9 * 2;
+                    y += MAP_HEIGHT / 9 * 8;
                     break;
                 case 3:
-                    x += SCREEN_WIDTH / 9 * 18;
-                    y += SCREEN_HEIGHT / 9 * 8;
+                    x += MAP_WIDTH / 9 * 18;
+                    y += MAP_HEIGHT / 9 * 8;
                     break;
                 default:
-                    x = (rand() % (int)(SCREEN_WIDTH * 3)) - SCREEN_WIDTH / 4;
-                    y = (rand() % (int)(SCREEN_HEIGHT * 3)) - SCREEN_HEIGHT / 4;
+                    x = (rand() % (int)(MAP_WIDTH * 3)) - MAP_WIDTH / 4;
+                    y = (rand() % (int)(MAP_HEIGHT * 3)) - MAP_HEIGHT / 4;
                 }
             } while (selectTerrain(x, y) != NULL || selectUI(x, y) != NULL);
 
@@ -346,12 +346,12 @@ void loadUI()
 void GeneratePixels()
 {
     bool start = true;
-    int totalColumns = SCREEN_WIDTH + SCREEN_WIDTH / 2;
-    int startPos = 0 - SCREEN_WIDTH / 4;
+    int totalColumns = MAP_WIDTH + MAP_WIDTH / 2;
+    int startPos = 0 - MAP_WIDTH / 4;
     int endPos = startPos + totalColumns;
     for (int i = startPos; i < endPos; i++)
     {
-        for (int j = -SCREEN_HEIGHT / 4; j < SCREEN_HEIGHT + SCREEN_HEIGHT / 4; j++)
+        for (int j = -MAP_HEIGHT / 4; j < MAP_HEIGHT + MAP_HEIGHT / 4; j++)
         {
             int width = 12;
             int height = 12;
@@ -411,18 +411,33 @@ void GeneratePixels()
 void GenerateOcean()
 {
     int scale = 8;
-    for (int i = -(SCREEN_WIDTH * scale) / 128 / 2; i < (SCREEN_WIDTH * scale) / 128; i++)
+    // for (int i = -(MAP_WIDTH * scale) / 128 / 2; i < (MAP_WIDTH * scale) / 128; i++)
+    //{
+    //     for (int j = -(MAP_HEIGHT * scale) / 128 / 2; j < (MAP_HEIGHT * scale) / 128; j++)
+    //     {
+    //         int index = rand() % 20 + 1;
+    //         OceanTile *oceanTile = new OceanTile("ocean tile (" + to_string(i) + ", " + to_string(j) + ")", textures["tile " + to_string(index)][0], surfaces["tile " + to_string(index)], false, true);
+    //         oceanTile->SetPosition(i * 128 * scale, j * 128 * scale);
+    //         oceanTile->SetScale(scale);
+    //         ocean.push_back(oceanTile);
+    //         gameObjects[0].push_back(oceanTile);
+    //     }
+    // }
+
+    for (int i = -10; i < 10; i++)
     {
-        for (int j = -(SCREEN_HEIGHT * scale) / 128 / 2; j < (SCREEN_HEIGHT * scale) / 128; j++)
+        for (int j = -6; j < 6; j++)
         {
-            int index = rand() % 20 + 1;
-            OceanTile *oceanTile = new OceanTile("ocean tile (" + to_string(i) + ", " + to_string(j) + ")", textures["tile " + to_string(index)][0], surfaces["tile " + to_string(index)], false, true);
+            std::cout << "Generating ocean tile at (" << i << ", " << j << ")" << std::endl;
+            int index = rand() % 1 + 3;
+            OceanTile *oceanTile = new OceanTile("ocean tile edge (" + to_string(i) + ", " + to_string(j) + ")", textures["tile " + to_string(index)][0], surfaces["tile " + to_string(index)], false, true);
             oceanTile->SetPosition(i * 128 * scale, j * 128 * scale);
             oceanTile->SetScale(scale);
             ocean.push_back(oceanTile);
             gameObjects[0].push_back(oceanTile);
         }
     }
+    std::cout << "Generated " << ocean.size() << " ocean tiles." << std::endl;
 }
 
 void renderPixels()
