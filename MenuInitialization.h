@@ -8,4 +8,4 @@ void loadMenuUI();
 
 void loadMenuBackground();
 
-
+void updateUIElementPositions();

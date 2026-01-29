@@ -3,7 +3,7 @@
 
 void RenderScreen();
 
-void renderObjects(SDL_Renderer* gRenderer);
+void renderObjects(SDL_Renderer *gRenderer);
 
 void renderUI();
 
@@ -16,3 +16,5 @@ void renderPieces();
 void renderInventory();
 
 void renderText();
+
+void renderOcean();

@@ -36,7 +36,7 @@ extern std::vector<Peak *> peaks;
 
 extern std::vector<std::vector<Terrain *>> terrain;
 
-extern std::vector<std::vector<Pixel *>> pixels;
+extern std::vector<Pixel *> pixels;
 
 extern std::vector<std::vector<GameObject *>> terrainOutlines;
 
@@ -45,6 +45,8 @@ extern std::vector<UIElement *> uiElements;
 extern std::vector<Piece *> pieces;
 
 extern std::vector<Text *> text;
+
+extern std::vector<OceanTile *> ocean;
 
 extern std::vector<Animation *> animations;
 
@@ -74,12 +76,19 @@ extern Terrain *hoveringTerrain;
 
 extern bool validMove;
 
+extern Uint32 currentTime;
+
+extern Uint32 prevTime;
+
+extern Uint32 deltaTime;
+
 enum gameState
 {
     MAIN_MENU = 0,
     SETTINGS = 1,
-    LOBBY = 2,
-    GAME = 3
+    LOADING = 2,
+    GAME = 3,
+    PAUSED = 4
 };
 
 extern gameState state;

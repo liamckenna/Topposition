@@ -1,16 +1,16 @@
 #include "GlobalVars.h"
 
-SDL_Window* window = NULL;
+SDL_Window *window = NULL;
 
-SDL_Surface* screenSurface = NULL;
+SDL_Surface *screenSurface = NULL;
 
-std::atomic<SDL_Renderer*> renderer = NULL;
+std::atomic<SDL_Renderer *> renderer = NULL;
 
-SDL_Texture* texture = NULL;
+SDL_Texture *texture = NULL;
 
-int SCREEN_WIDTH = 1920;
+int SCREEN_WIDTH = 2560;
 
-int SCREEN_HEIGHT = 1080;
+int SCREEN_HEIGHT = 1440;
 
 bool quit = false;
 
@@ -20,50 +20,58 @@ int movesLeft = 3;
 
 gameState state = MAIN_MENU;
 
-std::map<std::string, std::map<int, SDL_Texture*>> textures;
+std::map<std::string, std::map<int, SDL_Texture *>> textures;
 
-std::map<std::string, SDL_Surface*> surfaces;
+std::map<std::string, SDL_Surface *> surfaces;
 
-std::vector<std::vector<GameObject*>> gameObjects;
+std::vector<std::vector<GameObject *>> gameObjects;
 
-std::vector<Peak*> peaks;
+std::vector<Peak *> peaks;
 
-std::vector<std::vector<Terrain*>> terrain;
+std::vector<std::vector<Terrain *>> terrain;
 
-std::vector<std::vector<Pixel*>> pixels;
+std::vector<Pixel *> pixels;
 
-std::vector<std::vector<GameObject*>> terrainOutlines;
+std::vector<std::vector<GameObject *>> terrainOutlines;
 
-std::vector<UIElement*> uiElements;
+std::vector<UIElement *> uiElements;
 
-std::vector<Piece*> pieces;
+std::vector<Piece *> pieces;
 
-std::vector<Text*> text;
+std::vector<OceanTile *> ocean;
 
-std::vector<Animation*> animations;
+std::vector<Text *> text;
 
-std::vector<Player*> players;
+std::vector<Animation *> animations;
 
-GameObject* selectedObject = nullptr;
+std::vector<Player *> players;
 
-Item* selectedItem = nullptr;
+GameObject *selectedObject = nullptr;
 
-GameRules* rules = new GameRules();
+Item *selectedItem = nullptr;
+
+GameRules *rules = new GameRules();
 
 int shapeCount = 0;
 
-Player* currentTurn;
+Player *currentTurn;
 
-Text* playerOneText;
+Text *playerOneText;
 
-Text* playerTwoText;
+Text *playerTwoText;
 
-Text* playerThreeText;
+Text *playerThreeText;
 
-Text* playerFourText;
+Text *playerFourText;
 
-Terrain* hoveringTerrain;
+Terrain *hoveringTerrain;
 
 bool validMove;
 
-Player* first_place;
+Player *first_place;
+
+Uint32 currentTime = 0;
+
+Uint32 prevTime = 0;
+
+Uint32 deltaTime = 1;

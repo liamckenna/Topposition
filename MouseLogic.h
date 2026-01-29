@@ -5,20 +5,20 @@
 #include "GameInitialization.h"
 #include "PlayerMovement.h"
 
-void zoom(SDL_Event e, Input* playerInput);
+void zoom(SDL_MouseWheelEvent &event, Input *playerInput);
 
-void scroll(Input* playerInput);
+void scroll(Input *playerInput);
 
-GameObject* selectObject(int x, int y);
+GameObject *selectObject(int x, int y);
 
-UIElement* selectUI(int x, int y);
+UIElement *selectUI(int x, int y);
 
-Piece* selectPiece(int x, int y);
+Piece *selectPiece(int x, int y);
 
-Terrain* selectTerrain(int x, int y);
+Terrain *selectTerrain(int x, int y);
 
-Item* selectItem(int x, int y);
+Item *selectItem(int x, int y);
 
-void moveSelectedObject(GameObject* gameObject, Input* playerInput);
+void moveSelectedObject(GameObject *gameObject, Input *playerInput);
 
-void RecenterScreen(Input* playerInput);
+void RecenterScreen(Input *playerInput);

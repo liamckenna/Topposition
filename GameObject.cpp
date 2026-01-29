@@ -1,4 +1,5 @@
 #include "GameObject.h"
+#include "GlobalVars.h"
 #include <iostream>
 
 GameObject::GameObject(string name, SDL_Texture *texture, SDL_Surface *surface, bool m, bool r)
@@ -36,7 +37,17 @@ void GameObject::RenderGameObject(SDL_Renderer *renderer)
     {
         if (currentAnimation == nullptr)
         {
-            SDL_RenderTexture(renderer, texture, NULL, renderRect);
+            if (type == OCEAN_TILE)
+            {
+                SDL_SetTextureAlphaMod(texture, static_cast<int>(dynamic_cast<OceanTile *>(this)->GetAlphaFloat() * 255));
+                SDL_RenderTextureRotated(renderer, texture, NULL, renderRect, dynamic_cast<OceanTile *>(this)->GetRotation(), NULL, SDL_FLIP_NONE);
+            }
+            else
+                SDL_RenderTexture(renderer, texture, NULL, renderRect);
+            if (type == OCEAN_TILE)
+            {
+                SDL_SetTextureAlphaMod(texture, static_cast<int>(255));
+            }
         }
         else
         {
@@ -235,6 +246,23 @@ void Terrain::RenderGameObject(SDL_Renderer *renderer, Terrain *hoveringTerrain,
     }
 }
 
+void Peak::Claim(Player *player)
+{
+    if (claimedBy != nullptr)
+    {
+        for (int i = 0; i < claimedBy->peaks.size(); i++)
+        {
+            if (claimedBy->peaks[i] == this)
+            {
+                claimedBy->peaks.erase(claimedBy->peaks.begin() + i);
+                break;
+            }
+        }
+    }
+    claimedBy = player;
+    player->peaks.push_back(this);
+}
+
 void Pixel::RenderGameObject(SDL_Renderer *renderer, Terrain *hoveringTerrain)
 {
 
@@ -280,13 +308,89 @@ void Pixel::RenderGameObject(SDL_Renderer *renderer, Terrain *hoveringTerrain)
     }
     renderRect->w = (width + 2);
     renderRect->h = (height + 2);
-    // std::cout << "Renderer: " << &renderer << std::endl;
-    // std::cout << "Texture: " << &texture << std::endl;
-    // std::cout << "RenderRect: " << &renderRect << std::endl;
     SDL_RenderTexture(renderer, texture, NULL, renderRect);
     if (hovering)
     {
         SDL_SetTextureColorMod(texture, color.r, color.g, color.b);
+    }
+}
+
+void OceanTile::CheckTimer()
+{
+    this->tileTime += deltaTime;
+
+    if (fadingOut)
+    {
+        FadeOut();
+    }
+    else if (waitingToReturn)
+    {
+        if (tileTime >= (2 * 1000))
+        {
+            waitingToReturn = false;
+            tileTime = 0;
+            FadeIn();
+        }
+    }
+    else if (fadingIn)
+    {
+        FadeIn();
+    }
+    else if (tileTime >= (lifespan * 1000))
+    {
+        FadeOut();
+    }
+}
+
+void OceanTile::FadeOut()
+{
+    if (!fadingOut)
+    {
+        fadingOut = true;
+    }
+
+    if (alpha_float > 0.f)
+    {
+        alpha_float -= (0.25f * deltaTime) / 1000.f;
+        if (alpha_float < 0.f)
+            alpha_float = 0.f;
+    }
+    else
+    {
+        alpha_float = 0.f;
+        FullFade();
+    }
+}
+
+void OceanTile::FullFade()
+{
+    fadingOut = false;
+    tileTime = 0;
+    int index = rand() % 20 + 1;
+    SetTexture(textures["tile " + to_string(index)][0]);
+    SetSurface(surfaces["tile " + to_string(index)]);
+    waitingToReturn = true;
+}
+
+void OceanTile::FadeIn()
+{
+    if (!fadingIn)
+    {
+        fadingIn = true;
+        lifespan = rand() % 15 + 5;
+    }
+
+    if (alpha_float < 1.f)
+    {
+        alpha_float += (0.25f * deltaTime) / 1000.f;
+        if (alpha_float > 1.f)
+            alpha_float = 1.f;
+    }
+    else
+    {
+        fadingIn = false;
+        tileTime = 0;
+        alpha_float = 1.f;
     }
 }
 

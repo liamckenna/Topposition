@@ -8,11 +8,15 @@ bool loadMap();
 
 void loadGamePieces();
 
+void loadText();
+
 void loadUI();
 
-void GeneratePixels(int thread, int thread_count);
+void GeneratePixels();
 
-void renderPixels(int thread);
+void GenerateOcean();
+
+void renderPixels();
 
 void ResetMap();
 

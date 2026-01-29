@@ -25,7 +25,8 @@ public:
         PIECE = 3,
         ITEM = 4,
         UI_ELEMENT = 5,
-        PIXEL = 6
+        PIXEL = 6,
+        OCEAN_TILE = 7
     };
 
     float GetSize() const { return size; }
@@ -123,6 +124,7 @@ public:
         scale = 1;
         type = TERRAIN;
         pixels = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, 1400, 1400);
+        SDL_SetTextureScaleMode(pixels, SDL_SCALEMODE_NEAREST);
         SDL_SetRenderDrawColor(renderer, 0, 0, 0, 0);
         SDL_SetTextureBlendMode(pixels, SDL_BLENDMODE_BLEND);
         SDL_SetRenderTarget(renderer, pixels);
@@ -193,10 +195,7 @@ public:
     UIElement *GetClaimNotif() { return claimNotif; }
     void SetItem(Item *i) { item = i; }
     Item *GetItem() { return item; }
-    void Claim(Player *player)
-    {
-        claimedBy = player;
-    }
+    void Claim(Player *player);
     Player *GetClaimedBy() { return claimedBy; }
 };
 
@@ -269,6 +268,34 @@ public:
     SDL_Color GetColor() { return color; }
     bool GetOutline() { return outline; }
     Terrain *GetHiddenTerrain() { return hiddenTerrain; }
+};
+
+class OceanTile : public GameObject
+{
+    float lifespan;
+    float tileTime;
+    bool fadingOut = false;
+    bool fadingIn = false;
+    bool waitingToReturn = false;
+    float alpha_float = 1.f;
+    int rotation;
+
+public:
+    OceanTile(string name, SDL_Texture *texture, SDL_Surface *surface, bool m, bool r) : GameObject(name, texture, surface, m, r)
+    {
+        type = OCEAN_TILE;
+        lifespan = rand() % 15 + 5;
+        tileTime = 0;
+        rotation = rand() % 360;
+    }
+
+    void CheckTimer();
+    void FadeOut();
+    void FullFade();
+    void FadeIn();
+
+    float GetAlphaFloat() const { return alpha_float; }
+    int GetRotation() const { return rotation; }
 };
 
 class Text

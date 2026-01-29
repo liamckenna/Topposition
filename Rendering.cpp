@@ -2,7 +2,7 @@
 
 void RenderScreen()
 {
-    SDL_SetRenderDrawColor(renderer, 51, 169, 255, 100);
+    SDL_SetRenderDrawColor(renderer, 2, 120, 150, 100);
     SDL_RenderClear(renderer);
     // Render texture to screen
     if (state == MAIN_MENU)
@@ -11,6 +11,7 @@ void RenderScreen()
     }
     else if (state == GAME)
     {
+        renderOcean();
         renderTerrain();
         renderClaimNotifs();
         renderPieces();
@@ -94,5 +95,21 @@ void renderText()
     for (int i = 0; i < text.size(); i++)
     {
         text[i]->RenderText(renderer);
+    }
+}
+
+void renderOcean()
+{
+    int speed = 100;
+    if (deltaTime < 100)
+        deltaTime = 5;
+    for (int i = 0; i < ocean.size(); i++)
+    {
+        float dxf = 0.05;
+        float dyf = 0.025;
+
+        ocean[i]->SetPosition(ocean[i]->GetPosition().first + dxf, ocean[i]->GetPosition().second + dyf);
+        ocean[i]->CheckTimer();
+        ocean[i]->RenderGameObject(renderer);
     }
 }

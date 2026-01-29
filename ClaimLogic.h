@@ -3,14 +3,18 @@
 #include "GameLogic.h"
 #include "MouseLogic.h"
 
-void RefreshClaimNotifs(Peak* individualPeak = NULL);
+void RefreshClaimNotifs(Peak *individualPeak = NULL);
 
-void ClaimPeak(UIElement* claimNotif);
+void ClaimPeak(UIElement *claimNotif);
 
-Player* PeakBattle(Peak* peak, Player* attacker, Player* defender);
+Player *PeakBattle(Peak *peak, Player *attacker, Player *defender);
 
-void Retreat(Peak* peak, Player* player);
+Piece *PieceBattle(Peak *peak, Piece *attacker, Piece *defender);
 
-bool LastPlayerStanding(Peak* peak, Player* player);
+void RetreatPiece(Peak *peak, Piece *piece);
 
-bool IsOccupyingPeak(Peak* peak, Player* player);
+void RetreatPlayer(Peak *peak, Player *player);
+
+bool LastPlayerStanding(Peak *peak, Player *player);
+
+bool IsOccupyingPeak(Peak *peak, Player *player);

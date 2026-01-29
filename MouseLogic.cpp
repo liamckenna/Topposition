@@ -1,6 +1,6 @@
 #include "MouseLogic.h"
 
-void zoom(SDL_Event e, Input *playerInput)
+void zoom(SDL_MouseWheelEvent &event, Input *playerInput)
 {
 
     std::pair<float, float> relativePositionB4;
@@ -12,7 +12,7 @@ void zoom(SDL_Event e, Input *playerInput)
         {
             if (gameObjects[i][j]->GetResizable())
             {
-                if ((e.wheel.y < 0 && gameObjects[i][j]->GetSize() <= 0.4) || (e.wheel.y > 0 && gameObjects[i][j]->GetSize() >= 3.5))
+                if ((event.y < 0 && gameObjects[i][j]->GetSize() <= 0.4) || (event.y > 0 && gameObjects[i][j]->GetSize() >= 3.5))
                 {
                     continue;
                 }
@@ -21,7 +21,7 @@ void zoom(SDL_Event e, Input *playerInput)
 
                     relativePositionB4.first = (gameObjects[i][j]->GetPosition().first - playerInput->currentMousePosition.first) / gameObjects[i][j]->GetSize();
                     relativePositionB4.second = (gameObjects[i][j]->GetPosition().second - playerInput->currentMousePosition.second) / gameObjects[i][j]->GetSize();
-                    gameObjects[i][j]->AdjustSize((e.wheel.y / abs(e.wheel.y) * .1));
+                    gameObjects[i][j]->AdjustSize((event.y / abs(event.y) * .1));
                     newRelativePosition.first = (gameObjects[i][j]->GetPosition().first - playerInput->currentMousePosition.first) / gameObjects[i][j]->GetSize();
                     newRelativePosition.second = (gameObjects[i][j]->GetPosition().second - playerInput->currentMousePosition.second) / gameObjects[i][j]->GetSize();
 

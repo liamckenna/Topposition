@@ -2,24 +2,19 @@
 
 SDL_Color GetPixelColor(const SDL_Surface *surface, const int X, const int Y)
 {
-    // Bytes per pixel
-    const Uint8 Bpp = SDL_BYTESPERPIXEL(surface->format);
+    SDL_Color Color = {0, 0, 0, 0};
+    if (!surface || !surface->pixels)
+        return Color;
+    if (X < 0 || Y < 0 || X >= surface->w || Y >= surface->h)
+        return Color;
 
-    /*
-    Retrieve the address to a specific pixel
-    pSurface->pixels	= an array containing the SDL_Surface' pixels
-    pSurface->pitch		= the length of a row of pixels (in bytes)
-    X and Y				= the offset on where on the image to retrieve the pixel, (0, 0) is in the upper left corner of the image
-    */
+    const Uint8 Bpp = SDL_BYTESPERPIXEL(surface->format);
     Uint8 *pPixel = (Uint8 *)surface->pixels + Y * surface->pitch + X * Bpp;
 
-    Uint32 PixelData = *(Uint32 *)pPixel;
+    Uint32 PixelData = 0;
+    memcpy(&PixelData, pPixel, Bpp);
 
-    SDL_Color Color = {0x00, 0x00, 0x00};
-
-    // Retrieve the RGB values of the specific pixel
     SDL_GetRGBA(PixelData, SDL_GetPixelFormatDetails(surface->format), NULL, &Color.r, &Color.g, &Color.b, &Color.a);
-
     return Color;
 }
 

@@ -45,10 +45,12 @@ void ResetMap()
 
     for (int i = 0; i < pixels.size(); i++)
     {
-        for (int j = 0; j < pixels[i].size(); j++)
-        {
-            delete pixels[i][j];
-        }
+        delete pixels[i];
+    }
+
+    for (int i = 0; i < ocean.size(); i++)
+    {
+        ocean[i] = nullptr;
     }
 
     for (int i = 0; i < gameObjects.size(); i++)
@@ -76,12 +78,14 @@ void ResetMap()
     std::vector<Peak *> newPeaks;
     std::vector<UIElement *> newUIElements;
     std::vector<Player *> newPlayers;
-    std::vector<std::vector<Pixel *>> newPixels;
+    std::vector<Pixel *> newPixels;
     std::vector<Text *> newText;
+    std::vector<OceanTile *> newOcean;
     std::vector<Animation *> newAnimations;
     animations = newAnimations;
     players = newPlayers;
     text = newText;
+    ocean = newOcean;
     pixels = newPixels;
     uiElements = newUIElements;
     pieces = newPieces;
@@ -91,7 +95,9 @@ void ResetMap()
     peaks = newPeaks;
     if (state == GAME)
     {
+        state = LOADING;
         loadGame();
+        state = GAME;
     }
 }
 
@@ -104,30 +110,14 @@ void loadGame()
     loadUI();
     std::cout << "Loading Game Pieces..." << std::endl;
     loadGamePieces();
-
+    std::cout << "Loading Text..." << std::endl;
+    loadText();
     std::cout << "Generating Pixels..." << std::endl;
-    std::vector<std::thread> threads;
-    int thread = 0;
-    int thread_count = 1;
-    for (int i = 0; i < thread_count; i++)
-    {
-        std::vector<Pixel *> thread_vec;
-        pixels.push_back(thread_vec);
-    }
-    for (int i = 0; i < thread_count; i++)
-    {
-        int unique_thread_count = thread_count;
-        threads.push_back(std::thread([thread, unique_thread_count]
-                                      { GeneratePixels(thread, unique_thread_count); }));
-        thread++;
-    }
-
-    for (int i = 0; i < thread_count; i++)
-    {
-        threads[i].join();
-        renderPixels(i);
-        std::cout << "thread " << i << " joined..." << std::endl;
-    }
+    GeneratePixels();
+    std::cout << "Generating Ocean..." << std::endl;
+    GenerateOcean();
+    std::cout << "Rendering Pixels..." << std::endl;
+    renderPixels();
 
     SDL_SetRenderTarget(renderer, NULL);
 }
@@ -215,10 +205,33 @@ void loadGamePieces()
         {
             int x;
             int y;
+
             do
             {
-                x = (rand() % (int)(SCREEN_WIDTH * 1.5f)) - SCREEN_WIDTH / 4;
-                y = (rand() % (int)(SCREEN_HEIGHT * 1.5f)) - SCREEN_HEIGHT / 4;
+                x = (rand() % (int)(SCREEN_WIDTH * 2 / 9));
+                y = (rand() % (int)(SCREEN_HEIGHT * 2 / 9));
+                switch (j % 4)
+                {
+                case 0:
+                    x += SCREEN_WIDTH / 9 * 8;
+                    y -= SCREEN_HEIGHT / 9 * 2;
+                    break;
+                case 1:
+                    x += SCREEN_WIDTH / 9 * 8;
+                    y += SCREEN_HEIGHT / 9 * 18;
+                    break;
+                case 2:
+                    x -= SCREEN_WIDTH / 9 * 2;
+                    y += SCREEN_HEIGHT / 9 * 8;
+                    break;
+                case 3:
+                    x += SCREEN_WIDTH / 9 * 18;
+                    y += SCREEN_HEIGHT / 9 * 8;
+                    break;
+                default:
+                    x = (rand() % (int)(SCREEN_WIDTH * 3)) - SCREEN_WIDTH / 4;
+                    y = (rand() % (int)(SCREEN_HEIGHT * 3)) - SCREEN_HEIGHT / 4;
+                }
             } while (selectTerrain(x, y) != NULL || selectUI(x, y) != NULL);
 
             Piece *piece = new Piece(playerNumber, textures[pieceName][0], surfaces[pieceName], true);
@@ -239,6 +252,12 @@ void loadGamePieces()
             piece->SetPlayer(player);
         }
     }
+
+    currentTurn = players[0];
+}
+
+void loadText()
+{
     SDL_Color White = {255, 255, 255};
 
     Text *currentTurnText = new Text("currentTurnText", "Fonts/yoster.ttf", White, 150, 0, 300, 50, 100, renderer, "Current Turn: ");
@@ -274,7 +293,6 @@ void loadGamePieces()
     playerFourText->SetRendered(false);
     if (rules->GetPlayerCount() > 3)
         players[3]->SetTurnText(playerFourText);
-    currentTurn = players[0];
 }
 
 void loadUI()
@@ -325,12 +343,12 @@ void loadUI()
     movesLeft = currentRoll;
 }
 
-void GeneratePixels(int thread, int thread_count)
+void GeneratePixels()
 {
-
+    bool start = true;
     int totalColumns = SCREEN_WIDTH + SCREEN_WIDTH / 2;
-    int startPos = totalColumns / thread_count * thread - SCREEN_WIDTH / 4;
-    int endPos = startPos + totalColumns / thread_count;
+    int startPos = 0 - SCREEN_WIDTH / 4;
+    int endPos = startPos + totalColumns;
     for (int i = startPos; i < endPos; i++)
     {
         for (int j = -SCREEN_HEIGHT / 4; j < SCREEN_HEIGHT + SCREEN_HEIGHT / 4; j++)
@@ -345,40 +363,9 @@ void GeneratePixels(int thread, int thread_count)
                 continue;
 
             Pixel *pixel = new Pixel("pixel", textures["pixel"][0], surfaces["pixel"], false, true);
+
             pixel->SetHiddenTerrain(selectTerrain(x, y));
-
-            // y += 2;
-            // Terrain* tempTerrain = selectTerrain(x, y);
             pixel->SetPosition(x - width / 2, y - height / 2);
-
-            /*Terrain* topLeftTerrain = selectTerrain(i*4, j*4);
-            Terrain* bottomRightTerrain = selectTerrain(i*4 + 4, j*4 + 4);
-            if (topLeftTerrain == nullptr && bottomRightTerrain == nullptr) {
-                pixel->SetOutline(false);
-            } else if ((topLeftTerrain == nullptr && bottomRightTerrain != nullptr) ||
-                (topLeftTerrain != nullptr && bottomRightTerrain == nullptr) ||
-                (topLeftTerrain->GetLayer() != bottomRightTerrain->GetLayer())) {
-                pixel->SetOutline(true);
-            }*/
-
-            /*while (tempTerrain != NULL && tempTerrain->GetLayer() == pixel->GetHiddenTerrain()->GetLayer() && !pixel->GetOutline()) {
-                y += 4;
-                tempTerrain = selectTerrain(x, y);
-                height += 4;
-                j++;
-                if (tempTerrain != pixel->GetHiddenTerrain()) {
-                    bool contin = false;
-                    for (int i = 0; i < pixel->GetHiddenTerrain()->connectedTerrain.size(); i++) {
-                        if (tempTerrain == pixel->GetHiddenTerrain()->connectedTerrain[i]) {
-                            contin = true;
-                            break;
-                        }
-                    }
-                    if (!contin) break;
-                }
-
-            }*/
-
             pixel->SetWidth(width);
             pixel->SetHeight(height);
 
@@ -416,16 +403,33 @@ void GeneratePixels(int thread, int thread_count)
                 }
             }
             pixel->SetColor(pixelColor);
-            pixels[thread].push_back(pixel);
+            pixels.push_back(pixel);
         }
     }
 }
 
-void renderPixels(int thread)
+void GenerateOcean()
+{
+    int scale = 8;
+    for (int i = -(SCREEN_WIDTH * scale) / 128 / 2; i < (SCREEN_WIDTH * scale) / 128; i++)
+    {
+        for (int j = -(SCREEN_HEIGHT * scale) / 128 / 2; j < (SCREEN_HEIGHT * scale) / 128; j++)
+        {
+            int index = rand() % 20 + 1;
+            OceanTile *oceanTile = new OceanTile("ocean tile (" + to_string(i) + ", " + to_string(j) + ")", textures["tile " + to_string(index)][0], surfaces["tile " + to_string(index)], false, true);
+            oceanTile->SetPosition(i * 128 * scale, j * 128 * scale);
+            oceanTile->SetScale(scale);
+            ocean.push_back(oceanTile);
+            gameObjects[0].push_back(oceanTile);
+        }
+    }
+}
+
+void renderPixels()
 {
 
-    for (int i = 0; i < pixels[thread].size(); i++)
+    for (int i = 0; i < pixels.size(); i++)
     {
-        pixels[thread][i]->RenderGameObject(renderer, hoveringTerrain);
+        pixels[i]->RenderGameObject(renderer, hoveringTerrain);
     }
 }

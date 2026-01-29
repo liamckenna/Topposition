@@ -61,6 +61,10 @@ int main(int argc, char *args[])
 
 void CalculateFrameRate()
 {
+
+    currentTime = SDL_GetTicks();
+    deltaTime = currentTime - prevTime;
+
     static Uint32 startTime = SDL_GetTicks(); // Time when we started counting
     static int frameCount = 0;                // Frame counter
     static int fps = 0;                       // The FPS value
@@ -80,10 +84,14 @@ void CalculateFrameRate()
         fps = frameCount;
 
         // Print the FPS count
-        // std::cout << "FPS: " << fps << std::endl;
+        std::cout << "FPS: " << fps << std::endl;
 
         // Reset for the next second
         frameCount = 0;
         startTime = currentTime;
+        // std::cout << "deltaTime: " << deltaTime << std::endl;
+        std::cout << "ocean size: " << ocean.size() << std::endl;
     }
+
+    prevTime = currentTime;
 }

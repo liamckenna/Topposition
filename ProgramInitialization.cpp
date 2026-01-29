@@ -15,7 +15,8 @@ bool init()
     else
     {
         // Create window
-        window = SDL_CreateWindow("Topposition", SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_OCCLUDED);
+        window = SDL_CreateWindow("Topposition", SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_OCCLUDED | SDL_WINDOW_RESIZABLE);
+
         if (window == NULL)
         {
             printf("Window could not be created! SDL Error: %s\n", SDL_GetError());
@@ -23,11 +24,6 @@ bool init()
         }
         else
         {
-            // Set Fullscreen
-            //            if (SDL_SetWindowFullscreen(window, SDL_WINDOW_FULLSCREEN_DESKTOP) < 0) {
-            //                printf( "Warning: Fullscreen Failed! SDL Error: %s\n", SDL_GetError() );
-            //            }
-            // Create renderer for window
             renderer = SDL_CreateRenderer(window, NULL);
             if (renderer == NULL)
             {

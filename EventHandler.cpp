@@ -1,156 +1,307 @@
 #include "EventHandler.h"
+#include "MenuInitialization.h"
 #include <future>
 
 void HandleEvents(Input *playerInput)
 {
-    SDL_Event e;
+    SDL_Event event;
     SDL_GetMouseState(&playerInput->currentMousePosition.first, &playerInput->currentMousePosition.second);
-    while (SDL_PollEvent(&e) != 0)
+
+    while (SDL_PollEvent(&event) != 0)
     {
-        switch (e.type)
+        switch (event.type)
         {
         case SDL_EVENT_QUIT:
-            quit = true;
+            EventQuit(playerInput, event.button);
+            break;
+        case SDL_EVENT_WINDOW_RESIZED:
+            EventWindowResized(playerInput, event.window);
             break;
         case SDL_EVENT_MOUSE_WHEEL:
-            if (e.wheel.y > 0 || e.wheel.y < 0)
-            {
-                if (selectedObject == nullptr)
-                {
-                    zoom(e, playerInput);
-                }
-            }
+            EventMouseWheel(playerInput, event.wheel);
             break;
         case SDL_EVENT_MOUSE_BUTTON_DOWN:
-            playerInput->MouseButtonDown(e.button);
-            if (playerInput->GetMouseButtonDown("Left"))
-            {
-                SDL_GetMouseState(&playerInput->currentMousePosition.first, &playerInput->currentMousePosition.second);
-                selectedObject = selectUI(playerInput->currentMousePosition.first, playerInput->currentMousePosition.second);
-                // if (selectedObject != nullptr) Print(selectedObject->GetName() + " ok");
-                if (state == GAME)
-                {
-                    if (selectedObject == nullptr)
-                    {
-                        selectedObject = selectItem(playerInput->currentMousePosition.first,
-                                                    playerInput->currentMousePosition.second);
-                        if (selectedObject == nullptr)
-                        {
-                            selectedObject = selectPiece(playerInput->currentMousePosition.first,
-                                                         playerInput->currentMousePosition.second);
-                            if (selectedObject != nullptr && selectedObject->type == GameObject::PIECE)
-                            {
-                                Piece *piece = dynamic_cast<Piece *>(selectedObject);
-
-                                piece->SetDesignatedLocation(piece->GetBottomMiddle().first, piece->GetBottomMiddle().second); // bottom middle of player
-                                // std::cout << "Before:" << std::endl;
-                                // std::cout << "Designated Location: (" << piece->GetDesignatedLocation().first << ", " << piece->GetDesignatedLocation().second << ")" << std::endl;
-                                piece->SetScale(piece->GetScale() * 2);
-                                piece->SetBottomMiddle(piece->GetDesignatedLocation().first, piece->GetDesignatedLocation().second);
-                                if (piece->GetCurrentAnimation() != NULL)
-                                    piece->GetCurrentAnimation()->Pause();
-                            }
-                            else
-                            {
-                                // selectedObject = selectObject(gameObjects, playerInput->currentMousePosition.first, playerInput->currentMousePosition.second);
-                            }
-                        }
-                    }
-                }
-            }
-            else if (playerInput->GetMouseButtonDown("Right"))
-            {
-                SDL_GetMouseState(&playerInput->currentMousePosition.first, &playerInput->currentMousePosition.second);
-                std::cout << playerInput->currentMousePosition.first << ", " << playerInput->currentMousePosition.second << std::endl;
-                // UpdateScore();
-            }
-
+            EventMouseButtonDown(playerInput, event.button);
             break;
         case SDL_EVENT_MOUSE_BUTTON_UP:
-            if (selectedObject != nullptr)
-            {
-                // std::cout << selectedObject->GetName() << " wow" << std::endl;
-                if (state == MAIN_MENU)
-                {
-                    if (selectedObject->GetName() == "play")
-                    {
-                        std::cout << "hit play button" << std::endl;
-                        state = GAME;
-                        ResetMap();
-                        break;
-                    }
-                    else if (selectedObject->GetName() == "settings")
-                    {
-                    }
-                    else if (selectedObject->GetName() == "quit")
-                    {
-                        quit = true;
-                        break;
-                    }
-                }
-                else if (selectedObject->GetName() == "reset button")
-                {
-                    ResetMap();
-                }
-                else if ((selectedObject->GetName() == "dieOne" ||
-                          selectedObject->GetName() == "dieTwo") &&
-                         movesLeft < 1)
-                {
-                    currentRoll = Roll();
-                    movesLeft = currentRoll;
-                }
-                else if ((selectedObject->GetName() == "dieOne"))
-                {
-                    // UpdateScore();
-                }
-                else if (selectedObject->GetName() == "finish turn button")
-                {
-                    FinishTurn();
-                }
-                else if (selectedObject->GetName() == "claim peak button")
-                {
-                    ClaimPeak(dynamic_cast<UIElement *>(selectedObject));
-
-                    RefreshClaimNotifs();
-                }
-                else if (selectedObject->type == GameObject::PIECE)
-                {
-                    Piece *piece = dynamic_cast<Piece *>(selectedObject);
-                    pair<float, float> bottom_middle = piece->GetBottomMiddle();
-                    piece->SetScale(piece->GetScale() / 2.f);
-                    piece->SetBottomMiddle(bottom_middle.first, bottom_middle.second);
-                    Terrain *startingTerrain = selectTerrain(piece->GetDesignatedLocation().first, piece->GetDesignatedLocation().second);
-                    Terrain *targetTerrain = selectTerrain(piece->GetBottomMiddle().first, piece->GetBottomMiddle().second);
-                    if (piece->GetCurrentAnimation() != NULL)
-                        piece->GetCurrentAnimation()->Unpause();
-                    bool successful_move = Move(piece, startingTerrain, targetTerrain, movesLeft);
-                    if (successful_move) // std::cout << "MOVE SUCCESS!" << std::endl;
-                        // else //std::cout << "MOVE FAIL!" << std::endl;
-                        // std::cout << "After:" << std::endl;
-                        // std::cout << "Designated Location: (" << piece->GetDesignatedLocation().first << ", " << piece->GetDesignatedLocation().second << ")" << std::endl;
-                        hoveringTerrain = nullptr;
-                }
-                else if (selectedObject->type == GameObject::ITEM)
-                {
-                    // std::cout << "item selected: " << selectedObject->GetName() << std::endl;
-                }
-            }
-            playerInput->MouseButtonUp(e.button);
-            selectedObject = nullptr;
+            EventMouseButtonUp(playerInput, event.button);
             break;
         }
     }
-    SDL_GetMouseState(&playerInput->currentMousePosition.first, &playerInput->currentMousePosition.second);
-    if (playerInput->GetMouseButtonDown("Middle"))
+
+    MouseMovement(playerInput);
+
+    SDL_GetMouseState(&playerInput->prevMousePosition.first, &playerInput->prevMousePosition.second);
+}
+
+void EventQuit(Input *playerInput, SDL_MouseButtonEvent &event)
+{
+    quit = true;
+}
+
+void EventWindowResized(Input *playerInput, SDL_WindowEvent &event)
+{
+    SCREEN_WIDTH = event.data1;
+    SCREEN_HEIGHT = event.data2;
+    updateUIElementPositions();
+    switch (state)
     {
-        scroll(playerInput);
+    case MAIN_MENU:
+        break;
+    case SETTINGS:
+        break;
+    case LOADING:
+        break;
+    case GAME:
+        break;
+    case PAUSED:
+        break;
+    default:
+        break;
     }
-    if (playerInput->GetMouseButtonDown("Left"))
+}
+
+void EventMouseWheel(Input *playerInput, SDL_MouseWheelEvent &event)
+{
+    switch (state)
     {
+    case MAIN_MENU:
+        break;
+    case SETTINGS:
+        break;
+    case LOADING:
+        break;
+    case GAME:
+        if (event.y > 0 || event.y < 0)
+        {
+            if (selectedObject == nullptr)
+            {
+                zoom(event, playerInput);
+            }
+        }
+        break;
+    case PAUSED:
+        break;
+    default:
+        break;
+    }
+}
+
+void EventMouseButtonDown(Input *playerInput, SDL_MouseButtonEvent &event)
+{
+    playerInput->MouseButtonDown(event);
+    SDL_GetMouseState(&playerInput->currentMousePosition.first, &playerInput->currentMousePosition.second);
+    switch (state)
+    {
+    case MAIN_MENU:
+        MouseButtonDownMainMenu(playerInput, event);
+        break;
+    case SETTINGS:
+        break;
+    case LOADING:
+        break;
+    case GAME:
+        MouseButtonDownGame(playerInput, event);
+        break;
+    case PAUSED:
+        break;
+    default:
+        break;
+    }
+}
+
+void EventMouseButtonUp(Input *playerInput, SDL_MouseButtonEvent &event)
+{
+    playerInput->MouseButtonUp(event);
+    switch (state)
+    {
+    case MAIN_MENU:
+        MouseButtonUpMainMenu(playerInput, event);
+        break;
+    case SETTINGS:
+        break;
+    case LOADING:
+        break;
+    case GAME:
+        MouseButtonUpGame(playerInput, event);
+        break;
+    case PAUSED:
+        break;
+    default:
+        break;
+    }
+}
+
+void MouseMovement(Input *playerInput)
+{
+    SDL_GetMouseState(&playerInput->currentMousePosition.first, &playerInput->currentMousePosition.second);
+    switch (state)
+    {
+    case MAIN_MENU:
+        break;
+    case SETTINGS:
+        break;
+    case LOADING:
+        break;
+    case GAME:
+        if ((playerInput->GetMouseButtonDown("Middle")) && !playerInput->GetMouseButtonDown("Left"))
+        {
+            if (selectedObject == nullptr)
+            {
+                scroll(playerInput);
+            }
+        }
+        if (playerInput->GetMouseButtonDown("Left"))
+        {
+            if (selectedObject != nullptr)
+            {
+                moveSelectedObject(selectedObject, playerInput);
+            }
+        }
+        break;
+    case PAUSED:
+        break;
+    default:
+        break;
+    }
+}
+
+void MouseButtonDownMainMenu(Input *playerInput, SDL_MouseButtonEvent &event)
+{
+    switch (event.button)
+    {
+    case SDL_BUTTON_LEFT:
+        selectedObject = selectUI(playerInput->currentMousePosition.first, playerInput->currentMousePosition.second);
+        break;
+    case SDL_BUTTON_RIGHT:
+        break;
+    case SDL_BUTTON_MIDDLE:
+        break;
+    default:
+        break;
+    }
+}
+
+void MouseButtonDownGame(Input *playerInput, SDL_MouseButtonEvent &event)
+{
+    switch (event.button)
+    {
+    case SDL_BUTTON_LEFT:
+        selectedObject = selectUI(playerInput->currentMousePosition.first, playerInput->currentMousePosition.second);
+        if (selectedObject == nullptr && !playerInput->GetMouseButtonDown("Middle"))
+        {
+            selectedObject = selectItem(playerInput->currentMousePosition.first,
+                                        playerInput->currentMousePosition.second);
+            if (selectedObject == nullptr)
+            {
+                selectedObject = selectPiece(playerInput->currentMousePosition.first,
+                                             playerInput->currentMousePosition.second);
+                if (selectedObject != nullptr && selectedObject->type == GameObject::PIECE)
+                {
+                    Piece *piece = dynamic_cast<Piece *>(selectedObject);
+
+                    piece->SetDesignatedLocation(piece->GetBottomMiddle().first, piece->GetBottomMiddle().second);
+                    piece->SetScale(piece->GetScale() * 2);
+                    piece->SetBottomMiddle(piece->GetDesignatedLocation().first, piece->GetDesignatedLocation().second);
+                    if (piece->GetCurrentAnimation() != NULL)
+                        piece->GetCurrentAnimation()->Pause();
+                }
+            }
+        }
+        break;
+    case SDL_BUTTON_RIGHT:
+        break;
+    case SDL_BUTTON_MIDDLE:
+        break;
+    default:
+        break;
+    }
+}
+
+void MouseButtonUpMainMenu(Input *playerInput, SDL_MouseButtonEvent &event)
+{
+    switch (event.button)
+    {
+    case SDL_BUTTON_LEFT:
         if (selectedObject != nullptr)
         {
-            moveSelectedObject(selectedObject, playerInput);
+            if (selectedObject->GetName() == "play")
+            {
+                std::cout << "hit play button" << std::endl;
+                state = GAME;
+                ResetMap();
+            }
+            else if (selectedObject->GetName() == "settings")
+            {
+            }
+            else if (selectedObject->GetName() == "quit")
+            {
+                quit = true;
+            }
         }
+        selectedObject = nullptr;
+        break;
+    case SDL_BUTTON_RIGHT:
+        break;
+    case SDL_BUTTON_MIDDLE:
+        break;
+    default:
+        break;
     }
-    SDL_GetMouseState(&playerInput->prevMousePosition.first, &playerInput->prevMousePosition.second);
+}
+
+void MouseButtonUpGame(Input *playerInput, SDL_MouseButtonEvent &event)
+{
+    switch (event.button)
+    {
+    case SDL_BUTTON_LEFT:
+        if (selectedObject != nullptr)
+        {
+            if (selectedObject->GetName() == "reset button")
+            {
+                ResetMap();
+            }
+            else if ((selectedObject->GetName() == "dieOne" ||
+                      selectedObject->GetName() == "dieTwo") &&
+                     movesLeft < 1)
+            {
+                currentRoll = Roll();
+                movesLeft = currentRoll;
+            }
+            else if (selectedObject->GetName() == "finish turn button")
+            {
+                FinishTurn();
+            }
+            else if (selectedObject->GetName() == "claim peak button")
+            {
+                ClaimPeak(dynamic_cast<UIElement *>(selectedObject));
+
+                RefreshClaimNotifs();
+            }
+            else if (selectedObject->type == GameObject::PIECE)
+            {
+                Piece *piece = dynamic_cast<Piece *>(selectedObject);
+                pair<float, float> bottom_middle = piece->GetBottomMiddle();
+                piece->SetScale(piece->GetScale() / 2.f);
+                piece->SetBottomMiddle(bottom_middle.first, bottom_middle.second);
+                Terrain *startingTerrain = selectTerrain(piece->GetDesignatedLocation().first, piece->GetDesignatedLocation().second);
+                Terrain *targetTerrain = selectTerrain(piece->GetBottomMiddle().first, piece->GetBottomMiddle().second);
+                if (piece->GetCurrentAnimation() != NULL)
+                    piece->GetCurrentAnimation()->Unpause();
+                bool successful_move = Move(piece, startingTerrain, targetTerrain, movesLeft);
+                hoveringTerrain = nullptr;
+            }
+            else if (selectedObject->type == GameObject::ITEM)
+            {
+            }
+        }
+        selectedObject = nullptr;
+        break;
+    case SDL_BUTTON_RIGHT:
+        break;
+    case SDL_BUTTON_MIDDLE:
+        break;
+    default:
+        break;
+    }
 }
