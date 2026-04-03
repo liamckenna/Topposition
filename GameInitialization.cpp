@@ -434,7 +434,6 @@ void GenerateOcean()
             OceanTile *oceanTile = new OceanTile("ocean tile edge (" + to_string(i) + ", " + to_string(j) + ")", textures["tile " + to_string(index)][0], surfaces["tile " + to_string(index)], false, true);
             oceanTile->SetPosition(i * 128 * scale + MAP_WIDTH / 2, j * 128 * scale + MAP_HEIGHT / 2);
             oceanTile->SetScale(scale);
-            oceanTile->SetSpawnPosition(i * 128 * scale + MAP_WIDTH / 2, j * 128 * scale + MAP_HEIGHT / 2);
             
             ocean[i + 10].push_back(oceanTile);
             gameObjects[0].push_back(oceanTile);
