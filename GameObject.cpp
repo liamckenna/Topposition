@@ -41,7 +41,6 @@ void GameObject::RenderGameObject(SDL_Renderer *renderer)
             {
                 SDL_SetTextureAlphaMod(texture, static_cast<int>(dynamic_cast<OceanTile *>(this)->GetAlphaFloat() * 255));
                 SDL_RenderTextureRotated(renderer, texture, NULL, renderRect, dynamic_cast<OceanTile *>(this)->GetRotation(), NULL, SDL_FLIP_NONE);
-                // SDL_RenderTexture(renderer, texture, NULL, renderRect);
             }
             else
                 SDL_RenderTexture(renderer, texture, NULL, renderRect);
