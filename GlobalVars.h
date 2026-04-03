@@ -50,7 +50,7 @@ extern std::vector<Piece *> pieces;
 
 extern std::vector<Text *> text;
 
-extern std::vector<OceanTile *> ocean;
+extern std::vector<std::vector<OceanTile *>> ocean;
 
 extern std::vector<Animation *> animations;
 
@@ -85,6 +85,8 @@ extern Uint64 currentTime;
 extern Uint64 prevTime;
 
 extern Uint64 deltaTime;
+
+extern Uint64 gameStartTime;
 
 extern Uint64 frameCountTime;
 

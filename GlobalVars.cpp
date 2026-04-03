@@ -42,7 +42,7 @@ std::vector<UIElement *> uiElements;
 
 std::vector<Piece *> pieces;
 
-std::vector<OceanTile *> ocean;
+std::vector<std::vector<OceanTile *>> ocean;
 
 std::vector<Text *> text;
 
@@ -79,6 +79,8 @@ Uint64 currentTime = 0;
 Uint64 prevTime = 0;
 
 Uint64 deltaTime = 1;
+
+Uint64 gameStartTime = 0;
 
 Uint64 frameCountTime = 0;
 

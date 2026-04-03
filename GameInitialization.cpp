@@ -48,10 +48,7 @@ void ResetMap()
         delete pixels[i];
     }
 
-    for (int i = 0; i < ocean.size(); i++)
-    {
-        ocean[i] = nullptr;
-    }
+    ocean.clear();
 
     for (int i = 0; i < gameObjects.size(); i++)
     {
@@ -80,7 +77,7 @@ void ResetMap()
     std::vector<Player *> newPlayers;
     std::vector<Pixel *> newPixels;
     std::vector<Text *> newText;
-    std::vector<OceanTile *> newOcean;
+    std::vector<std::vector<OceanTile *>> newOcean;
     std::vector<Animation *> newAnimations;
     animations = newAnimations;
     players = newPlayers;
@@ -120,6 +117,9 @@ void loadGame()
     renderPixels();
 
     SDL_SetRenderTarget(renderer, NULL);
+
+    std::cout << "Game Loaded!" << std::endl;
+    gameStartTime = SDL_GetTicks();
 }
 
 bool loadMap()
@@ -426,14 +426,17 @@ void GenerateOcean()
 
     for (int i = -10; i < 10; i++)
     {
-        for (int j = -6; j < 6; j++)
+        ocean.resize(20);
+        for (int j = -10; j < 10; j++)
         {
             std::cout << "Generating ocean tile at (" << i << ", " << j << ")" << std::endl;
-            int index = rand() % 1 + 3;
+            int index = rand() % 20 + 1;
             OceanTile *oceanTile = new OceanTile("ocean tile edge (" + to_string(i) + ", " + to_string(j) + ")", textures["tile " + to_string(index)][0], surfaces["tile " + to_string(index)], false, true);
-            oceanTile->SetPosition(i * 128 * scale, j * 128 * scale);
+            oceanTile->SetPosition(i * 128 * scale + MAP_WIDTH / 2, j * 128 * scale + MAP_HEIGHT / 2);
             oceanTile->SetScale(scale);
-            ocean.push_back(oceanTile);
+            oceanTile->SetSpawnPosition(i * 128 * scale + MAP_WIDTH / 2, j * 128 * scale + MAP_HEIGHT / 2);
+            
+            ocean[i + 10].push_back(oceanTile);
             gameObjects[0].push_back(oceanTile);
         }
     }

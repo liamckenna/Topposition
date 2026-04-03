@@ -100,16 +100,19 @@ void renderText()
 
 void renderOcean()
 {
-    int speed = 100;
-    if (deltaTime < 100)
+    int speed = 32;
+    if (deltaTime > 100)
         deltaTime = 5;
     for (int i = 0; i < ocean.size(); i++)
     {
-        float dxf = 1 * deltaTime / 1000.f;
-        float dyf = 1 * deltaTime / 1000.f;
+        for (int j = 0; j < ocean[i].size(); j++)
+        {
+            float dxf = speed * deltaTime / 1000.f;
+            float dyf = speed * deltaTime / 1000.f;
 
-        ocean[i]->SetPosition(ocean[i]->GetPosition().first + dxf, ocean[i]->GetPosition().second + dyf);
-        ocean[i]->CheckTimer();
-        ocean[i]->RenderGameObject(renderer);
+            ocean[i][j]->SetPosition(ocean[i][j]->GetPosition().first + dxf, ocean[i][j]->GetPosition().second + dyf);
+            ocean[i][j]->CheckTimer();
+            ocean[i][j]->RenderGameObject(renderer);
+        }
     }
 }

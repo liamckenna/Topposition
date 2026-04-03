@@ -2,7 +2,7 @@
 #include <chrono>
 #include <thread>
 
-void RefreshClaimNotifs(Peak *individualPeak)
+void RefreshClaimNotifs(Peak *individualPeak, Piece *occupyingPiece)
 {
     if (individualPeak != NULL)
     {
@@ -10,6 +10,7 @@ void RefreshClaimNotifs(Peak *individualPeak)
         {
             if (individualPeak->occupants[i]->GetPlayer() == currentTurn && individualPeak->GetClaimedBy() != currentTurn)
             {
+                individualPeak->GetClaimNotif()->SetPosition(individualPeak->occupants[i]->GetCenter().first, individualPeak->occupants[i]->GetCenter().second - 100);
                 individualPeak->GetClaimNotif()->SetRendered(true);
                 break;
             }

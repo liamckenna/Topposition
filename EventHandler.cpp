@@ -144,7 +144,7 @@ void MouseMovement(Input *playerInput)
     case LOADING:
         break;
     case GAME:
-        if ((playerInput->GetMouseButtonDown("Middle")) && !playerInput->GetMouseButtonDown("Left"))
+        if ((playerInput->GetMouseButtonDown("Middle") || playerInput->GetMouseButtonDown("Right")) && !playerInput->GetMouseButtonDown("Left"))
         {
             if (selectedObject == nullptr)
             {

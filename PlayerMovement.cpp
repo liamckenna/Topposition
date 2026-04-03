@@ -24,7 +24,7 @@ bool Move(Piece* piece, Terrain* startingPoint, Terrain* targetTerrain, int& mov
         }
         if (targetTerrain != NULL) targetTerrain->occupants.push_back(piece);
         if (targetTerrain != NULL && targetTerrain->type == GameObject::PEAK) {
-            RefreshClaimNotifs(dynamic_cast<Peak *>(targetTerrain));
+            RefreshClaimNotifs(dynamic_cast<Peak *>(targetTerrain), piece);
         } else {
             RefreshClaimNotifs();
         }

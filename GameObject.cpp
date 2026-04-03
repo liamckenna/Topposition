@@ -58,7 +58,7 @@ void GameObject::RenderGameObject(SDL_Renderer *renderer)
 }
 
 void GameObject::SetPosition(float x, float y, bool posOnly)
-{
+{    
     position.first = x;
     position.second = y;
     if (!posOnly)
@@ -438,15 +438,15 @@ Animation::Animation(SDL_Texture *ss, SDL_Surface *s, float d, int fc, pair<int,
 void Animation::CycleFrame(Uint64 current)
 {
     if (paused)
-        lastUpdate = current;
-    float dT = (current - lastUpdate) / 1000.0f;
+        lastUpdate = currentTime;
+    float dT = (currentTime - lastUpdate) / 1000.0f;
 
-    int framesToUpdate = floor(dT / (1.0f / (frameCount / duration)));
+    int framesToUpdate = floor(dT * frameCount / duration);
     if (framesToUpdate > 0)
     {
         lastFrame += framesToUpdate;
         lastFrame %= frameCount;
-        lastUpdate = current;
+        lastUpdate = currentTime;
         int row = lastFrame / sheetDimensions.first;
         int column = lastFrame % sheetDimensions.first;
         rect->x = spriteDimensions.first * column;
