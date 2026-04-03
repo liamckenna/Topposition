@@ -20,5 +20,3 @@ Terrain *selectTerrain(int x, int y);
 Item *selectItem(int x, int y);
 
 void moveSelectedObject(GameObject *gameObject, Input *playerInput);
-
-void RecenterScreen(Input *playerInput);

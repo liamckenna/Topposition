@@ -2,43 +2,27 @@
 #include <chrono>
 #include <thread>
 
-void RefreshClaimNotifs(Peak *individualPeak, Piece *occupyingPiece)
+void RefreshClaimNotifs()
 {
-    if (individualPeak != NULL)
+    for (int i = 0; i < peaks.size(); i++)
     {
-        for (int i = 0; i < individualPeak->occupants.size(); i++)
+        for (int j = 0; j < peaks[i]->occupants.size(); j++)
         {
-            if (individualPeak->occupants[i]->GetPlayer() == currentTurn && individualPeak->GetClaimedBy() != currentTurn)
+            if (peaks[i]->occupants[j]->GetPlayer() == currentTurn && peaks[i]->GetClaimedBy() != currentTurn)
             {
-                individualPeak->GetClaimNotif()->SetPosition(individualPeak->occupants[i]->GetCenter().first, individualPeak->occupants[i]->GetCenter().second - 100);
-                individualPeak->GetClaimNotif()->SetRendered(true);
+                peaks[i]->GetClaimNotif()->globalPosition.first = (peaks[i]->occupants[j]->GetCenter().first / cameraZoom) + cameraPosition.first;
+                peaks[i]->GetClaimNotif()->globalPosition.second = (peaks[i]->occupants[j]->GetCenter().second / cameraZoom) + cameraPosition.second - 150;
+                peaks[i]->SetPosition((peaks[i]->globalPosition.first - cameraPosition.first) * cameraZoom, (peaks[i]->globalPosition.second - cameraPosition.second) * cameraZoom);
+                peaks[i]->GetClaimNotif()->SetRendered(true);
                 break;
             }
             else
             {
-                individualPeak->GetClaimNotif()->SetRendered(false);
-            }
-        }
-    }
-    else
-    {
-        for (int i = 0; i < peaks.size(); i++)
-        {
-            for (int j = 0; j < peaks[i]->occupants.size(); j++)
-            {
-                if (peaks[i]->occupants[j]->GetPlayer() == currentTurn && peaks[i]->GetClaimedBy() != currentTurn)
-                {
-                    peaks[i]->GetClaimNotif()->SetRendered(true);
-                    break;
-                }
-                else
-                {
-                    peaks[i]->GetClaimNotif()->SetRendered(false);
-                }
-            }
-            if (peaks[i]->occupants.size() == 0)
                 peaks[i]->GetClaimNotif()->SetRendered(false);
+            }
         }
+        if (peaks[i]->occupants.size() == 0)
+            peaks[i]->GetClaimNotif()->SetRendered(false);
     }
 }
 

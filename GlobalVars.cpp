@@ -72,7 +72,7 @@ Terrain *hoveringTerrain;
 
 bool validMove;
 
-Player *first_place;
+Player *firstPlace;
 
 Uint64 currentTime = 0;
 
@@ -85,3 +85,7 @@ Uint64 gameStartTime = 0;
 Uint64 frameCountTime = 0;
 
 int frameCounter = 0;
+
+float cameraZoom = 1.f;
+
+std::pair<float, float> cameraPosition = {0.f, 0.f};

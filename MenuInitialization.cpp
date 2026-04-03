@@ -16,6 +16,7 @@ void loadMenuUI()
     gameObjects[0].push_back(logo);
     logo->SetScale((float)SCREEN_HEIGHT / 1152);
     logo->SetPosition(0, 0);
+    logo->globalPosition = logo->GetPosition();
 
     UIElement *playButton = new UIElement("play", textures["play"][0], surfaces["play"], true, true);
     uiElements.push_back(playButton);
@@ -23,6 +24,7 @@ void loadMenuUI()
     playButton->SetScale((float)SCREEN_HEIGHT / 1152);
     playButton->SetCenter(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 3 * 2);
     playButton->SetSelectable(true);
+    playButton->globalPosition = playButton->GetPosition();
 
     // UIElement *settingsButton = new UIElement("settings", textures["settings"][0], surfaces["settings"], true, true);
     // uiElements.push_back(settingsButton);
@@ -35,6 +37,7 @@ void loadMenuUI()
     gameObjects[0].push_back(quitButton);
     quitButton->SetScale((float)SCREEN_HEIGHT / 1152);
     quitButton->SetCenter(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 3 * 2 + ((quitButton->GetDimensions().second * quitButton->GetScale()) * 2));
+    quitButton->globalPosition = quitButton->GetPosition();
 };
 
 void loadMenuBackground()
@@ -44,6 +47,7 @@ void loadMenuBackground()
     gameObjects[0].push_back(background);
     background->SetScale((float)SCREEN_HEIGHT / 1152);
     background->SetPosition(0, 0);
+    background->globalPosition = background->GetPosition();
 }
 
 void updateUIElementPositions()
@@ -76,7 +80,7 @@ void updateUIElementPositions()
         }
         else if (uiElements[i]->GetName() == "dieOne")
         {
-            uiElements[i]->SetPosition(SCREEN_WIDTH - (uiElements[i]->GetDimensions().first * uiElements[i]->GetScale() * uiElements[i]->GetSize()) - 10, 10);
+            uiElements[i]->SetPosition(SCREEN_WIDTH - (uiElements[i]->GetDimensions().first * uiElements[i]->GetScale()) - 10, 10);
         }
         else if (uiElements[i]->GetName() == "dieTwo")
         {
@@ -89,20 +93,20 @@ void updateUIElementPositions()
                     break;
                 }
             }
-            uiElements[i]->SetPosition(SCREEN_WIDTH - ((die1->GetDimensions().first * die1->GetScale() * die1->GetSize()) + 10) * 2, 10);
+            uiElements[i]->SetPosition(SCREEN_WIDTH - ((die1->GetDimensions().first * die1->GetScale()) + 10) * 2, 10);
         }
         else if (uiElements[i]->GetName() == "movesLeftText")
         {
-            uiElements[i]->SetPosition(0, SCREEN_HEIGHT - (uiElements[i]->GetDimensions().second * uiElements[i]->GetScale() * uiElements[i]->GetSize()));
+            uiElements[i]->SetPosition(0, SCREEN_HEIGHT - (uiElements[i]->GetDimensions().second * uiElements[i]->GetScale()));
         }
         else if (uiElements[i]->GetName() == "movesLeftCount")
         {
-            uiElements[i]->SetPosition(0, SCREEN_HEIGHT - (uiElements[i]->GetDimensions().second * uiElements[i]->GetScale() * uiElements[i]->GetSize()));
+            uiElements[i]->SetPosition(0, SCREEN_HEIGHT - (uiElements[i]->GetDimensions().second * uiElements[i]->GetScale()));
         }
         else if (uiElements[i]->GetName() == "finish turn button")
         {
-            uiElements[i]->SetPosition(SCREEN_WIDTH - (uiElements[i]->GetDimensions().first * uiElements[i]->GetScale() * uiElements[i]->GetSize()) - 10,
-                                       SCREEN_HEIGHT - (uiElements[i]->GetDimensions().second * uiElements[i]->GetScale() * uiElements[i]->GetSize()) - 10);
+            uiElements[i]->SetPosition(SCREEN_WIDTH - (uiElements[i]->GetDimensions().first * uiElements[i]->GetScale()) - 10,
+                                       SCREEN_HEIGHT - (uiElements[i]->GetDimensions().second * uiElements[i]->GetScale()) - 10);
         }
     }
 }

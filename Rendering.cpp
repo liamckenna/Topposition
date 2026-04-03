@@ -17,25 +17,11 @@ void RenderScreen()
         renderPieces();
         renderUI();
         renderText();
-        renderInventory();
+        //renderInventory();
     }
 
     // Update screen
     SDL_RenderPresent(renderer);
-}
-
-void renderObjects(SDL_Renderer *renderer)
-{
-    for (int i = 0; i < gameObjects.size(); i++)
-    {
-        for (int j = 0; j < gameObjects[i].size(); j++)
-        {
-            if (gameObjects[i][j]->GetRendered())
-            {
-                gameObjects[i][j]->RenderGameObject(renderer);
-            }
-        }
-    }
 }
 
 void renderUI()
@@ -111,6 +97,8 @@ void renderOcean()
             float dyf = speed * deltaTime / 1000.f;
 
             ocean[i][j]->SetPosition(ocean[i][j]->GetPosition().first + dxf, ocean[i][j]->GetPosition().second + dyf);
+            ocean[i][j]->globalPosition.first += dxf;
+            ocean[i][j]->globalPosition.second += dyf;
             ocean[i][j]->CheckTimer();
             ocean[i][j]->RenderGameObject(renderer);
         }

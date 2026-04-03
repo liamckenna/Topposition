@@ -7,32 +7,35 @@ GameObject::GameObject(string name, SDL_Texture *texture, SDL_Surface *surface, 
     this->name = name;
     this->texture = texture;
     this->surface = surface;
-    size = 1;
     SDL_GetTextureSize(texture, &dimensions.first, &dimensions.second);
 
     SetPosition(0, 0, true);
     SetCenter();
-    SetDefaultPosition(0, 0);
     movable = m;
     rendered = r;
 }
 
 void GameObject::RenderGameObject(SDL_Renderer *renderer)
 {
-    if (size == 1)
+
+
+    bool fetch_success = SDL_GetTextureSize(texture, &dimensions.first, &dimensions.second);
+
+    if (resizable)
     {
-        renderRect->x = defaultPosition.first;
-        renderRect->y = defaultPosition.second;
+        renderRect->x = (globalPosition.first - cameraPosition.first) * cameraZoom;
+        renderRect->y = (globalPosition.second - cameraPosition.second) * cameraZoom;
+        renderRect->w = (float)(dimensions.first * cameraZoom * scale);
+        renderRect->h = (float)(dimensions.second * cameraZoom * scale);
     }
     else
     {
-        renderRect->x = position.first;
-        renderRect->y = position.second;
+        renderRect->x = globalPosition.first;
+        renderRect->y = globalPosition.second;
+        renderRect->w = (float)(dimensions.first * scale);
+        renderRect->h = (float)(dimensions.second * scale);
     }
-    bool fetch_success = SDL_GetTextureSize(texture, &dimensions.first, &dimensions.second);
-
-    renderRect->w = (float)(dimensions.first * size * scale);
-    renderRect->h = (float)(dimensions.second * size * scale);
+    
     if (rendered)
     {
         if (currentAnimation == nullptr)
@@ -41,12 +44,11 @@ void GameObject::RenderGameObject(SDL_Renderer *renderer)
             {
                 SDL_SetTextureAlphaMod(texture, static_cast<int>(dynamic_cast<OceanTile *>(this)->GetAlphaFloat() * 255));
                 SDL_RenderTextureRotated(renderer, texture, NULL, renderRect, dynamic_cast<OceanTile *>(this)->GetRotation(), NULL, SDL_FLIP_NONE);
+                SDL_SetTextureAlphaMod(texture, static_cast<int>(255));
             }
             else
-                SDL_RenderTexture(renderer, texture, NULL, renderRect);
-            if (type == OCEAN_TILE)
             {
-                SDL_SetTextureAlphaMod(texture, static_cast<int>(255));
+                SDL_RenderTexture(renderer, texture, NULL, renderRect);
             }
         }
         else
@@ -65,33 +67,14 @@ void GameObject::SetPosition(float x, float y, bool posOnly)
         SetCenter();
         SetBottomRight();
     }
-    if (size == 1)
-    {
-        defaultPosition.first = position.first;
-        defaultPosition.second = position.second;
-    }
 }
 
-void GameObject::AdjustSize(float multiplier, int w, int h)
-{
-
-    if (w == 0 || h == 0)
-    {
-        size += multiplier;
-    }
-    else
-    {
-        dimensions.first = w;
-        dimensions.second = h;
-    }
-    SetPosition(center.first - (dimensions.first * size * scale) / 2, center.second - (dimensions.second * size * scale) / 2, true);
-}
 void GameObject::SetCenter(float x, float y, bool centerOnly)
 {
     if (x == 0 && y == 0)
     {
-        center.first = position.first + (dimensions.first * size * scale) / 2;
-        center.second = position.second + (dimensions.second * size * scale) / 2;
+        center.first = position.first + (dimensions.first * cameraZoom * scale) / 2;
+        center.second = position.second + (dimensions.second * cameraZoom * scale) / 2;
     }
     else
     {
@@ -99,12 +82,10 @@ void GameObject::SetCenter(float x, float y, bool centerOnly)
         {
             center.first = x;
             center.second = y;
-            position.first = center.first - (dimensions.first * size * scale) / 2;
-            position.second = center.second - (dimensions.second * size * scale) / 2;
+            position.first = center.first - (dimensions.first * cameraZoom * scale) / 2;
+            position.second = center.second - (dimensions.second * cameraZoom * scale) / 2;
 
             SetBottomRight();
-            if (size == 1)
-                SetDefaultPosition(position.first, position.second);
         }
         else
         {
@@ -124,19 +105,13 @@ void GameObject::SetMovable(bool m)
     movable = m;
 }
 
-void GameObject::SetDefaultPosition(float x, float y)
-{
-    defaultPosition.first = x;
-    defaultPosition.second = y;
-}
-
 void GameObject::SetBottomRight(float x, float y, bool brOnly)
 {
 
     if (x == 0 && y == 0)
     {
-        bottomRight.first = position.first + (dimensions.first * size * scale);
-        bottomRight.second = position.second + (dimensions.second * size * scale);
+        bottomRight.first = position.first + (dimensions.first * cameraZoom * scale);
+        bottomRight.second = position.second + (dimensions.second * cameraZoom * scale);
     }
     else
     {
@@ -144,12 +119,10 @@ void GameObject::SetBottomRight(float x, float y, bool brOnly)
         {
             bottomRight.first = x;
             bottomRight.second = y;
-            position.first = bottomRight.first - (dimensions.first * size * scale);
-            position.second = bottomRight.second - (dimensions.second * size * scale);
+            position.first = bottomRight.first - (dimensions.first * cameraZoom * scale);
+            position.second = bottomRight.second - (dimensions.second * cameraZoom * scale);
 
             SetCenter();
-            if (size == 1)
-                SetDefaultPosition(position.first, position.second);
         }
         else
         {
@@ -164,8 +137,8 @@ void GameObject::SetBottomMiddle(float x, float y, bool bmOnly)
 
     if (x == 0 && y == 0)
     {
-        center.first = position.first + (dimensions.first * size * scale) / 2;
-        bottomRight.second = position.second + (dimensions.second * size * scale);
+        center.first = position.first + (dimensions.first * cameraZoom * scale) / 2;
+        bottomRight.second = position.second + (dimensions.second * cameraZoom * scale);
     }
     else
     {
@@ -173,13 +146,14 @@ void GameObject::SetBottomMiddle(float x, float y, bool bmOnly)
         {
             center.first = x;
             bottomRight.second = y;
-            position.first = center.first - (dimensions.first * size * scale) / 2;
-            position.second = bottomRight.second - (dimensions.second * size * scale);
+            position.first = center.first - (dimensions.first * cameraZoom * scale) / 2;
+            position.second = bottomRight.second - (dimensions.second * cameraZoom * scale);
+
+            globalPosition.first = (position.first / cameraZoom) + cameraPosition.first;
+            globalPosition.second = (position.second / cameraZoom) + cameraPosition.second;
 
             SetCenter();
             SetBottomRight();
-            if (size == 1)
-                SetDefaultPosition(position.first, position.second);
         }
         else
         {
@@ -222,19 +196,11 @@ void Terrain::RenderGameObject(SDL_Renderer *renderer, Terrain *hoveringTerrain,
         }
     }
 
-    if (size == 1)
-    {
-        renderRect->x = defaultPosition.first;
-        renderRect->y = defaultPosition.second;
-    }
-    else
-    {
-        renderRect->x = position.first;
-        renderRect->y = position.second;
-    }
+    renderRect->x = (globalPosition.first - cameraPosition.first) * cameraZoom;
+    renderRect->y = (globalPosition.second - cameraPosition.second) * cameraZoom;
 
-    renderRect->w = ceil(dimensions.first * size * 2);
-    renderRect->h = ceil(dimensions.second * size * 2);
+    renderRect->w = ceil(dimensions.first * cameraZoom * 2);
+    renderRect->h = ceil(dimensions.second * cameraZoom * 2);
     if (rendered)
     {
         SDL_RenderTextureRotated(renderer, pixels, NULL, renderRect, 0, NULL, SDL_FLIP_NONE);
@@ -296,16 +262,8 @@ void Pixel::RenderGameObject(SDL_Renderer *renderer, Terrain *hoveringTerrain)
         SDL_SetTextureColorMod(texture, color.r, color.g, color.b);
     }
 
-    if (size == 1)
-    {
-        renderRect->x = position.first - hiddenTerrain->GetPosition().first;
-        renderRect->y = position.second - hiddenTerrain->GetPosition().second;
-    }
-    else
-    {
-        renderRect->x = position.first - hiddenTerrain->GetPosition().first;
-        renderRect->y = position.second - hiddenTerrain->GetPosition().second;
-    }
+    renderRect->x = position.first - hiddenTerrain->GetPosition().first;
+    renderRect->y = position.second - hiddenTerrain->GetPosition().second;
     renderRect->w = (width + 2);
     renderRect->h = (height + 2);
     SDL_RenderTexture(renderer, texture, NULL, renderRect);

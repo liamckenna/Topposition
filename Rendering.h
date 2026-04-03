@@ -3,8 +3,6 @@
 
 void RenderScreen();
 
-void renderObjects(SDL_Renderer *gRenderer);
-
 void renderUI();
 
 void renderClaimNotifs();

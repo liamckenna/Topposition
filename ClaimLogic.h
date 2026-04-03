@@ -3,7 +3,7 @@
 #include "GameLogic.h"
 #include "MouseLogic.h"
 
-void RefreshClaimNotifs(Peak *individualPeak = NULL, Piece *occupyingPiece = NULL);
+void RefreshClaimNotifs();
 
 void ClaimPeak(UIElement *claimNotif);
 

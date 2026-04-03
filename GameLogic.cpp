@@ -92,21 +92,21 @@ void UpdateScore()
             pointsLeft -= players[i]->peaks[j]->GetLayer();
         }
     }
-    first_place = nullptr;
+    firstPlace = nullptr;
     for (int i = 0; i < players.size(); i++)
     {
-        if (first_place == nullptr || players[i]->GetScore() > first_place->GetScore())
+        if (firstPlace == nullptr || players[i]->GetScore() > firstPlace->GetScore())
         {
-            first_place = players[i];
+            firstPlace = players[i];
         }
     }
     for (int i = 0; i < players.size(); i++)
     {
-        if (players[i]->GetScore() == first_place->GetScore())
+        if (players[i]->GetScore() == firstPlace->GetScore())
         {
-            if (first_place->GetColor() != players[i]->GetColor())
+            if (firstPlace->GetColor() != players[i]->GetColor())
             {
-                first_place = nullptr;
+                firstPlace = nullptr;
                 break;
             }
         }
@@ -115,7 +115,7 @@ void UpdateScore()
     for (int i = 0; i < players.size(); i++)
     {
         std::cout << "Player " << i + 1 << ": " << players[i]->GetScore();
-        if (players[i] == first_place)
+        if (players[i] == firstPlace)
         {
             std::cout << " (First Place!)" << std::endl;
         }
@@ -127,8 +127,8 @@ void UpdateScore()
     std::cout << std::endl;
     if (pointsLeft == 0)
     {
-        if (first_place != nullptr)
-            GameFinished(first_place);
+        if (firstPlace != nullptr)
+            GameFinished(firstPlace);
     }
 }
 

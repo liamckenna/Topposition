@@ -103,4 +103,8 @@ enum gameState
 
 extern gameState state;
 
-extern Player *first_place;
+extern Player *firstPlace;
+
+extern float cameraZoom;
+
+extern std::pair<float, float> cameraPosition;

@@ -17,6 +17,7 @@ void GeneratePeak()
     peak->SetScale(0.1);
     peak->SetScale(peak->GetScale() * 2);
     peak->SetCenter(x, y);
+    peak->globalPosition = peak->GetPosition();
     peaks.push_back(peak);
     peak->SetPeakID(peaks.size());
     terrain[height].push_back(peak);
@@ -26,6 +27,7 @@ void GeneratePeak()
     GameObject *outline = new GameObject(outlineName, textures[outlineName][height], surfaces[outlineName], false, true);
     outline->SetScale(0.1);
     outline->SetCenter(x, y);
+    outline->globalPosition = outline->GetPosition();
     terrainOutlines[height].push_back(outline);
     gameObjects[height].push_back(outline);
     peak->SetOutline(outline);
@@ -49,6 +51,7 @@ void GeneratePeak()
             pieces.push_back(item);
             item->SetScale(0.05);
             item->SetCenter(peak->GetCenter().first, peak->GetCenter().second);
+            item->globalPosition = item->GetPosition();
             gameObjects[height].push_back(item);
             peak->SetItem(item);
         }
@@ -60,10 +63,14 @@ void GeneratePeak()
         int b = (rand() % MAP_HEIGHT) * 2;
 
         peak->SetCenter(a, b);
+        peak->globalPosition = peak->GetPosition();
         outline->SetCenter(a, b);
+        outline->globalPosition = outline->GetPosition();
+
         if (peak->GetItem() != nullptr)
         {
             peak->GetItem()->SetCenter(a, b);
+            peak->GetItem()->globalPosition = peak->GetItem()->GetPosition();
         }
     }
     SDL_Color color;
@@ -110,6 +117,7 @@ void GenerateTerrain(Peak *peak, int shape, int height)
         if (negativeY == 1)
             offsetY *= -1;
         layer->SetCenter(above->GetCenter().first + offsetX, above->GetCenter().second + offsetY);
+        layer->globalPosition = layer->GetPosition();
         while (!TerrainIsSurrounded(above, layer))
         {
             offsetX = rand() % 20;
@@ -121,6 +129,7 @@ void GenerateTerrain(Peak *peak, int shape, int height)
             if (negativeY == 1)
                 offsetY *= -1;
             layer->SetCenter(above->GetCenter().first + offsetX, above->GetCenter().second + offsetY);
+            layer->globalPosition = layer->GetPosition();
         }
         layer->SetOffsetX(offsetX);
         layer->SetOffsetY(offsetY);
@@ -144,6 +153,7 @@ void GenerateTerrain(Peak *peak, int shape, int height)
         GameObject *outline = new GameObject(outlineName, textures[outlineName][i], surfaces[outlineName], false, true);
         outline->SetScale(peak->GetScale() + 0.1 * (height - i));
         outline->SetCenter(peak->GetCenter().first, peak->GetCenter().second);
+        outline->globalPosition = outline->GetPosition();
         terrainOutlines[i].push_back(outline);
         gameObjects[i].push_back(outline);
         layer->SetOutline(outline);
@@ -390,8 +400,8 @@ std::vector<Terrain *> MergeTerrain(Terrain *peak)
         {
             for (int j = 0; j < height; j++)
             {
-                pixelOne = GetPixelColor(peak->GetSurface(), (offsetOne.first + i) / (peak->GetScale() * peak->GetSize()), (offsetOne.second + j) / (peak->GetScale() * peak->GetSize()));
-                pixelTwo = GetPixelColor(other->GetSurface(), (offsetTwo.first + i) / (other->GetScale() * other->GetSize()), (offsetTwo.second + j) / (other->GetScale() * other->GetSize()));
+                pixelOne = GetPixelColor(peak->GetSurface(), (offsetOne.first + i) / peak->GetScale(), (offsetOne.second + j) / peak->GetScale());
+                pixelTwo = GetPixelColor(other->GetSurface(), (offsetTwo.first + i) / other->GetScale(), (offsetTwo.second + j) / other->GetScale());
 
                 if ((pixelOne.r == 255 && pixelOne.g == 255 && pixelOne.b == 255) && (pixelTwo.r == 255 && pixelTwo.g == 255 && pixelTwo.b == 255))
                 {
@@ -480,8 +490,8 @@ bool TerrainIsSurrounded(Terrain *peak, Terrain *other)
     {
         for (int j = 0; j < height; j++)
         {
-            pixelOne = GetPixelColor(peak->GetSurface(), (offsetOne.first + i) / (peak->GetScale() * peak->GetSize()), (offsetOne.second + j) / (peak->GetScale() * peak->GetSize()));
-            pixelTwo = GetPixelColor(other->GetSurface(), (offsetTwo.first + i) / (other->GetScale() * other->GetSize()), (offsetTwo.second + j) / (other->GetScale() * other->GetSize()));
+            pixelOne = GetPixelColor(peak->GetSurface(), (offsetOne.first + i) / peak->GetScale(), (offsetOne.second + j) / peak->GetScale());
+            pixelTwo = GetPixelColor(other->GetSurface(), (offsetTwo.first + i) / other->GetScale(), (offsetTwo.second + j) / other->GetScale());
 
             if ((pixelOne.r == 255 && pixelOne.g == 255 && pixelOne.b == 255) && (pixelTwo.r != 255 || pixelTwo.g != 255 || pixelTwo.b != 255))
             {
@@ -510,9 +520,11 @@ void GroomTerrain()
                 int b = (rand() % MAP_HEIGHT) * 2;
 
                 peaks[i]->SetCenter(a, b);
+                peaks[i]->globalPosition = peaks[i]->GetPosition();
                 if (peaks[i]->GetItem() != nullptr)
                 {
                     peaks[i]->GetItem()->SetCenter(a, b);
+                    peaks[i]->GetItem()->globalPosition = peaks[i]->GetItem()->GetPosition();
                 }
                 moveCount++;
             }
@@ -530,6 +542,7 @@ void GroomTerrain()
                     above = peaks[i]->childTerrain[j - 1];
                 }
                 current->SetCenter(above->GetCenter().first + current->GetOffsetX(), above->GetCenter().second + current->GetOffsetY());
+                current->globalPosition = current->GetPosition();
             }
         }
     }

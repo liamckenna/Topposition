@@ -2,71 +2,59 @@
 
 void zoom(SDL_MouseWheelEvent &event, Input *playerInput)
 {
-
+    float prevCameraZoom = cameraZoom;
     std::pair<float, float> relativePositionB4;
     std::pair<float, float> newRelativePosition;
     SDL_GetMouseState(&playerInput->currentMousePosition.first, &playerInput->currentMousePosition.second);
+    float mouseX = playerInput->currentMousePosition.first;
+    float mouseY = playerInput->currentMousePosition.second;
+    if ((event.y < 0 && cameraZoom <= 0.4) || (event.y > 0 && cameraZoom >= 3.5))
+    {
+        return;
+    }
+    cameraZoom += (event.y / abs(event.y) * .1);
+    //std::cout << "Camera Zoom: " << cameraZoom << std::endl;
+
+    cameraPosition.first += (mouseX / prevCameraZoom) - (mouseX / cameraZoom);
+    cameraPosition.second += (mouseY / prevCameraZoom) - (mouseY / cameraZoom);
+    //std::cout << "Camera Position: " << cameraPosition.first << ", " << cameraPosition.second << std::endl;
+
     for (int i = 0; i < gameObjects.size(); i++)
     {
         for (int j = 0; j < gameObjects[i].size(); j++)
         {
             if (gameObjects[i][j]->GetResizable())
             {
-                if ((event.y < 0 && gameObjects[i][j]->GetSize() <= 0.4) || (event.y > 0 && gameObjects[i][j]->GetSize() >= 3.5))
-                {
-                    continue;
-                }
-                else
-                {
+                relativePositionB4.first = (gameObjects[i][j]->GetPosition().first - mouseX) / prevCameraZoom;
+                relativePositionB4.second = (gameObjects[i][j]->GetPosition().second - mouseY) / prevCameraZoom;
 
-                    relativePositionB4.first = (gameObjects[i][j]->GetPosition().first - playerInput->currentMousePosition.first) / gameObjects[i][j]->GetSize();
-                    relativePositionB4.second = (gameObjects[i][j]->GetPosition().second - playerInput->currentMousePosition.second) / gameObjects[i][j]->GetSize();
-                    gameObjects[i][j]->AdjustSize((event.y / abs(event.y) * .1));
-                    newRelativePosition.first = (gameObjects[i][j]->GetPosition().first - playerInput->currentMousePosition.first) / gameObjects[i][j]->GetSize();
-                    newRelativePosition.second = (gameObjects[i][j]->GetPosition().second - playerInput->currentMousePosition.second) / gameObjects[i][j]->GetSize();
+                gameObjects[i][j]->SetPosition(gameObjects[i][j]->GetCenter().first - (gameObjects[i][j]->GetDimensions().first * cameraZoom * gameObjects[i][j]->GetScale()) / 2, gameObjects[i][j]->GetCenter().second - (gameObjects[i][j]->GetDimensions().second * cameraZoom * gameObjects[i][j]->GetScale()) / 2, true);
+                newRelativePosition.first = (gameObjects[i][j]->GetPosition().first - mouseX) / cameraZoom;
+                newRelativePosition.second = (gameObjects[i][j]->GetPosition().second - mouseY) / cameraZoom;
 
-                    gameObjects[i][j]->SetPosition((gameObjects[i][j]->GetPosition().first + (relativePositionB4.first - newRelativePosition.first) * gameObjects[i][j]->GetSize()),
-                                                   (gameObjects[i][j]->GetPosition().second + (relativePositionB4.second - newRelativePosition.second) * gameObjects[i][j]->GetSize()));
-                    if (gameObjects[i][j]->GetSize() == 1 && i > 0)
-                    {
-                        gameObjects[i][j]->SetDefaultPosition(gameObjects[i][j]->GetPosition().first, gameObjects[i][j]->GetPosition().second);
-                    }
-                }
+                gameObjects[i][j]->SetPosition((gameObjects[i][j]->GetPosition().first + (relativePositionB4.first - newRelativePosition.first) * cameraZoom),
+                                               (gameObjects[i][j]->GetPosition().second + (relativePositionB4.second - newRelativePosition.second) * cameraZoom));
             }
         }
     }
-    // RecenterScreen(playerInput);
 }
 
 void scroll(Input *playerInput)
 {
-    bool enabled = true;
+    cameraPosition.first -= (playerInput->currentMousePosition.first - playerInput->prevMousePosition.first) / cameraZoom;
+    cameraPosition.second -= (playerInput->currentMousePosition.second - playerInput->prevMousePosition.second) / cameraZoom;
+    //std::cout << "Camera Position: " << cameraPosition.first << ", " << cameraPosition.second << std::endl;
     for (int i = 0; i < gameObjects.size(); i++)
     {
         for (int j = 0; j < gameObjects[i].size(); j++)
         {
-            if (i == 0)
-            {
-                /*if (gameObjects[i][j]->GetSize() <= 0.5f ||
-                    (gameObjects[i][j]->GetPosition().first > 0 && ((playerInput->currentMousePosition.first - playerInput->prevMousePosition.first) > 0)) ||
-                    ((gameObjects[i][j]->GetPosition().first + (gameObjects[i][j]->GetSize() * gameObjects[i][j]->GetDimensions().first)) < SCREEN_WIDTH * 2 && ((playerInput->currentMousePosition.first - playerInput->prevMousePosition.first) < 0)) ||
-                    (gameObjects[i][j]->GetPosition().second > 0 && ((playerInput->currentMousePosition.second - playerInput->prevMousePosition.second) > 0)) ||
-                    ((gameObjects[i][j]->GetPosition().second + (gameObjects[i][j]->GetSize() * gameObjects[i][j]->GetDimensions().second)) < SCREEN_HEIGHT * 2 && ((playerInput->currentMousePosition.second - playerInput->prevMousePosition.second) < 0))) {
-                    enabled = false;
-                    continue;
-                } else {
-                    enabled = true;
-                }*/
-            }
-            if (enabled && gameObjects[i][j]->GetResizable())
+            if (gameObjects[i][j]->GetResizable())
             {
                 gameObjects[i][j]->SetPosition(gameObjects[i][j]->GetPosition().first + playerInput->currentMousePosition.first - playerInput->prevMousePosition.first,
                                                gameObjects[i][j]->GetPosition().second + playerInput->currentMousePosition.second - playerInput->prevMousePosition.second);
             }
         }
     }
-
-    // RecenterScreen(playerInput);
 }
 
 GameObject *selectObject(int x, int y)
@@ -87,8 +75,8 @@ GameObject *selectObject(int x, int y)
                 {
 
                     SDL_Color color = GetPixelColor(gameObjects[i][j]->GetSurface(),
-                                                    (x - width_LowerBound) / (gameObjects[i][j]->GetSize() * gameObjects[i][j]->GetScale()),
-                                                    (y - height_LowerBound) / (gameObjects[i][j]->GetSize() * gameObjects[i][j]->GetScale()));
+                                                    (x - width_LowerBound) / (cameraZoom * gameObjects[i][j]->GetScale()),
+                                                    (y - height_LowerBound) / (cameraZoom * gameObjects[i][j]->GetScale()));
 
                     if (color.r == 0 && color.g == 0 && color.b == 0)
                     {
@@ -120,9 +108,8 @@ UIElement *selectUI(int x, int y)
             if (y >= height_LowerBound && y <= height_UpperBound)
             {
                 SDL_Color color = GetPixelColor(uiElements[i]->GetSurface(),
-                                                (x - width_LowerBound) / (uiElements[i]->GetSize() * uiElements[i]->GetScale()),
-                                                (y - height_LowerBound) / (uiElements[i]->GetSize() * uiElements[i]->GetScale()));
-                // std::cout << uiElements[i]->GetName() << std::endl;
+                                                (x - width_LowerBound) / (cameraZoom * uiElements[i]->GetScale()),
+                                                (y - height_LowerBound) / (cameraZoom * uiElements[i]->GetScale()));
                 if (color.r == 0 && color.g == 0 && color.b == 0 && uiElements[i]->GetName() == "claim peak button")
                 {
                     continue;
@@ -153,8 +140,8 @@ Piece *selectPiece(int x, int y)
             {
 
                 SDL_Color color = GetPixelColor(pieces[i]->GetSurface(),
-                                                (x - width_LowerBound) / (pieces[i]->GetSize() * pieces[i]->GetScale()),
-                                                (y - height_LowerBound) / (pieces[i]->GetSize() * pieces[i]->GetScale()));
+                                                (x - width_LowerBound) / (cameraZoom * pieces[i]->GetScale()),
+                                                (y - height_LowerBound) / (cameraZoom * pieces[i]->GetScale()));
                 if (color.r == 0 && color.g == 0 && color.b == 0)
                 {
                     continue;
@@ -189,8 +176,8 @@ Terrain *selectTerrain(int x, int y)
                 {
 
                     SDL_Color color = GetPixelColor(terrain[i][j]->GetSurface(),
-                                                    (x - width_LowerBound) / (terrain[i][j]->GetSize() * terrain[i][j]->GetScale()),
-                                                    (y - height_LowerBound) / (terrain[i][j]->GetSize() * terrain[i][j]->GetScale()));
+                                                    (x - width_LowerBound) / (cameraZoom * terrain[i][j]->GetScale()),
+                                                    (y - height_LowerBound) / (cameraZoom * terrain[i][j]->GetScale()));
 
                     if (color.r == 0 && color.g == 0 && color.b == 0)
                     {
@@ -218,8 +205,8 @@ Item *selectItem(int x, int y)
             {
 
                 SDL_Color color = GetPixelColor(currentTurn->inventory[i]->GetSurface(),
-                                                (x - width_LowerBound) / (currentTurn->inventory[i]->GetSize() * currentTurn->inventory[i]->GetScale()),
-                                                (y - height_LowerBound) / (currentTurn->inventory[i]->GetSize() * currentTurn->inventory[i]->GetScale()));
+                                                (x - width_LowerBound) / (cameraZoom * currentTurn->inventory[i]->GetScale()),
+                                                (y - height_LowerBound) / (cameraZoom * currentTurn->inventory[i]->GetScale()));
                 if (color.r == 0 && color.g == 0 && color.b == 0)
                 {
                     continue;
@@ -238,73 +225,17 @@ void moveSelectedObject(GameObject *gameObject, Input *playerInput)
 {
     if (gameObject->GetMovable())
     {
+        std::pair<float, float> prevPosition = gameObject->GetPosition();
         gameObject->SetCenter(gameObject->GetCenter().first + playerInput->currentMousePosition.first - playerInput->prevMousePosition.first,
                               gameObject->GetCenter().second + playerInput->currentMousePosition.second - playerInput->prevMousePosition.second);
+        gameObject->globalPosition.first += (gameObject->GetPosition().first - prevPosition.first) / cameraZoom;
+        gameObject->globalPosition.second += (gameObject->GetPosition().second - prevPosition.second) / cameraZoom;
+
         Terrain *terrain_under = selectTerrain(gameObject->GetBottomMiddle().first, gameObject->GetBottomMiddle().second);
         if (hoveringTerrain != terrain_under)
         {
             hoveringTerrain = terrain_under;
             validMove = CheckMovementPossibility(dynamic_cast<Piece *>(gameObject), hoveringTerrain);
-        }
-    }
-}
-
-void RecenterScreen(Input *playerInput)
-{
-    if (gameObjects[0][0]->GetPosition().first > 0)
-    {
-        for (int i = gameObjects.size() - 1; i >= 0; i--)
-        {
-            for (int j = gameObjects[i].size() - 1; j >= 0; j--)
-            {
-                if (gameObjects[i][j]->GetResizable())
-                {
-                    gameObjects[i][j]->SetPosition(gameObjects[i][j]->GetPosition().first - gameObjects[0][0]->GetPosition().first,
-                                                   gameObjects[i][j]->GetPosition().second);
-                }
-            }
-        }
-    }
-    if (gameObjects[0][0]->GetPosition().first + gameObjects[0][0]->GetDimensions().first * gameObjects[0][0]->GetSize() < SCREEN_WIDTH)
-    {
-        for (int i = gameObjects.size() - 1; i >= 0; i--)
-        {
-            for (int j = gameObjects[i].size() - 1; j >= 0; j--)
-            {
-                if (gameObjects[i][j]->GetResizable())
-                {
-                    gameObjects[i][j]->SetPosition(gameObjects[i][j]->GetPosition().first + (SCREEN_WIDTH - (gameObjects[0][0]->GetPosition().first + gameObjects[0][0]->GetDimensions().first * gameObjects[0][0]->GetSize())),
-                                                   gameObjects[i][j]->GetPosition().second);
-                }
-            }
-        }
-    }
-    if (gameObjects[0][0]->GetPosition().second > 0)
-    {
-        for (int i = gameObjects.size() - 1; i >= 0; i--)
-        {
-            for (int j = gameObjects[i].size() - 1; j >= 0; j--)
-            {
-                if (gameObjects[i][j]->GetResizable())
-                {
-                    gameObjects[i][j]->SetPosition(gameObjects[i][j]->GetPosition().first,
-                                                   gameObjects[i][j]->GetPosition().second - gameObjects[0][0]->GetPosition().second);
-                }
-            }
-        }
-    }
-    if (gameObjects[0][0]->GetPosition().second + gameObjects[0][0]->GetDimensions().second * gameObjects[0][0]->GetSize() < SCREEN_HEIGHT)
-    {
-        for (int i = gameObjects.size() - 1; i >= 0; i--)
-        {
-            for (int j = gameObjects[i].size() - 1; j >= 0; j--)
-            {
-                if (gameObjects[i][j]->GetResizable())
-                {
-                    gameObjects[i][j]->SetPosition(gameObjects[i][j]->GetPosition().first,
-                                                   gameObjects[i][j]->GetPosition().second + (SCREEN_HEIGHT - (gameObjects[0][0]->GetPosition().second + gameObjects[0][0]->GetDimensions().second * gameObjects[0][0]->GetSize())));
-                }
-            }
         }
     }
 }

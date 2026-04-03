@@ -29,8 +29,6 @@ public:
         OCEAN_TILE = 7
     };
 
-    float GetSize() const { return size; }
-
 protected:
     string name;
     SDL_Texture *texture;
@@ -39,8 +37,6 @@ protected:
     bool selectable = false;
     bool rendered = true;
     SDL_FRect *renderRect = new SDL_FRect();
-    float size;
-    pair<float, float> defaultPosition;
     pair<float, float> position;
     pair<float, float> dimensions;
     pair<float, float> center;
@@ -83,14 +79,14 @@ public:
     void SetSelectable(bool s) { selectable = s; }
     void SetScale(float s) { scale = s; }
     void SetPosition(float x, float y, bool posOnly = false);
-    void SetDefaultPosition(float x, float y);
     virtual void SetCenter(float x = 0, float y = 0, bool centerOnly = false);
     void SetMovable(bool m);
     void SetRendered(bool r);
-    void AdjustSize(float multiplier = 1, int w = 0, int h = 0);
     virtual void RenderGameObject(SDL_Renderer *renderer);
     void SetBottomRight(float x = 0, float y = 0, bool brOnly = false);
     void SetBottomMiddle(float x = 0, float y = 0, bool bmOnly = false);
+
+    pair<float, float> globalPosition;
 };
 
 class Peak;

@@ -9,8 +9,11 @@ bool Move(Piece* piece, Terrain* startingPoint, Terrain* targetTerrain, int& mov
     bool moveSuccess = MovementAttempt(heightDifference, moveCount, startingPoint, targetTerrain, currentPath, false);
 
     if (!moveSuccess) {
+        std::pair<float, float> originalPosition = piece->GetPosition();
         piece->SetCenter(piece->GetDesignatedLocation().first, piece->GetCenter().second);
         piece->SetBottomRight(piece->GetBottomRight().first, piece->GetDesignatedLocation().second);
+        piece->globalPosition.first += (piece->GetPosition().first - originalPosition.first) / cameraZoom;
+        piece->globalPosition.second += (piece->GetPosition().second - originalPosition.second) / cameraZoom;
     } else {
         movesLeft = movesLeft - moveCount;
         piece->SetDesignatedLocation(piece->GetCenter().first, piece->GetBottomRight().second);
@@ -23,11 +26,7 @@ bool Move(Piece* piece, Terrain* startingPoint, Terrain* targetTerrain, int& mov
             }
         }
         if (targetTerrain != NULL) targetTerrain->occupants.push_back(piece);
-        if (targetTerrain != NULL && targetTerrain->type == GameObject::PEAK) {
-            RefreshClaimNotifs(dynamic_cast<Peak *>(targetTerrain), piece);
-        } else {
-            RefreshClaimNotifs();
-        }
+        RefreshClaimNotifs();
         if (targetTerrain == NULL)  {
             piece->SetCurrentAnimation(piece->animations["floatIdle"]);
             piece->SetSurface(surfaces[currentTurn->GetName() + " piece float"]);
