@@ -12,7 +12,6 @@ void ResetMap()
         for (int j = 0; j < terrain[i].size(); j++)
         {
             terrain[i][j] = nullptr;
-            terrainOutlines[i][j] = nullptr;
         }
     }
 
@@ -70,7 +69,6 @@ void ResetMap()
 
     std::vector<Piece *> newPieces;
     std::vector<std::vector<Terrain *>> newTerrain;
-    std::vector<std::vector<GameObject *>> newTerrainOutlines;
     std::vector<std::vector<GameObject *>> newGameObjects;
     std::vector<Peak *> newPeaks;
     std::vector<UIElement *> newUIElements;
@@ -87,7 +85,6 @@ void ResetMap()
     uiElements = newUIElements;
     pieces = newPieces;
     terrain = newTerrain;
-    terrainOutlines = newTerrainOutlines;
     gameObjects = newGameObjects;
     peaks = newPeaks;
     if (state == GAME)
@@ -127,19 +124,16 @@ void loadGame()
 bool loadMap()
 {
 
-    // Loading success flag
     bool success = true;
 
-    // Load splash image
     GameObject *water = new GameObject("water", textures["water"][0], surfaces["water"], false, true);
 
-    water->SetPosition(0, 0);
+    water->SetGlobalPosition(0, 0);
 
     for (int i = 0; i < rules->GetMaxHeight() + 1; i++)
     {
         gameObjects.push_back(vector<GameObject *>());
         terrain.push_back(vector<Terrain *>());
-        terrainOutlines.push_back(vector<GameObject *>());
     }
 
     gameObjects[0].push_back(water);
@@ -195,7 +189,7 @@ void loadGamePieces()
             Piece *flag = new Piece(playerNumber, textures[flagName][0], surfaces[flagName], false);
             flag->SetScale(3);
             flag->SetBottomMiddle(peaks[i]->GetCenter().first, peaks[i]->GetCenter().second);
-            flag->globalPosition = flag->GetPosition();
+
             pieces.push_back(flag);
             gameObjects[gameObjects.size() - 2].push_back(flag);
             peaks[i]->flags.push_back(flag);
@@ -234,7 +228,7 @@ void loadGamePieces()
                     x = (rand() % (int)(MAP_WIDTH * 3)) - MAP_WIDTH / 4;
                     y = (rand() % (int)(MAP_HEIGHT * 3)) - MAP_HEIGHT / 4;
                 }
-            } while (selectTerrain(x, y) != NULL || selectUI(x, y) != NULL);
+            } while (selectTerrain(x, y, false) != NULL || selectUI(x, y, false) != NULL);
 
             Piece *piece = new Piece(pieceName + " " + std::to_string(i), textures[pieceName][0], surfaces[pieceName], true);
             piece->SetScale(3);
@@ -252,9 +246,6 @@ void loadGamePieces()
             pieces.push_back(piece);
             player->soldiers.push_back(piece);
             piece->SetPlayer(player);
-
-            piece->globalPosition = piece->GetPosition();
-            std::cout << "Piece " << piece->GetName() << " spawned at (" << piece->globalPosition.first << ", " << piece->globalPosition.second << ")" << std::endl;
         }
     }
 
@@ -306,39 +297,38 @@ void loadUI()
     UIElement *resetButton = new UIElement("reset button", textures["reset"][0], surfaces["reset"], true, true);
     uiElements.push_back(resetButton);
     gameObjects[gameObjects.size() - 1].push_back(resetButton);
-    resetButton->SetPosition(0, 0);
-    resetButton->globalPosition = resetButton->GetPosition();
+    resetButton->SetGlobalPosition(0, 0);
+
     UIElement *die1 = new UIElement("dieOne", textures["die 1"][0], surfaces["die 1"], true, true);
     die1->SetScale(0.1);
     uiElements.push_back(die1);
     gameObjects[gameObjects.size() - 1].push_back(die1);
-    die1->SetPosition(SCREEN_WIDTH - (die1->GetDimensions().first * die1->GetScale()) - 10, 10);
-    die1->globalPosition = die1->GetPosition();
+    die1->SetGlobalPosition(SCREEN_WIDTH - (die1->GetDimensions().first * die1->GetScale()) - 10, 10);
+
     UIElement *die2 = new UIElement("dieTwo", textures["die 2"][0], surfaces["die 2"], true, true);
     die2->SetScale(0.1);
     uiElements.push_back(die2);
     gameObjects[gameObjects.size() - 1].push_back(die2);
-    die2->SetPosition(SCREEN_WIDTH - ((die1->GetDimensions().first * die1->GetScale()) + 10) * 2, 10);
-    die2->globalPosition = die2->GetPosition();
+    die2->SetGlobalPosition(SCREEN_WIDTH - ((die1->GetDimensions().first * die1->GetScale()) + 10) * 2, 10);
+
     UIElement *movesLeftText = new UIElement("movesLeftText", textures["moves left"][0], surfaces["moves left"], true, false);
     movesLeftText->SetScale(0.1);
     uiElements.push_back(movesLeftText);
     gameObjects[gameObjects.size() - 1].push_back(movesLeftText);
-    movesLeftText->SetPosition(0, SCREEN_HEIGHT - (movesLeftText->GetDimensions().second * movesLeftText->GetScale()));
-    movesLeftText->globalPosition = movesLeftText->GetPosition();
+    movesLeftText->SetGlobalPosition(0, SCREEN_HEIGHT - (movesLeftText->GetDimensions().second * movesLeftText->GetScale()));
+
     UIElement *movesLeftCount = new UIElement("movesLeftCount", textures["moves left 3"][0], surfaces["moves left 3"], true, false);
     movesLeftCount->SetScale(0.1);
     uiElements.push_back(movesLeftCount);
     gameObjects[gameObjects.size() - 1].push_back(movesLeftCount);
-    movesLeftCount->SetPosition(0, SCREEN_HEIGHT - (movesLeftCount->GetDimensions().second * movesLeftCount->GetScale()));
-    movesLeftCount->globalPosition = movesLeftCount->GetPosition();
+    movesLeftCount->SetGlobalPosition(0, SCREEN_HEIGHT - (movesLeftCount->GetDimensions().second * movesLeftCount->GetScale()));
+
     UIElement *finishTurnButton = new UIElement("finish turn button", textures["finish turn"][0], surfaces["finish turn"], true, true);
     finishTurnButton->SetScale(0.1);
-    finishTurnButton->SetPosition(SCREEN_WIDTH - (finishTurnButton->GetDimensions().first * finishTurnButton->GetScale()) - 10,
+    finishTurnButton->SetGlobalPosition(SCREEN_WIDTH - (finishTurnButton->GetDimensions().first * finishTurnButton->GetScale()) - 10,
                                   SCREEN_HEIGHT - (finishTurnButton->GetDimensions().second * finishTurnButton->GetScale()) - 10);
     uiElements.push_back(finishTurnButton);
     gameObjects[gameObjects.size() - 1].push_back(finishTurnButton);
-    finishTurnButton->globalPosition = finishTurnButton->GetPosition();
 
     for (int i = 0; i < peaks.size(); i++)
     {
@@ -349,7 +339,6 @@ void loadUI()
         uiElements.push_back(claimPeakButton);
         gameObjects[gameObjects.size() - 1].push_back(claimPeakButton);
         peaks[i]->SetClaimNotif(claimPeakButton);
-        claimPeakButton->globalPosition = claimPeakButton->GetPosition();
     }
     currentRoll = Roll();
     movesLeft = currentRoll;
@@ -370,17 +359,16 @@ void GeneratePixels()
 
             int x = i * width + width / 2;
             int y = j * height + height / 2;
-            Terrain *currentTerrain = selectTerrain(x, y);
+            Terrain *currentTerrain = selectTerrain(x, y, false);
             if (currentTerrain == nullptr)
                 continue;
 
             Pixel *pixel = new Pixel("pixel", textures["pixel"][0], surfaces["pixel"], false, true);
 
-            pixel->SetHiddenTerrain(selectTerrain(x, y));
-            pixel->SetPosition(x - width / 2, y - height / 2);
+            pixel->SetHiddenTerrain(selectTerrain(x, y, false));
+            pixel->SetGlobalPosition(x - width / 2, y - height / 2);
             pixel->SetWidth(width);
             pixel->SetHeight(height);
-            pixel->globalPosition = pixel->GetPosition();
 
             SDL_Color pixelColor;
             if (pixel->GetHiddenTerrain()->GetLayer() == 1 && pixel->GetHiddenTerrain()->GetBiome() == "plains")
@@ -432,10 +420,9 @@ void GenerateOcean()
         {
             int index = rand() % 20 + 1;
             OceanTile *oceanTile = new OceanTile("ocean tile edge (" + to_string(i) + ", " + to_string(j) + ")", textures["tile " + to_string(index)][0], surfaces["tile " + to_string(index)], false, true);
-            oceanTile->SetPosition(i * 128 * scale + MAP_WIDTH / 2, j * 128 * scale + MAP_HEIGHT / 2);
-            oceanTile->globalPosition = oceanTile->GetPosition();
+            oceanTile->SetGlobalPosition(i * 128 * scale + MAP_WIDTH / 2, j * 128 * scale + MAP_HEIGHT / 2);
             oceanTile->SetScale(scale);
-            
+
             ocean[i + 10].push_back(oceanTile);
             gameObjects[0].push_back(oceanTile);
         }

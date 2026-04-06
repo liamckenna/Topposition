@@ -171,7 +171,7 @@ void MouseButtonDownMainMenu(Input *playerInput, SDL_MouseButtonEvent &event)
     switch (event.button)
     {
     case SDL_BUTTON_LEFT:
-        selectedObject = selectUI(playerInput->currentMousePosition.first, playerInput->currentMousePosition.second);
+        selectedObject = selectUI(playerInput->currentMousePosition.first, playerInput->currentMousePosition.second, false);
         break;
     case SDL_BUTTON_RIGHT:
         break;
@@ -187,7 +187,7 @@ void MouseButtonDownGame(Input *playerInput, SDL_MouseButtonEvent &event)
     switch (event.button)
     {
     case SDL_BUTTON_LEFT:
-        selectedObject = selectUI(playerInput->currentMousePosition.first, playerInput->currentMousePosition.second);
+        selectedObject = selectUI(playerInput->currentMousePosition.first, playerInput->currentMousePosition.second, false);
         if (selectedObject == nullptr && !playerInput->GetMouseButtonDown("Middle"))
         {
             selectedObject = selectItem(playerInput->currentMousePosition.first,

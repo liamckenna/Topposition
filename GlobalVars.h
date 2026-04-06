@@ -42,8 +42,6 @@ extern std::vector<std::vector<Terrain *>> terrain;
 
 extern std::vector<Pixel *> pixels;
 
-extern std::vector<std::vector<GameObject *>> terrainOutlines;
-
 extern std::vector<UIElement *> uiElements;
 
 extern std::vector<Piece *> pieces;

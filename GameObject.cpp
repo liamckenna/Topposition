@@ -9,7 +9,8 @@ GameObject::GameObject(string name, SDL_Texture *texture, SDL_Surface *surface, 
     this->surface = surface;
     SDL_GetTextureSize(texture, &dimensions.first, &dimensions.second);
 
-    SetPosition(0, 0, true);
+    SetGlobalPosition(0, 0);
+    globalPosition = std::make_pair(position.first, position.second);
     SetCenter();
     movable = m;
     rendered = r;
@@ -58,10 +59,56 @@ void GameObject::RenderGameObject(SDL_Renderer *renderer)
     }
 }
 
+pair<float, float> GameObject::GetPosition(bool update)
+{
+    if (update)
+    {
+        position.first = (globalPosition.first - cameraPosition.first) * cameraZoom;
+        position.second = (globalPosition.second - cameraPosition.second) * cameraZoom;
+    }
+    return position;
+}
+
+pair<float, float> GameObject::GetBottomRight(bool update)
+{
+    if (update)
+    {
+        bottomRight.first = (globalPosition.first - cameraPosition.first + (dimensions.first * scale)) * cameraZoom;
+        bottomRight.second = (globalPosition.second - cameraPosition.second + (dimensions.second * scale)) * cameraZoom;
+    }
+    return bottomRight;
+}
+
+pair<float, float> GameObject::GetBottomMiddle(bool update)
+{
+    if (update)
+    {
+        center.first = (globalPosition.first - cameraPosition.first + (dimensions.first * scale) / 2) * cameraZoom;
+        bottomRight.second = (globalPosition.second - cameraPosition.second + (dimensions.second * scale)) * cameraZoom;
+    }
+    return std::make_pair(center.first, bottomRight.second);
+}
+
+    void GameObject::SetGlobalPosition(float x, float y)
+{
+    globalPosition.first = x;
+    globalPosition.second = y;
+
+    position.first = (x - cameraPosition.first) * cameraZoom;
+    position.second = (y - cameraPosition.second) * cameraZoom;
+
+    SetCenter();
+    SetBottomRight();
+}
+
 void GameObject::SetPosition(float x, float y, bool posOnly)
 {    
     position.first = x;
     position.second = y;
+
+    globalPosition.first = x / cameraZoom + cameraPosition.first;
+    globalPosition.second = y / cameraZoom + cameraPosition.second;
+
     if (!posOnly)
     {
         SetCenter();
@@ -78,19 +125,13 @@ void GameObject::SetCenter(float x, float y, bool centerOnly)
     }
     else
     {
+        center.first = x;
+        center.second = y;
+        
         if (!centerOnly)
         {
-            center.first = x;
-            center.second = y;
-            position.first = center.first - (dimensions.first * cameraZoom * scale) / 2;
-            position.second = center.second - (dimensions.second * cameraZoom * scale) / 2;
-
+            SetPosition(center.first - (dimensions.first * cameraZoom * scale) / 2, center.second - (dimensions.second * cameraZoom * scale) / 2, true);
             SetBottomRight();
-        }
-        else
-        {
-            center.first = x;
-            center.second = y;
         }
     }
 }
@@ -115,19 +156,12 @@ void GameObject::SetBottomRight(float x, float y, bool brOnly)
     }
     else
     {
+        bottomRight.first = x;
+        bottomRight.second = y;
         if (!brOnly)
         {
-            bottomRight.first = x;
-            bottomRight.second = y;
-            position.first = bottomRight.first - (dimensions.first * cameraZoom * scale);
-            position.second = bottomRight.second - (dimensions.second * cameraZoom * scale);
-
+            SetPosition(bottomRight.first - (dimensions.first * cameraZoom * scale), bottomRight.second - (dimensions.second * cameraZoom * scale), true);
             SetCenter();
-        }
-        else
-        {
-            bottomRight.first = x;
-            bottomRight.second = y;
         }
     }
 }
@@ -142,23 +176,14 @@ void GameObject::SetBottomMiddle(float x, float y, bool bmOnly)
     }
     else
     {
+        center.first = x;
+        bottomRight.second = y;
+
         if (!bmOnly)
         {
-            center.first = x;
-            bottomRight.second = y;
-            position.first = center.first - (dimensions.first * cameraZoom * scale) / 2;
-            position.second = bottomRight.second - (dimensions.second * cameraZoom * scale);
-
-            globalPosition.first = (position.first / cameraZoom) + cameraPosition.first;
-            globalPosition.second = (position.second / cameraZoom) + cameraPosition.second;
-
+            SetPosition(center.first - (dimensions.first * cameraZoom * scale) / 2, bottomRight.second - (dimensions.second * cameraZoom * scale), true);
             SetCenter();
             SetBottomRight();
-        }
-        else
-        {
-            center.first = x;
-            bottomRight.second = y;
         }
     }
 }
@@ -262,8 +287,8 @@ void Pixel::RenderGameObject(SDL_Renderer *renderer, Terrain *hoveringTerrain)
         SDL_SetTextureColorMod(texture, color.r, color.g, color.b);
     }
 
-    renderRect->x = position.first - hiddenTerrain->GetPosition().first;
-    renderRect->y = position.second - hiddenTerrain->GetPosition().second;
+    renderRect->x = globalPosition.first - hiddenTerrain->GetPosition().first;
+    renderRect->y = globalPosition.second - hiddenTerrain->GetPosition().second;
     renderRect->w = (width + 2);
     renderRect->h = (height + 2);
     SDL_RenderTexture(renderer, texture, NULL, renderRect);

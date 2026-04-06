@@ -96,9 +96,7 @@ void renderOcean()
             float dxf = speed * deltaTime / 1000.f;
             float dyf = speed * deltaTime / 1000.f;
 
-            ocean[i][j]->SetPosition(ocean[i][j]->GetPosition().first + dxf, ocean[i][j]->GetPosition().second + dyf);
-            ocean[i][j]->globalPosition.first += dxf;
-            ocean[i][j]->globalPosition.second += dyf;
+            ocean[i][j]->SetGlobalPosition(ocean[i][j]->globalPosition.first + dxf, ocean[i][j]->globalPosition.second + dyf);
             ocean[i][j]->CheckTimer();
             ocean[i][j]->RenderGameObject(renderer);
         }

@@ -12,8 +12,8 @@ bool Move(Piece* piece, Terrain* startingPoint, Terrain* targetTerrain, int& mov
         std::pair<float, float> originalPosition = piece->GetPosition();
         piece->SetCenter(piece->GetDesignatedLocation().first, piece->GetCenter().second);
         piece->SetBottomRight(piece->GetBottomRight().first, piece->GetDesignatedLocation().second);
-        piece->globalPosition.first += (piece->GetPosition().first - originalPosition.first) / cameraZoom;
-        piece->globalPosition.second += (piece->GetPosition().second - originalPosition.second) / cameraZoom;
+        //piece->globalPosition.first += (piece->GetPosition().first - originalPosition.first) / cameraZoom;
+        //piece->globalPosition.second += (piece->GetPosition().second - originalPosition.second) / cameraZoom;
     } else {
         movesLeft = movesLeft - moveCount;
         piece->SetDesignatedLocation(piece->GetCenter().first, piece->GetBottomRight().second);

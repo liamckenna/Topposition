@@ -48,7 +48,7 @@ protected:
 public:
     enum objectType type = GENERIC;
     GameObject(string name, SDL_Texture *texture, SDL_Surface *surface, bool m, bool r);
-    pair<float, float> GetPosition() { return position; }
+    pair<float, float> GetPosition(bool update = true);
     pair<float, float> GetDimensions() { return dimensions; }
     string GetName() { return name; }
     SDL_Texture *GetTexture() { return texture; }
@@ -63,14 +63,8 @@ public:
     bool GetResizable() const { return resizable; }
     SDL_FRect *GetRectangle() const { return renderRect; }
     Animation *GetCurrentAnimation() const { return currentAnimation; }
-    pair<float, float> GetBottomRight() { return bottomRight; }
-    pair<float, float> GetBottomMiddle()
-    {
-        std::pair<float, float> bm;
-        bm.first = center.first;
-        bm.second = bottomRight.second;
-        return bm;
-    }
+    pair<float, float> GetBottomRight(bool update = true);
+    pair<float, float> GetBottomMiddle(bool update = true);
     void SetCurrentAnimation(Animation *ca) { currentAnimation = ca; }
     void SetRectangle(SDL_FRect *r) { renderRect = r; }
     void SetResizable(bool r) { resizable = r; }
@@ -78,6 +72,7 @@ public:
     void SetSurface(SDL_Surface *s) { surface = s; }
     void SetSelectable(bool s) { selectable = s; }
     void SetScale(float s) { scale = s; }
+    void SetGlobalPosition(float x, float y);
     void SetPosition(float x, float y, bool posOnly = false);
     virtual void SetCenter(float x = 0, float y = 0, bool centerOnly = false);
     void SetMovable(bool m);
@@ -101,7 +96,6 @@ protected:
     Peak *peak;
     Terrain *upperTerrain = nullptr;
     Terrain *lowerTerrain = nullptr;
-    GameObject *outline = nullptr;
     int offsetX;
     int offsetY;
     SDL_Color color;
@@ -134,7 +128,6 @@ public:
     double GetRotation() const { return rotation; }
     Terrain *GetUpperTerrain() { return upperTerrain; }
     Terrain *GetLowerTerrain() { return lowerTerrain; }
-    GameObject *GetOutline() { return outline; }
     int GetOffsetX() { return offsetX; }
     int GetOffsetY() { return offsetY; }
     string GetBiome() { return biome; }
@@ -143,7 +136,6 @@ public:
     void SetColor(SDL_Color c) { color = c; }
     void SetOffsetX(int ox) { offsetX = ox; }
     void SetOffsetY(int oy) { offsetY = oy; }
-    void SetOutline(GameObject *o) { outline = o; }
     void SetUpperTerrain(Terrain *ut) { upperTerrain = ut; }
     void SetLowerTerrain(Terrain *lt) { lowerTerrain = lt; }
     void SetRotation(double r) { rotation = r; }
@@ -246,7 +238,6 @@ class Pixel : public GameObject
     SDL_Color color;
     int width;
     int height;
-    bool outline = false;
 
 public:
     Pixel(string name, SDL_Texture *texture, SDL_Surface *surface, bool m, bool r) : GameObject(name, texture, surface, false, r)
@@ -259,10 +250,8 @@ public:
     void SetColor(SDL_Color c) { color = c; }
     void SetWidth(int w) { width = w; }
     void SetHeight(int h) { height = h; }
-    void SetOutline(bool o) { outline = o; }
 
     SDL_Color GetColor() { return color; }
-    bool GetOutline() { return outline; }
     Terrain *GetHiddenTerrain() { return hiddenTerrain; }
 };
 

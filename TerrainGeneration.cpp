@@ -17,20 +17,11 @@ void GeneratePeak()
     peak->SetScale(0.1);
     peak->SetScale(peak->GetScale() * 2);
     peak->SetCenter(x, y);
-    peak->globalPosition = peak->GetPosition();
+    //peak->globalPosition = std::make_pair(peak->GetCenter().first - (peak->GetDimensions().first * peak->GetScale()) / 2, peak->GetCenter().second - (peak->GetDimensions().second * peak->GetScale()) / 2);
     peaks.push_back(peak);
     peak->SetPeakID(peaks.size());
     terrain[height].push_back(peak);
     gameObjects[height].push_back(peak);
-
-    string outlineName = "outline " + to_string(shape);
-    GameObject *outline = new GameObject(outlineName, textures[outlineName][height], surfaces[outlineName], false, true);
-    outline->SetScale(0.1);
-    outline->SetCenter(x, y);
-    outline->globalPosition = outline->GetPosition();
-    terrainOutlines[height].push_back(outline);
-    gameObjects[height].push_back(outline);
-    peak->SetOutline(outline);
 
     int itemChance = (rand() % 100) + 1;
     float odds = (float)height / (float)rules->GetMaxHeight() * 100;
@@ -51,7 +42,7 @@ void GeneratePeak()
             pieces.push_back(item);
             item->SetScale(0.05);
             item->SetCenter(peak->GetCenter().first, peak->GetCenter().second);
-            item->globalPosition = item->GetPosition();
+            //item->globalPosition = std::make_pair(item->GetCenter().first - (item->GetDimensions().first * item->GetScale()) / 2, item->GetCenter().second - (item->GetDimensions().second * item->GetScale()) / 2);
             gameObjects[height].push_back(item);
             peak->SetItem(item);
         }
@@ -63,14 +54,12 @@ void GeneratePeak()
         int b = (rand() % MAP_HEIGHT) * 2;
 
         peak->SetCenter(a, b);
-        peak->globalPosition = peak->GetPosition();
-        outline->SetCenter(a, b);
-        outline->globalPosition = outline->GetPosition();
+        //peak->globalPosition = std::make_pair(a - (peak->GetDimensions().first * peak->GetScale()) / 2, b - (peak->GetDimensions().second * peak->GetScale()) / 2);
 
         if (peak->GetItem() != nullptr)
         {
             peak->GetItem()->SetCenter(a, b);
-            peak->GetItem()->globalPosition = peak->GetItem()->GetPosition();
+            //peak->GetItem()->globalPosition = std::make_pair(a - (peak->GetItem()->GetDimensions().first * peak->GetItem()->GetScale()) / 2, b - (peak->GetItem()->GetDimensions().second * peak->GetItem()->GetScale()) / 2);
         }
     }
     SDL_Color color;
@@ -117,7 +106,7 @@ void GenerateTerrain(Peak *peak, int shape, int height)
         if (negativeY == 1)
             offsetY *= -1;
         layer->SetCenter(above->GetCenter().first + offsetX, above->GetCenter().second + offsetY);
-        layer->globalPosition = layer->GetPosition();
+        //layer->globalPosition = std::make_pair(layer->GetCenter().first - (layer->GetDimensions().first * layer->GetScale()) / 2, layer->GetCenter().second - (layer->GetDimensions().second * layer->GetScale()) / 2);
         while (!TerrainIsSurrounded(above, layer))
         {
             offsetX = rand() % 20;
@@ -129,7 +118,7 @@ void GenerateTerrain(Peak *peak, int shape, int height)
             if (negativeY == 1)
                 offsetY *= -1;
             layer->SetCenter(above->GetCenter().first + offsetX, above->GetCenter().second + offsetY);
-            layer->globalPosition = layer->GetPosition();
+            //layer->globalPosition = std::make_pair(layer->GetCenter().first - (layer->GetDimensions().first * layer->GetScale()) / 2, layer->GetCenter().second - (layer->GetDimensions().second * layer->GetScale()) / 2);
         }
         layer->SetOffsetX(offsetX);
         layer->SetOffsetY(offsetY);
@@ -148,15 +137,6 @@ void GenerateTerrain(Peak *peak, int shape, int height)
         gameObjects[i].push_back(layer);
         terrain[i].push_back(layer);
         peak->childTerrain.push_back(layer);
-
-        string outlineName = "outline " + to_string(shape);
-        GameObject *outline = new GameObject(outlineName, textures[outlineName][i], surfaces[outlineName], false, true);
-        outline->SetScale(peak->GetScale() + 0.1 * (height - i));
-        outline->SetCenter(peak->GetCenter().first, peak->GetCenter().second);
-        outline->globalPosition = outline->GetPosition();
-        terrainOutlines[i].push_back(outline);
-        gameObjects[i].push_back(outline);
-        layer->SetOutline(outline);
     }
 }
 
@@ -520,11 +500,11 @@ void GroomTerrain()
                 int b = (rand() % MAP_HEIGHT) * 2;
 
                 peaks[i]->SetCenter(a, b);
-                peaks[i]->globalPosition = peaks[i]->GetPosition();
+                //peaks[i]->globalPosition = std::make_pair(peaks[i]->GetCenter().first - (peaks[i]->GetDimensions().first * peaks[i]->GetScale()) / 2, peaks[i]->GetCenter().second - (peaks[i]->GetDimensions().second * peaks[i]->GetScale()) / 2);
                 if (peaks[i]->GetItem() != nullptr)
                 {
                     peaks[i]->GetItem()->SetCenter(a, b);
-                    peaks[i]->GetItem()->globalPosition = peaks[i]->GetItem()->GetPosition();
+                    //peaks[i]->GetItem()->globalPosition = std::make_pair(peaks[i]->GetItem()->GetCenter().first - (peaks[i]->GetItem()->GetDimensions().first * peaks[i]->GetItem()->GetScale()) / 2, peaks[i]->GetItem()->GetCenter().second - (peaks[i]->GetItem()->GetDimensions().second * peaks[i]->GetItem()->GetScale()) / 2);
                 }
                 moveCount++;
             }
@@ -542,7 +522,7 @@ void GroomTerrain()
                     above = peaks[i]->childTerrain[j - 1];
                 }
                 current->SetCenter(above->GetCenter().first + current->GetOffsetX(), above->GetCenter().second + current->GetOffsetY());
-                current->globalPosition = current->GetPosition();
+                //current->globalPosition = std::make_pair(current->GetCenter().first - (current->GetDimensions().first * current->GetScale()) / 2, current->GetCenter().second - (current->GetDimensions().second * current->GetScale()) / 2);
             }
         }
     }

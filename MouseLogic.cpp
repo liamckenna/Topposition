@@ -19,24 +19,6 @@ void zoom(SDL_MouseWheelEvent &event, Input *playerInput)
     cameraPosition.second += (mouseY / prevCameraZoom) - (mouseY / cameraZoom);
     //std::cout << "Camera Position: " << cameraPosition.first << ", " << cameraPosition.second << std::endl;
 
-    for (int i = 0; i < gameObjects.size(); i++)
-    {
-        for (int j = 0; j < gameObjects[i].size(); j++)
-        {
-            if (gameObjects[i][j]->GetResizable())
-            {
-                relativePositionB4.first = (gameObjects[i][j]->GetPosition().first - mouseX) / prevCameraZoom;
-                relativePositionB4.second = (gameObjects[i][j]->GetPosition().second - mouseY) / prevCameraZoom;
-
-                gameObjects[i][j]->SetPosition(gameObjects[i][j]->GetCenter().first - (gameObjects[i][j]->GetDimensions().first * cameraZoom * gameObjects[i][j]->GetScale()) / 2, gameObjects[i][j]->GetCenter().second - (gameObjects[i][j]->GetDimensions().second * cameraZoom * gameObjects[i][j]->GetScale()) / 2, true);
-                newRelativePosition.first = (gameObjects[i][j]->GetPosition().first - mouseX) / cameraZoom;
-                newRelativePosition.second = (gameObjects[i][j]->GetPosition().second - mouseY) / cameraZoom;
-
-                gameObjects[i][j]->SetPosition((gameObjects[i][j]->GetPosition().first + (relativePositionB4.first - newRelativePosition.first) * cameraZoom),
-                                               (gameObjects[i][j]->GetPosition().second + (relativePositionB4.second - newRelativePosition.second) * cameraZoom));
-            }
-        }
-    }
 }
 
 void scroll(Input *playerInput)
@@ -44,30 +26,18 @@ void scroll(Input *playerInput)
     cameraPosition.first -= (playerInput->currentMousePosition.first - playerInput->prevMousePosition.first) / cameraZoom;
     cameraPosition.second -= (playerInput->currentMousePosition.second - playerInput->prevMousePosition.second) / cameraZoom;
     //std::cout << "Camera Position: " << cameraPosition.first << ", " << cameraPosition.second << std::endl;
-    for (int i = 0; i < gameObjects.size(); i++)
-    {
-        for (int j = 0; j < gameObjects[i].size(); j++)
-        {
-            if (gameObjects[i][j]->GetResizable())
-            {
-                gameObjects[i][j]->SetPosition(gameObjects[i][j]->GetPosition().first + playerInput->currentMousePosition.first - playerInput->prevMousePosition.first,
-                                               gameObjects[i][j]->GetPosition().second + playerInput->currentMousePosition.second - playerInput->prevMousePosition.second);
-            }
-        }
-    }
 }
 
-GameObject *selectObject(int x, int y)
+GameObject *selectObject(int x, int y, bool update)
 {
-
     for (int i = gameObjects.size() - 1; i >= 0; i--)
     {
         for (int j = gameObjects[i].size() - 1; j >= 0; j--)
         {
-            int width_LowerBound = gameObjects[i][j]->GetPosition().first;
-            int width_UpperBound = gameObjects[i][j]->GetBottomRight().first;
-            int height_LowerBound = gameObjects[i][j]->GetPosition().second;
-            int height_UpperBound = gameObjects[i][j]->GetBottomRight().second;
+            int width_LowerBound = gameObjects[i][j]->GetPosition(update).first;
+            int width_UpperBound = gameObjects[i][j]->GetBottomRight(update).first;
+            int height_LowerBound = gameObjects[i][j]->GetPosition(update).second;
+            int height_UpperBound = gameObjects[i][j]->GetBottomRight(update).second;
 
             if (x >= width_LowerBound && x <= width_UpperBound)
             {
@@ -90,19 +60,29 @@ GameObject *selectObject(int x, int y)
     return nullptr;
 }
 
-UIElement *selectUI(int x, int y)
+UIElement *selectUI(int x, int y, bool update)
 {
-    Print(to_string(uiElements.size()));
     for (int i = 0; i < uiElements.size(); i++)
     {
         if (!uiElements[i]->GetSelectable())
         {
             continue;
         }
-        int width_LowerBound = uiElements[i]->GetPosition().first;
-        int width_UpperBound = uiElements[i]->GetBottomRight().first;
-        int height_LowerBound = uiElements[i]->GetPosition().second;
-        int height_UpperBound = uiElements[i]->GetBottomRight().second;
+        int width_LowerBound, width_UpperBound, height_LowerBound, height_UpperBound;
+        if (!uiElements[i]->GetResizable())
+        {
+            width_LowerBound = uiElements[i]->GetPosition(update).first;
+            width_UpperBound = uiElements[i]->GetBottomRight(update).first;
+            height_LowerBound = uiElements[i]->GetPosition(update).second;
+            height_UpperBound = uiElements[i]->GetBottomRight(update).second;
+        }
+        else
+        {
+            width_LowerBound = uiElements[i]->GetPosition().first;
+            width_UpperBound = uiElements[i]->GetBottomRight().first;
+            height_LowerBound = uiElements[i]->GetPosition().second;
+            height_UpperBound = uiElements[i]->GetBottomRight().second;
+        }
         if (x >= width_LowerBound && x <= width_UpperBound)
         {
             if (y >= height_LowerBound && y <= height_UpperBound)
@@ -124,16 +104,16 @@ UIElement *selectUI(int x, int y)
     return nullptr;
 }
 
-Piece *selectPiece(int x, int y)
+Piece *selectPiece(int x, int y, bool update)
 {
     for (int i = pieces.size() - 1; i >= 0; i--)
     {
         if (!pieces[i]->GetSelectable() || !pieces[i]->GetRendered())
             continue;
-        int width_LowerBound = pieces[i]->GetPosition().first;
-        int width_UpperBound = pieces[i]->GetBottomRight().first;
-        int height_LowerBound = pieces[i]->GetPosition().second;
-        int height_UpperBound = pieces[i]->GetBottomRight().second;
+        int width_LowerBound = pieces[i]->GetPosition(update).first;
+        int width_UpperBound = pieces[i]->GetBottomRight(update).first;
+        int height_LowerBound = pieces[i]->GetPosition(update).second;
+        int height_UpperBound = pieces[i]->GetBottomRight(update).second;
         if (x >= width_LowerBound && x <= width_UpperBound)
         {
             if (y >= height_LowerBound && y <= height_UpperBound)
@@ -159,16 +139,16 @@ Piece *selectPiece(int x, int y)
     return nullptr;
 }
 
-Terrain *selectTerrain(int x, int y)
+Terrain *selectTerrain(int x, int y, bool update)
 {
     for (int i = terrain.size() - 1; i >= 0; i--)
     {
         for (int j = terrain[i].size() - 1; j >= 0; j--)
         {
-            int width_LowerBound = terrain[i][j]->GetPosition().first;
-            int width_UpperBound = terrain[i][j]->GetBottomRight().first;
-            int height_LowerBound = terrain[i][j]->GetPosition().second;
-            int height_UpperBound = terrain[i][j]->GetBottomRight().second;
+            int width_LowerBound = terrain[i][j]->GetPosition(update).first;
+            int width_UpperBound = terrain[i][j]->GetBottomRight(update).first;
+            int height_LowerBound = terrain[i][j]->GetPosition(update).second;
+            int height_UpperBound = terrain[i][j]->GetBottomRight(update).second;
 
             if (x >= width_LowerBound && x <= width_UpperBound)
             {
@@ -191,14 +171,14 @@ Terrain *selectTerrain(int x, int y)
     return nullptr;
 }
 
-Item *selectItem(int x, int y)
+Item *selectItem(int x, int y, bool update)
 {
     for (int i = 0; i < currentTurn->inventory.size(); i++)
     {
-        int width_LowerBound = currentTurn->inventory[i]->GetPosition().first;
-        int width_UpperBound = currentTurn->inventory[i]->GetBottomRight().first;
-        int height_LowerBound = currentTurn->inventory[i]->GetPosition().second;
-        int height_UpperBound = currentTurn->inventory[i]->GetBottomRight().second;
+        int width_LowerBound = currentTurn->inventory[i]->GetPosition(update).first;
+        int width_UpperBound = currentTurn->inventory[i]->GetBottomRight(update).first;
+        int height_LowerBound = currentTurn->inventory[i]->GetPosition(update).second;
+        int height_UpperBound = currentTurn->inventory[i]->GetBottomRight(update).second;
         if (x >= width_LowerBound && x <= width_UpperBound)
         {
             if (y >= height_LowerBound && y <= height_UpperBound)
@@ -225,11 +205,8 @@ void moveSelectedObject(GameObject *gameObject, Input *playerInput)
 {
     if (gameObject->GetMovable())
     {
-        std::pair<float, float> prevPosition = gameObject->GetPosition();
         gameObject->SetCenter(gameObject->GetCenter().first + playerInput->currentMousePosition.first - playerInput->prevMousePosition.first,
                               gameObject->GetCenter().second + playerInput->currentMousePosition.second - playerInput->prevMousePosition.second);
-        gameObject->globalPosition.first += (gameObject->GetPosition().first - prevPosition.first) / cameraZoom;
-        gameObject->globalPosition.second += (gameObject->GetPosition().second - prevPosition.second) / cameraZoom;
 
         Terrain *terrain_under = selectTerrain(gameObject->GetBottomMiddle().first, gameObject->GetBottomMiddle().second);
         if (hoveringTerrain != terrain_under)

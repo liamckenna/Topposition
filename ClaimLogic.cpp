@@ -10,9 +10,8 @@ void RefreshClaimNotifs()
         {
             if (peaks[i]->occupants[j]->GetPlayer() == currentTurn && peaks[i]->GetClaimedBy() != currentTurn)
             {
-                peaks[i]->GetClaimNotif()->globalPosition.first = (peaks[i]->occupants[j]->GetCenter().first / cameraZoom) + cameraPosition.first;
-                peaks[i]->GetClaimNotif()->globalPosition.second = (peaks[i]->occupants[j]->GetCenter().second / cameraZoom) + cameraPosition.second - 150;
-                peaks[i]->SetPosition((peaks[i]->globalPosition.first - cameraPosition.first) * cameraZoom, (peaks[i]->globalPosition.second - cameraPosition.second) * cameraZoom);
+                peaks[i]->GetClaimNotif()->SetGlobalPosition((peaks[i]->occupants[j]->GetCenter().first / cameraZoom) + cameraPosition.first,
+                                                             (peaks[i]->occupants[j]->GetCenter().second / cameraZoom) + cameraPosition.second - 150);
                 peaks[i]->GetClaimNotif()->SetRendered(true);
                 break;
             }
@@ -55,7 +54,7 @@ void ClaimPeak(UIElement *peakNotif)
             for (int j = 0; j < currentTurn->inventory.size(); j++)
             {
                 currentTurn->inventory[j]->SetScale(0.1);
-                currentTurn->inventory[j]->SetPosition(100 + 70 * j, 10);
+                currentTurn->inventory[j]->SetGlobalPosition(100 + 70 * j, 10);
             }
         }
         for (int j = 0; j < peak->flags.size(); j++)

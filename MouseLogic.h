@@ -9,14 +9,14 @@ void zoom(SDL_MouseWheelEvent &event, Input *playerInput);
 
 void scroll(Input *playerInput);
 
-GameObject *selectObject(int x, int y);
+GameObject *selectObject(int x, int y, bool update = true);
 
-UIElement *selectUI(int x, int y);
+UIElement *selectUI(int x, int y, bool update = true);
 
-Piece *selectPiece(int x, int y);
+Piece *selectPiece(int x, int y, bool update = true);
 
-Terrain *selectTerrain(int x, int y);
+Terrain *selectTerrain(int x, int y, bool update = true);
 
-Item *selectItem(int x, int y);
+Item *selectItem(int x, int y, bool update = true);
 
 void moveSelectedObject(GameObject *gameObject, Input *playerInput);

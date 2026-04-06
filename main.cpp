@@ -66,7 +66,7 @@ void CalculateFrameRate()
     deltaTime = currentTime - prevTime;
 
     //if (deltaTime < 5)
-    //SDL_Delay(5 - deltaTime);
+    //    SDL_Delay(5 - deltaTime);
 
     currentTime = SDL_GetTicks();
     deltaTime = currentTime - prevTime;
@@ -76,7 +76,6 @@ void CalculateFrameRate()
     if (frameCountTime >= 1000)
     {
         std::cout << "FPS: " << frameCounter << std::endl;
-        std::cout << "Seconds since start: " << (currentTime - gameStartTime) / 1000.f << std::endl;
         frameCounter = 0;
         frameCountTime = 0;
     }

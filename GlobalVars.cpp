@@ -36,8 +36,6 @@ std::vector<std::vector<Terrain *>> terrain;
 
 std::vector<Pixel *> pixels;
 
-std::vector<std::vector<GameObject *>> terrainOutlines;
-
 std::vector<UIElement *> uiElements;
 
 std::vector<Piece *> pieces;
