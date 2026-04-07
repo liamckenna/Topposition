@@ -1,0 +1,110 @@
+[
+{
+  "directory": "C:/Lee/Repos/Topposition/build",
+  "command": "C:\\msys64\\ucrt64\\bin\\g++.exe   -g -std=gnu++17 -o CMakeFiles\\Topposition.dir\\main.cpp.obj -c C:\\Lee\\Repos\\Topposition\\main.cpp",
+  "file": "C:/Lee/Repos/Topposition/main.cpp",
+  "output": "CMakeFiles/Topposition.dir/main.cpp.obj"
+},
+{
+  "directory": "C:/Lee/Repos/Topposition/build",
+  "command": "C:\\msys64\\ucrt64\\bin\\g++.exe   -g -std=gnu++17 -o CMakeFiles\\Topposition.dir\\GameObject.cpp.obj -c C:\\Lee\\Repos\\Topposition\\GameObject.cpp",
+  "file": "C:/Lee/Repos/Topposition/GameObject.cpp",
+  "output": "CMakeFiles/Topposition.dir/GameObject.cpp.obj"
+},
+{
+  "directory": "C:/Lee/Repos/Topposition/build",
+  "command": "C:\\msys64\\ucrt64\\bin\\g++.exe   -g -std=gnu++17 -o CMakeFiles\\Topposition.dir\\Input.cpp.obj -c C:\\Lee\\Repos\\Topposition\\Input.cpp",
+  "file": "C:/Lee/Repos/Topposition/Input.cpp",
+  "output": "CMakeFiles/Topposition.dir/Input.cpp.obj"
+},
+{
+  "directory": "C:/Lee/Repos/Topposition/build",
+  "command": "C:\\msys64\\ucrt64\\bin\\g++.exe   -g -std=gnu++17 -o CMakeFiles\\Topposition.dir\\GameRules.cpp.obj -c C:\\Lee\\Repos\\Topposition\\GameRules.cpp",
+  "file": "C:/Lee/Repos/Topposition/GameRules.cpp",
+  "output": "CMakeFiles/Topposition.dir/GameRules.cpp.obj"
+},
+{
+  "directory": "C:/Lee/Repos/Topposition/build",
+  "command": "C:\\msys64\\ucrt64\\bin\\g++.exe   -g -std=gnu++17 -o CMakeFiles\\Topposition.dir\\GlobalVars.cpp.obj -c C:\\Lee\\Repos\\Topposition\\GlobalVars.cpp",
+  "file": "C:/Lee/Repos/Topposition/GlobalVars.cpp",
+  "output": "CMakeFiles/Topposition.dir/GlobalVars.cpp.obj"
+},
+{
+  "directory": "C:/Lee/Repos/Topposition/build",
+  "command": "C:\\msys64\\ucrt64\\bin\\g++.exe   -g -std=gnu++17 -o CMakeFiles\\Topposition.dir\\Player.cpp.obj -c C:\\Lee\\Repos\\Topposition\\Player.cpp",
+  "file": "C:/Lee/Repos/Topposition/Player.cpp",
+  "output": "CMakeFiles/Topposition.dir/Player.cpp.obj"
+},
+{
+  "directory": "C:/Lee/Repos/Topposition/build",
+  "command": "C:\\msys64\\ucrt64\\bin\\g++.exe   -g -std=gnu++17 -o CMakeFiles\\Topposition.dir\\TerrainGeneration.cpp.obj -c C:\\Lee\\Repos\\Topposition\\TerrainGeneration.cpp",
+  "file": "C:/Lee/Repos/Topposition/TerrainGeneration.cpp",
+  "output": "CMakeFiles/Topposition.dir/TerrainGeneration.cpp.obj"
+},
+{
+  "directory": "C:/Lee/Repos/Topposition/build",
+  "command": "C:\\msys64\\ucrt64\\bin\\g++.exe   -g -std=gnu++17 -o CMakeFiles\\Topposition.dir\\ProgramInitialization.cpp.obj -c C:\\Lee\\Repos\\Topposition\\ProgramInitialization.cpp",
+  "file": "C:/Lee/Repos/Topposition/ProgramInitialization.cpp",
+  "output": "CMakeFiles/Topposition.dir/ProgramInitialization.cpp.obj"
+},
+{
+  "directory": "C:/Lee/Repos/Topposition/build",
+  "command": "C:\\msys64\\ucrt64\\bin\\g++.exe   -g -std=gnu++17 -o CMakeFiles\\Topposition.dir\\Rendering.cpp.obj -c C:\\Lee\\Repos\\Topposition\\Rendering.cpp",
+  "file": "C:/Lee/Repos/Topposition/Rendering.cpp",
+  "output": "CMakeFiles/Topposition.dir/Rendering.cpp.obj"
+},
+{
+  "directory": "C:/Lee/Repos/Topposition/build",
+  "command": "C:\\msys64\\ucrt64\\bin\\g++.exe   -g -std=gnu++17 -o CMakeFiles\\Topposition.dir\\GameInitialization.cpp.obj -c C:\\Lee\\Repos\\Topposition\\GameInitialization.cpp",
+  "file": "C:/Lee/Repos/Topposition/GameInitialization.cpp",
+  "output": "CMakeFiles/Topposition.dir/GameInitialization.cpp.obj"
+},
+{
+  "directory": "C:/Lee/Repos/Topposition/build",
+  "command": "C:\\msys64\\ucrt64\\bin\\g++.exe   -g -std=gnu++17 -o CMakeFiles\\Topposition.dir\\MouseLogic.cpp.obj -c C:\\Lee\\Repos\\Topposition\\MouseLogic.cpp",
+  "file": "C:/Lee/Repos/Topposition/MouseLogic.cpp",
+  "output": "CMakeFiles/Topposition.dir/MouseLogic.cpp.obj"
+},
+{
+  "directory": "C:/Lee/Repos/Topposition/build",
+  "command": "C:\\msys64\\ucrt64\\bin\\g++.exe   -g -std=gnu++17 -o CMakeFiles\\Topposition.dir\\PlayerMovement.cpp.obj -c C:\\Lee\\Repos\\Topposition\\PlayerMovement.cpp",
+  "file": "C:/Lee/Repos/Topposition/PlayerMovement.cpp",
+  "output": "CMakeFiles/Topposition.dir/PlayerMovement.cpp.obj"
+},
+{
+  "directory": "C:/Lee/Repos/Topposition/build",
+  "command": "C:\\msys64\\ucrt64\\bin\\g++.exe   -g -std=gnu++17 -o CMakeFiles\\Topposition.dir\\GameLogic.cpp.obj -c C:\\Lee\\Repos\\Topposition\\GameLogic.cpp",
+  "file": "C:/Lee/Repos/Topposition/GameLogic.cpp",
+  "output": "CMakeFiles/Topposition.dir/GameLogic.cpp.obj"
+},
+{
+  "directory": "C:/Lee/Repos/Topposition/build",
+  "command": "C:\\msys64\\ucrt64\\bin\\g++.exe   -g -std=gnu++17 -o CMakeFiles\\Topposition.dir\\ClaimLogic.cpp.obj -c C:\\Lee\\Repos\\Topposition\\ClaimLogic.cpp",
+  "file": "C:/Lee/Repos/Topposition/ClaimLogic.cpp",
+  "output": "CMakeFiles/Topposition.dir/ClaimLogic.cpp.obj"
+},
+{
+  "directory": "C:/Lee/Repos/Topposition/build",
+  "command": "C:\\msys64\\ucrt64\\bin\\g++.exe   -g -std=gnu++17 -o CMakeFiles\\Topposition.dir\\EventHandler.cpp.obj -c C:\\Lee\\Repos\\Topposition\\EventHandler.cpp",
+  "file": "C:/Lee/Repos/Topposition/EventHandler.cpp",
+  "output": "CMakeFiles/Topposition.dir/EventHandler.cpp.obj"
+},
+{
+  "directory": "C:/Lee/Repos/Topposition/build",
+  "command": "C:\\msys64\\ucrt64\\bin\\g++.exe   -g -std=gnu++17 -o CMakeFiles\\Topposition.dir\\MultiPurposeFunctions.cpp.obj -c C:\\Lee\\Repos\\Topposition\\MultiPurposeFunctions.cpp",
+  "file": "C:/Lee/Repos/Topposition/MultiPurposeFunctions.cpp",
+  "output": "CMakeFiles/Topposition.dir/MultiPurposeFunctions.cpp.obj"
+},
+{
+  "directory": "C:/Lee/Repos/Topposition/build",
+  "command": "C:\\msys64\\ucrt64\\bin\\g++.exe   -g -std=gnu++17 -o CMakeFiles\\Topposition.dir\\AnimationHandler.cpp.obj -c C:\\Lee\\Repos\\Topposition\\AnimationHandler.cpp",
+  "file": "C:/Lee/Repos/Topposition/AnimationHandler.cpp",
+  "output": "CMakeFiles/Topposition.dir/AnimationHandler.cpp.obj"
+},
+{
+  "directory": "C:/Lee/Repos/Topposition/build",
+  "command": "C:\\msys64\\ucrt64\\bin\\g++.exe   -g -std=gnu++17 -o CMakeFiles\\Topposition.dir\\MenuInitialization.cpp.obj -c C:\\Lee\\Repos\\Topposition\\MenuInitialization.cpp",
+  "file": "C:/Lee/Repos/Topposition/MenuInitialization.cpp",
+  "output": "CMakeFiles/Topposition.dir/MenuInitialization.cpp.obj"
+}
+]

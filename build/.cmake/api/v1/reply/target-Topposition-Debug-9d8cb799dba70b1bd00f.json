@@ -80,7 +80,7 @@
 			"compileCommandFragments" : 
 			[
 				{
-					"fragment" : "-Og -g3 -fno-omit-frame-pointer -g -std=gnu++17"
+					"fragment" : "-g -std=gnu++17"
 				}
 			],
 			"language" : "CXX",
@@ -121,7 +121,7 @@
 		"commandFragments" : 
 		[
 			{
-				"fragment" : "-Og -g3 -fno-omit-frame-pointer -g",
+				"fragment" : "-g",
 				"role" : "flags"
 			},
 			{

@@ -94,6 +94,22 @@
 			"value" : "1"
 		},
 		{
+			"name" : "CMAKE_COLOR_MAKEFILE",
+			"properties" : 
+			[
+				{
+					"name" : "ADVANCED",
+					"value" : "1"
+				},
+				{
+					"name" : "HELPSTRING",
+					"value" : "Enable/Disable color output during build."
+				}
+			],
+			"type" : "BOOL",
+			"value" : "ON"
+		},
+		{
 			"name" : "CMAKE_COMMAND",
 			"properties" : 
 			[
@@ -143,7 +159,7 @@
 				}
 			],
 			"type" : "STRING",
-			"value" : "C:/msys64/ucrt64/bin/c++.exe"
+			"value" : "C:/msys64/ucrt64/bin/g++.exe"
 		},
 		{
 			"name" : "CMAKE_CXX_COMPILER_AR",
@@ -191,7 +207,7 @@
 				}
 			],
 			"type" : "STRING",
-			"value" : "-Og -g3 -fno-omit-frame-pointer"
+			"value" : ""
 		},
 		{
 			"name" : "CMAKE_CXX_FLAGS_DEBUG",
@@ -274,6 +290,18 @@
 			"value" : "-lkernel32 -luser32 -lgdi32 -lwinspool -lshell32 -lole32 -loleaut32 -luuid -lcomdlg32 -ladvapi32"
 		},
 		{
+			"name" : "CMAKE_C_COMPILER",
+			"properties" : 
+			[
+				{
+					"name" : "HELPSTRING",
+					"value" : "No help, variable specified on the command line."
+				}
+			],
+			"type" : "FILEPATH",
+			"value" : "C:/msys64/ucrt64/bin/gcc.exe"
+		},
+		{
 			"name" : "CMAKE_DLLTOOL",
 			"properties" : 
 			[
@@ -288,18 +316,6 @@
 			],
 			"type" : "FILEPATH",
 			"value" : "C:/msys64/ucrt64/bin/dlltool.exe"
-		},
-		{
-			"name" : "CMAKE_EDIT_COMMAND",
-			"properties" : 
-			[
-				{
-					"name" : "HELPSTRING",
-					"value" : "Path to cache edit program executable."
-				}
-			],
-			"type" : "INTERNAL",
-			"value" : "C:/Program Files/CMake/bin/cmake-gui.exe"
 		},
 		{
 			"name" : "CMAKE_EXECUTABLE_FORMAT",
@@ -394,36 +410,16 @@
 			"value" : ""
 		},
 		{
-			"name" : "CMAKE_EXPORT_BUILD_DATABASE",
-			"properties" : 
-			[
-				{
-					"name" : "ADVANCED",
-					"value" : "1"
-				},
-				{
-					"name" : "HELPSTRING",
-					"value" : "Enable/Disable output of build database during the build."
-				}
-			],
-			"type" : "BOOL",
-			"value" : ""
-		},
-		{
 			"name" : "CMAKE_EXPORT_COMPILE_COMMANDS",
 			"properties" : 
 			[
 				{
-					"name" : "ADVANCED",
-					"value" : "1"
-				},
-				{
 					"name" : "HELPSTRING",
-					"value" : "Enable/Disable output of compile commands during generation."
+					"value" : "No help, variable specified on the command line."
 				}
 			],
 			"type" : "BOOL",
-			"value" : ""
+			"value" : "TRUE"
 		},
 		{
 			"name" : "CMAKE_EXTRA_GENERATOR",
@@ -459,7 +455,7 @@
 				}
 			],
 			"type" : "INTERNAL",
-			"value" : "Ninja"
+			"value" : "MinGW Makefiles"
 		},
 		{
 			"name" : "CMAKE_GENERATOR_INSTANCE",
@@ -571,11 +567,11 @@
 				},
 				{
 					"name" : "HELPSTRING",
-					"value" : "Program used to build from build.ninja files."
+					"value" : "Path to a program."
 				}
 			],
 			"type" : "FILEPATH",
-			"value" : "C:/msys64/ucrt64/bin/ninja.exe"
+			"value" : "C:/msys64/ucrt64/bin/mingw32-make.exe"
 		},
 		{
 			"name" : "CMAKE_MODULE_LINKER_FLAGS",
@@ -1279,7 +1275,7 @@
 				}
 			],
 			"type" : "INTERNAL",
-			"value" : "-IC:/msys64/ucrt64/include/harfbuzz;-IC:/msys64/ucrt64/include/freetype2;-IC:/msys64/ucrt64/include;-IC:/msys64/ucrt64/include/libpng16;-IC:/msys64/ucrt64/include/glib-2.0;-IC:/msys64/ucrt64/lib/glib-2.0/include"
+			"value" : "-IC:/msys64/ucrt64/bin/../include/harfbuzz;-IC:/msys64/ucrt64/bin/../include/freetype2;-IC:/msys64/ucrt64/bin/../include;-IC:/msys64/ucrt64/bin/../include/libpng16;-IC:/msys64/ucrt64/bin/../include/glib-2.0;-IC:/msys64/ucrt64/bin/../lib/glib-2.0/include"
 		},
 		{
 			"name" : "PC_HARFBUZZ_CFLAGS_I",
@@ -1327,7 +1323,7 @@
 				}
 			],
 			"type" : "INTERNAL",
-			"value" : "C:/msys64/ucrt64/include"
+			"value" : "C:/msys64/ucrt64/bin/../include"
 		},
 		{
 			"name" : "PC_HARFBUZZ_INCLUDE_DIRS",
@@ -1339,7 +1335,7 @@
 				}
 			],
 			"type" : "INTERNAL",
-			"value" : "C:/msys64/ucrt64/include/harfbuzz;C:/msys64/ucrt64/include/freetype2;C:/msys64/ucrt64/include;C:/msys64/ucrt64/include/libpng16;C:/msys64/ucrt64/include/glib-2.0;C:/msys64/ucrt64/lib/glib-2.0/include"
+			"value" : "C:/msys64/ucrt64/bin/../include/harfbuzz;C:/msys64/ucrt64/bin/../include/freetype2;C:/msys64/ucrt64/bin/../include;C:/msys64/ucrt64/bin/../include/libpng16;C:/msys64/ucrt64/bin/../include/glib-2.0;C:/msys64/ucrt64/bin/../lib/glib-2.0/include"
 		},
 		{
 			"name" : "PC_HARFBUZZ_LDFLAGS",
@@ -1351,7 +1347,7 @@
 				}
 			],
 			"type" : "INTERNAL",
-			"value" : "-LC:/msys64/ucrt64/lib;-lharfbuzz"
+			"value" : "-LC:/msys64/ucrt64/bin/../lib;-lharfbuzz"
 		},
 		{
 			"name" : "PC_HARFBUZZ_LDFLAGS_OTHER",
@@ -1375,7 +1371,7 @@
 				}
 			],
 			"type" : "INTERNAL",
-			"value" : "C:/msys64/ucrt64/lib"
+			"value" : "C:/msys64/ucrt64/bin/../lib"
 		},
 		{
 			"name" : "PC_HARFBUZZ_LIBRARIES",
@@ -1399,7 +1395,7 @@
 				}
 			],
 			"type" : "INTERNAL",
-			"value" : "C:/msys64/ucrt64/lib"
+			"value" : "C:/msys64/ucrt64/bin/../lib"
 		},
 		{
 			"name" : "PC_HARFBUZZ_LIBS",
@@ -1471,7 +1467,7 @@
 				}
 			],
 			"type" : "INTERNAL",
-			"value" : "C:/msys64/ucrt64"
+			"value" : "C:/msys64/ucrt64/bin/.."
 		},
 		{
 			"name" : "PC_HARFBUZZ_STATIC_CFLAGS",
@@ -1483,7 +1479,7 @@
 				}
 			],
 			"type" : "INTERNAL",
-			"value" : "-IC:/msys64/ucrt64/include/harfbuzz;-IC:/msys64/ucrt64/include/freetype2;-IC:/msys64/ucrt64/include;-IC:/msys64/ucrt64/include/libpng16;-IC:/msys64/ucrt64/include/glib-2.0;-IC:/msys64/ucrt64/lib/glib-2.0/include"
+			"value" : "-IC:/msys64/ucrt64/bin/../include/harfbuzz;-IC:/msys64/ucrt64/bin/../include/freetype2;-IC:/msys64/ucrt64/bin/../include;-IC:/msys64/ucrt64/bin/../include/libpng16;-IC:/msys64/ucrt64/bin/../include/glib-2.0;-IC:/msys64/ucrt64/bin/../lib/glib-2.0/include"
 		},
 		{
 			"name" : "PC_HARFBUZZ_STATIC_CFLAGS_I",
@@ -1519,7 +1515,7 @@
 				}
 			],
 			"type" : "INTERNAL",
-			"value" : "C:/msys64/ucrt64/include/harfbuzz;C:/msys64/ucrt64/include/freetype2;C:/msys64/ucrt64/include;C:/msys64/ucrt64/include/libpng16;C:/msys64/ucrt64/include/glib-2.0;C:/msys64/ucrt64/lib/glib-2.0/include"
+			"value" : "C:/msys64/ucrt64/bin/../include/harfbuzz;C:/msys64/ucrt64/bin/../include/freetype2;C:/msys64/ucrt64/bin/../include;C:/msys64/ucrt64/bin/../include/libpng16;C:/msys64/ucrt64/bin/../include/glib-2.0;C:/msys64/ucrt64/bin/../lib/glib-2.0/include"
 		},
 		{
 			"name" : "PC_HARFBUZZ_STATIC_LDFLAGS",
@@ -1531,7 +1527,7 @@
 				}
 			],
 			"type" : "INTERNAL",
-			"value" : "-LC:/msys64/ucrt64/lib;-lharfbuzz;-lm;-lusp10;-lgdi32;-lrpcrt4;-luser32;-ldwrite;-lfreetype;-lbz2;-lpng16;-lz;-lbrotlidec;-lbrotlicommon;-lglib-2.0;-lintl;-lws2_32;-lole32;-lwinmm;-lshlwapi;-luuid;-latomic;-lm;-lpcre2-8;-lgraphite2"
+			"value" : "-LC:/msys64/ucrt64/bin/../lib;-lharfbuzz;-lm;-lusp10;-lgdi32;-lrpcrt4;-luser32;-ldwrite;-lfreetype;-lbz2;-lpng16;-lz;-lbrotlidec;-lbrotlicommon;-lglib-2.0;-lintl;-lws2_32;-lole32;-lwinmm;-lshlwapi;-luuid;-latomic;-lm;-lpcre2-8;-lgraphite2"
 		},
 		{
 			"name" : "PC_HARFBUZZ_STATIC_LDFLAGS_OTHER",
@@ -1579,7 +1575,7 @@
 				}
 			],
 			"type" : "INTERNAL",
-			"value" : "C:/msys64/ucrt64/lib"
+			"value" : "C:/msys64/ucrt64/bin/../lib"
 		},
 		{
 			"name" : "PC_HARFBUZZ_STATIC_LIBS",
@@ -1863,7 +1859,7 @@
 				}
 			],
 			"type" : "PATH",
-			"value" : "C:/msys64/ucrt64/lib"
+			"value" : "C:/msys64/ucrt64/bin/../lib"
 		},
 		{
 			"name" : "harfbuzz_LINK_LIBRARIES",
@@ -1915,7 +1911,7 @@
 				}
 			],
 			"type" : "INTERNAL",
-			"value" : "C:/msys64/ucrt64/lib"
+			"value" : "C:/msys64/ucrt64/bin/../lib"
 		}
 	],
 	"kind" : "cache",
