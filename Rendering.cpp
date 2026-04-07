@@ -111,7 +111,7 @@ void renderText()
 
 void renderOcean()
 {
-    int speed = 32;
+    int speed = 128;
     if (deltaTime > 100)
         deltaTime = 5;
     for (int i = 0; i < ocean.size(); i++)
@@ -126,4 +126,40 @@ void renderOcean()
             ocean[i][j]->RenderGameObject(renderer);
         }
     }
+    CheckOceanTilePositioning();
+}
+
+void CheckOceanTilePositioning()
+{
+    std::vector<OceanTile *> edgeTiles;
+    for (int i = 0; i < 11; i++)
+    {
+        for (int j = 0; j < 11; j++)
+        {
+            if (ocean[i][j]->globalPosition.first >= 7680 || ocean[i][j]->globalPosition.second >= 6560)
+            {
+                edgeTiles.push_back(ocean[i][j]);
+                std::cout << "added ocean tile \"" << ocean[i][j]->GetName() << "\" at position (" << ocean[i][j]->globalPosition.first << ", " << ocean[i][j]->globalPosition.second << ") to edgeTiles" << std::endl;
+            }
+        }
+    }
+    for (int i = 0; i < edgeTiles.size(); i++)
+    {
+        ReflectOceanTile(edgeTiles[i]);
+    }
+}
+
+void ReflectOceanTile(OceanTile *tile)
+{
+    tile->SetGlobalPosition(tile->globalPosition.first + 1024, tile->globalPosition.second + 1024);
+    float x = tile->globalPosition.first;
+    float y = tile->globalPosition.second;
+
+    float newX = 4000 - y;
+    float newY = 4000 - x;
+
+    tile->SetGlobalPosition(newX, newY);
+    std::cout << "Reflected ocean tile \"" << tile->GetName()
+              << "\" from old position (" << x << ", " << y
+              << ") to new position (" << newX << ", " << newY << ")" << std::endl;
 }

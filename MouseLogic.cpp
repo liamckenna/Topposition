@@ -83,23 +83,28 @@ void ClampCameraBoundaries()
 {
     std::pair<float, float> domain = {-2240, 7360};
     std::pair<float, float> range = {-1210, 4090};
-    
-    if (cameraPosition.first < domain.first)
-    {
-        cameraPosition.first = domain.first;
-    }
-    else if (cameraPosition.first + worldResolution.first > domain.second)
-    {
-        cameraPosition.first = domain.second - worldResolution.first;
-    }
 
-    if (cameraPosition.second < range.first)
+    bool clamp = false;
+
+    if (clamp)
     {
-        cameraPosition.second = range.first;
-    }
-    else if (cameraPosition.second + worldResolution.second > range.second)
-    {
-        cameraPosition.second = range.second - worldResolution.second;
+        if (cameraPosition.first < domain.first)
+        {
+            cameraPosition.first = domain.first;
+        }
+        else if (cameraPosition.first + worldResolution.first > domain.second)
+        {
+            cameraPosition.first = domain.second - worldResolution.first;
+        }
+
+        if (cameraPosition.second < range.first)
+        {
+            cameraPosition.second = range.first;
+        }
+        else if (cameraPosition.second + worldResolution.second > range.second)
+        {
+            cameraPosition.second = range.second - worldResolution.second;
+        }
     }
 }
 

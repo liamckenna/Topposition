@@ -415,17 +415,16 @@ void GenerateOcean()
 {
     int scale = 8;
 
-    for (int i = -10; i < 10; i++)
+    for (int i = 0; i < 11; i++)
     {
-        ocean.resize(20);
-        for (int j = -10; j < 10; j++)
+        ocean.resize(11);
+        for (int j = 0; j < 11; j++)
         {
             int index = rand() % 20 + 1;
             OceanTile *oceanTile = new OceanTile("ocean tile edge (" + to_string(i) + ", " + to_string(j) + ")", textures["tile " + to_string(index)][0], surfaces["tile " + to_string(index)], false, true);
-            oceanTile->SetGlobalPosition(i * 128 * scale + MAP_WIDTH / 2, j * 128 * scale + MAP_HEIGHT / 2);
+            oceanTile->SetGlobalPosition(-3584 + (i * 128 * scale), -4704 + (j * 128 * scale));
             oceanTile->SetScale(scale);
-
-            ocean[i + 10].push_back(oceanTile);
+            ocean[i].push_back(oceanTile);
             gameObjects[0].push_back(oceanTile);
         }
     }
@@ -433,7 +432,6 @@ void GenerateOcean()
 
 void renderPixels()
 {
-
     for (int i = 0; i < pixels.size(); i++)
     {
         pixels[i]->RenderGameObject(renderer, hoveringTerrain);

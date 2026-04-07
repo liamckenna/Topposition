@@ -16,3 +16,7 @@ void renderInventory();
 void renderText();
 
 void renderOcean();
+
+void CheckOceanTilePositioning();
+
+void ReflectOceanTile(OceanTile *tile);
