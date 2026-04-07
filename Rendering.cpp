@@ -1,8 +1,33 @@
 #include "Rendering.h"
-
+#include "MultiPurposeFunctions.h"
 void RenderScreen()
 {
-    SDL_SetRenderDrawColor(renderer, 2, 120, 150, 100);
+    if (seaHover)
+    {
+        if (validMove)
+        {
+            if (startingTerrain != nullptr)
+            {
+                SDL_SetRenderDrawColor(renderer, 2 / 1.5f, 120 / 1.5f, 150 / 1.5f, 100);
+            }
+            else
+            {
+                SDL_SetRenderDrawColor(renderer, 2, 120, 150, 100);
+            }
+        }
+        else
+        {
+            int r = 2;
+            int g = 120;
+            int b = 150;
+            HueShift(r, g, b, -192.0f);
+            SDL_SetRenderDrawColor(renderer, r, g, b, 100);
+        }
+    }
+    else
+    {
+        SDL_SetRenderDrawColor(renderer, 2, 120, 150, 100);
+    }
     SDL_RenderClear(renderer);
     // Render texture to screen
     if (state == MAIN_MENU)

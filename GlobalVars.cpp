@@ -8,9 +8,9 @@ std::atomic<SDL_Renderer *> renderer = NULL;
 
 SDL_Texture *texture = NULL;
 
-int SCREEN_WIDTH = 2560;
+int SCREEN_WIDTH = 1920;
 
-int SCREEN_HEIGHT = 1440;
+int SCREEN_HEIGHT = 1080;
 
 int MAP_WIDTH = 2560;
 
@@ -66,9 +66,11 @@ Text *playerThreeText;
 
 Text *playerFourText;
 
+Terrain *startingTerrain;
+
 Terrain *hoveringTerrain;
 
-bool validMove;
+bool validMove = true;
 
 Player *firstPlace;
 
@@ -87,3 +89,7 @@ int frameCounter = 0;
 float cameraZoom = 1.f;
 
 std::pair<float, float> cameraPosition = {0.f, 0.f};
+
+bool seaHover = false;
+
+std::pair<float, float> worldResolution = std::make_pair(SCREEN_WIDTH, SCREEN_HEIGHT);

@@ -1,5 +1,6 @@
 #include "EventHandler.h"
 #include "MenuInitialization.h"
+#include "MouseLogic.h"
 #include <future>
 
 void HandleEvents(Input *playerInput)
@@ -41,9 +42,12 @@ void EventQuit(Input *playerInput, SDL_MouseButtonEvent &event)
 
 void EventWindowResized(Input *playerInput, SDL_WindowEvent &event)
 {
+    float oldCameraZoom = cameraZoom;
+    int oldScreenWidth = SCREEN_WIDTH;
+    int oldScreenHeight = SCREEN_HEIGHT;
     SCREEN_WIDTH = event.data1;
     SCREEN_HEIGHT = event.data2;
-    updateUIElementPositions();
+    
     switch (state)
     {
     case MAIN_MENU:
@@ -53,12 +57,43 @@ void EventWindowResized(Input *playerInput, SDL_WindowEvent &event)
     case LOADING:
         break;
     case GAME:
+        if (SCREEN_WIDTH / cameraZoom > 9600.f)
+        {
+            std::cout << SCREEN_WIDTH / cameraZoom << " > 9600.f" << std::endl;
+            cameraZoom = SCREEN_WIDTH / 9600.f;
+        }
+        else if (SCREEN_WIDTH / cameraZoom < 1920.f)
+        {
+            std::cout << SCREEN_WIDTH / cameraZoom << " < 9600.f" << std::endl;
+            cameraZoom = SCREEN_WIDTH / 1920.f;
+        }
+        worldResolution.first = SCREEN_WIDTH / cameraZoom;
+        worldResolution.second = SCREEN_HEIGHT / cameraZoom;
+        cameraPosition.first = cameraPosition.first - (SCREEN_WIDTH / 2 / cameraZoom) + (oldScreenWidth / 2 / oldCameraZoom);
+        cameraPosition.second = cameraPosition.second - (SCREEN_HEIGHT / 2 / cameraZoom) + (oldScreenHeight / 2 / oldCameraZoom);
+        ClampCameraBoundaries();
         break;
     case PAUSED:
+        if (SCREEN_WIDTH / cameraZoom > 9600.f)
+        {
+            std::cout << SCREEN_WIDTH / cameraZoom << " > 9600.f" << std::endl;
+            cameraZoom = SCREEN_WIDTH / 9600.f;
+        }
+        else if (SCREEN_WIDTH / cameraZoom < 1920.f)
+        {
+            std::cout << SCREEN_WIDTH / cameraZoom << " < 9600.f" << std::endl;
+            cameraZoom = SCREEN_WIDTH / 1920.f;
+        }
+        worldResolution.first = SCREEN_WIDTH / cameraZoom;
+        worldResolution.second = SCREEN_HEIGHT / cameraZoom;
+        cameraPosition.first = cameraPosition.first - (SCREEN_WIDTH / 2 / cameraZoom) + (oldScreenWidth / 2 / oldCameraZoom);
+        cameraPosition.second = cameraPosition.second - (SCREEN_HEIGHT / 2 / cameraZoom) + (oldScreenHeight / 2 / oldCameraZoom);
+        ClampCameraBoundaries();
         break;
     default:
         break;
     }
+    updateUIElementPositions();
 }
 
 void EventMouseWheel(Input *playerInput, SDL_MouseWheelEvent &event)
@@ -203,6 +238,7 @@ void MouseButtonDownGame(Input *playerInput, SDL_MouseButtonEvent &event)
                     piece->SetDesignatedLocation(piece->GetBottomMiddle().first, piece->GetBottomMiddle().second);
                     piece->SetScale(piece->GetScale() * 2);
                     piece->SetBottomMiddle(piece->GetDesignatedLocation().first, piece->GetDesignatedLocation().second);
+                    startingTerrain = selectTerrain(piece->GetDesignatedLocation().first, piece->GetDesignatedLocation().second);
                     if (piece->GetCurrentAnimation() != NULL)
                         piece->GetCurrentAnimation()->Pause();
                 }
@@ -283,12 +319,15 @@ void MouseButtonUpGame(Input *playerInput, SDL_MouseButtonEvent &event)
                 pair<float, float> bottom_middle = piece->GetBottomMiddle();
                 piece->SetScale(piece->GetScale() / 2.f);
                 piece->SetBottomMiddle(bottom_middle.first, bottom_middle.second);
-                Terrain *startingTerrain = selectTerrain(piece->GetDesignatedLocation().first, piece->GetDesignatedLocation().second);
+                //Terrain *startingTerrain = selectTerrain(piece->GetDesignatedLocation().first, piece->GetDesignatedLocation().second);
                 Terrain *targetTerrain = selectTerrain(piece->GetBottomMiddle().first, piece->GetBottomMiddle().second);
                 if (piece->GetCurrentAnimation() != NULL)
                     piece->GetCurrentAnimation()->Unpause();
                 bool successful_move = Move(piece, startingTerrain, targetTerrain, movesLeft);
+                startingTerrain = nullptr;
                 hoveringTerrain = nullptr;
+                seaHover = false;
+                validMove = true;
             }
             else if (selectedObject->type == GameObject::ITEM)
             {

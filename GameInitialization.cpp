@@ -99,6 +99,7 @@ void loadGame()
 {
     cameraZoom = 1.f;
     cameraPosition = {0, 0};
+    worldResolution = {SCREEN_WIDTH, SCREEN_HEIGHT};
 
     std::cout << "Loading Map..." << std::endl;
     loadMap();
@@ -336,6 +337,7 @@ void loadUI()
         claimPeakButton->SetScale(0.1);
         claimPeakButton->SetCenter(peaks[i]->GetCenter().first + 50, peaks[i]->GetCenter().second - 50);
         claimPeakButton->SetResizable(true);
+        claimPeakButton->SetTopLayer(false);
         uiElements.push_back(claimPeakButton);
         gameObjects[gameObjects.size() - 1].push_back(claimPeakButton);
         peaks[i]->SetClaimNotif(claimPeakButton);

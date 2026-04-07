@@ -10,6 +10,7 @@ void RefreshClaimNotifs()
         {
             if (peaks[i]->occupants[j]->GetPlayer() == currentTurn && peaks[i]->GetClaimedBy() != currentTurn)
             {
+                peaks[i]->occupants[j]->UpdateRelativePositions();
                 peaks[i]->GetClaimNotif()->SetGlobalPosition((peaks[i]->occupants[j]->GetCenter().first / cameraZoom) + cameraPosition.first,
                                                              (peaks[i]->occupants[j]->GetCenter().second / cameraZoom) + cameraPosition.second - 150);
                 peaks[i]->GetClaimNotif()->SetRendered(true);
@@ -47,6 +48,7 @@ void ClaimPeak(UIElement *peakNotif)
         {
             peak->GetItem()->SetOwner(currentTurn);
             peak->GetItem()->SetResizable(false);
+            peak->GetItem()->SetTopLayer(false);
             peak->GetItem()->SetSelectable(true);
             currentTurn->inventory.push_back(peak->GetItem());
 

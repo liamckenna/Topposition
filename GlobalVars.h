@@ -74,6 +74,8 @@ extern Text *playerFourText;
 
 extern Player *currentTurn;
 
+extern Terrain *startingTerrain;
+
 extern Terrain *hoveringTerrain;
 
 extern bool validMove;
@@ -106,3 +108,9 @@ extern Player *firstPlace;
 extern float cameraZoom;
 
 extern std::pair<float, float> cameraPosition;
+
+extern bool seaHover;
+
+extern bool hovering;
+
+extern std::pair<float, float> worldResolution;

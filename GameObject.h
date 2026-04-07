@@ -36,6 +36,7 @@ protected:
     bool movable = false;
     bool selectable = false;
     bool rendered = true;
+    bool topLayer = false;
     SDL_FRect *renderRect = new SDL_FRect();
     pair<float, float> position;
     pair<float, float> dimensions;
@@ -65,6 +66,7 @@ public:
     Animation *GetCurrentAnimation() const { return currentAnimation; }
     pair<float, float> GetBottomRight(bool update = true);
     pair<float, float> GetBottomMiddle(bool update = true);
+    bool GetTopLayer() { return topLayer; }
     void SetCurrentAnimation(Animation *ca) { currentAnimation = ca; }
     void SetRectangle(SDL_FRect *r) { renderRect = r; }
     void SetResizable(bool r) { resizable = r; }
@@ -72,7 +74,7 @@ public:
     void SetSurface(SDL_Surface *s) { surface = s; }
     void SetSelectable(bool s) { selectable = s; }
     void SetScale(float s) { scale = s; }
-    void SetGlobalPosition(float x, float y);
+    void SetGlobalPosition(float x, float y, bool updateRelative = true);
     void SetPosition(float x, float y, bool posOnly = false);
     virtual void SetCenter(float x = 0, float y = 0, bool centerOnly = false);
     void SetMovable(bool m);
@@ -80,6 +82,12 @@ public:
     virtual void RenderGameObject(SDL_Renderer *renderer);
     void SetBottomRight(float x = 0, float y = 0, bool brOnly = false);
     void SetBottomMiddle(float x = 0, float y = 0, bool bmOnly = false);
+    void SetTopLayer(bool tl) { topLayer = tl; }
+    void UpdateRelativePositions();
+    void UpdatePosition();
+    void UpdateCenter();
+    void UpdateBottomRight();
+    void UpdateGlobalPosition();
 
     pair<float, float> globalPosition;
 };
@@ -156,6 +164,7 @@ public:
         associatedPeak = ap;
         resizable = false;
         selectable = s;
+        topLayer = true;
     }
     Peak *GetAssociatedPeak() { return associatedPeak; }
     void SetAssociatedPeak(Peak *ap) { associatedPeak = ap; }

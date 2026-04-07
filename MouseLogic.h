@@ -20,3 +20,5 @@ Terrain *selectTerrain(int x, int y, bool update = true);
 Item *selectItem(int x, int y, bool update = true);
 
 void moveSelectedObject(GameObject *gameObject, Input *playerInput);
+
+void ClampCameraBoundaries();

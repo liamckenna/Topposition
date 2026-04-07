@@ -10,8 +10,6 @@ GameObject::GameObject(string name, SDL_Texture *texture, SDL_Surface *surface, 
     SDL_GetTextureSize(texture, &dimensions.first, &dimensions.second);
 
     SetGlobalPosition(0, 0);
-    globalPosition = std::make_pair(position.first, position.second);
-    SetCenter();
     movable = m;
     rendered = r;
 }
@@ -22,19 +20,19 @@ void GameObject::RenderGameObject(SDL_Renderer *renderer)
 
     bool fetch_success = SDL_GetTextureSize(texture, &dimensions.first, &dimensions.second);
 
-    if (resizable)
-    {
-        renderRect->x = (globalPosition.first - cameraPosition.first) * cameraZoom;
-        renderRect->y = (globalPosition.second - cameraPosition.second) * cameraZoom;
-        renderRect->w = (float)(dimensions.first * cameraZoom * scale);
-        renderRect->h = (float)(dimensions.second * cameraZoom * scale);
-    }
-    else
+    if (topLayer)
     {
         renderRect->x = globalPosition.first;
         renderRect->y = globalPosition.second;
         renderRect->w = (float)(dimensions.first * scale);
         renderRect->h = (float)(dimensions.second * scale);
+    }
+    else
+    {
+        renderRect->x = (globalPosition.first - cameraPosition.first) * cameraZoom;
+        renderRect->y = (globalPosition.second - cameraPosition.second) * cameraZoom;
+        renderRect->w = (float)(dimensions.first * cameraZoom * scale);
+        renderRect->h = (float)(dimensions.second * cameraZoom * scale);
     }
     
     if (rendered)
@@ -44,8 +42,32 @@ void GameObject::RenderGameObject(SDL_Renderer *renderer)
             if (type == OCEAN_TILE)
             {
                 SDL_SetTextureAlphaMod(texture, static_cast<int>(dynamic_cast<OceanTile *>(this)->GetAlphaFloat() * 255));
+
+                if (seaHover)
+                {
+                    if (validMove)
+                    {
+                        if (startingTerrain != nullptr)
+                        {
+                            SDL_SetTextureColorMod(texture, 255 / 2, 255 / 2, 255 / 2);
+                        }
+                    }
+                    else
+                    {
+                        SDL_SetTextureColorMod(texture, 255, 0, 0);
+                    }
+                }
+
                 SDL_RenderTextureRotated(renderer, texture, NULL, renderRect, dynamic_cast<OceanTile *>(this)->GetRotation(), NULL, SDL_FLIP_NONE);
                 SDL_SetTextureAlphaMod(texture, static_cast<int>(255));
+
+                if (seaHover)
+                {
+                    if (!validMove || startingTerrain != nullptr)
+                    {
+                        SDL_SetTextureColorMod(texture, 255, 255, 255);
+                    }   
+                }
             }
             else
             {
@@ -89,30 +111,92 @@ pair<float, float> GameObject::GetBottomMiddle(bool update)
     return std::make_pair(center.first, bottomRight.second);
 }
 
-    void GameObject::SetGlobalPosition(float x, float y)
+void GameObject::SetGlobalPosition(float x, float y, bool updateRelative)
 {
     globalPosition.first = x;
     globalPosition.second = y;
 
-    position.first = (x - cameraPosition.first) * cameraZoom;
-    position.second = (y - cameraPosition.second) * cameraZoom;
+    if (updateRelative)
+    {
+        UpdateRelativePositions();
+    }
+    
+}
 
-    SetCenter();
-    SetBottomRight();
+void GameObject::UpdateRelativePositions()
+{
+    UpdatePosition();
+    UpdateCenter();
+    UpdateBottomRight();
+}
+
+void GameObject::UpdatePosition()
+{
+    if (topLayer)
+    {
+        position.first = globalPosition.first;
+        position.second = globalPosition.second;
+    }
+    else
+    {
+        position.first = (globalPosition.first - cameraPosition.first) * cameraZoom;
+        position.second = (globalPosition.second - cameraPosition.second) * cameraZoom;
+    }
+}
+
+void GameObject::UpdateCenter()
+{
+    if (topLayer)
+    {
+        center.first = globalPosition.first + (dimensions.first * scale / 2);
+        center.second = globalPosition.second + (dimensions.second * scale / 2);
+    }
+    else
+    {
+        center.first = (globalPosition.first - cameraPosition.first + (dimensions.first * scale / 2)) * cameraZoom;
+        center.second = (globalPosition.second - cameraPosition.second + (dimensions.second * scale / 2)) * cameraZoom;
+    }
+}
+
+void GameObject::UpdateBottomRight()
+{
+    if (topLayer)
+    {
+        bottomRight.first = globalPosition.first + (dimensions.first * scale);
+        bottomRight.second = globalPosition.second + (dimensions.second * scale);
+    }
+    else
+    {
+        bottomRight.first = (globalPosition.first - cameraPosition.first + (dimensions.first * scale)) * cameraZoom;
+        bottomRight.second = (globalPosition.second - cameraPosition.second + (dimensions.second * scale)) * cameraZoom;
+    }    
+}
+
+void GameObject::UpdateGlobalPosition()
+{
+    if (topLayer)
+    {
+        globalPosition.first = position.first;
+        globalPosition.second = position.second;
+    }
+    else
+    {
+        globalPosition.first = position.first / cameraZoom + cameraPosition.first;
+        globalPosition.second = position.second / cameraZoom + cameraPosition.second;
+    }
 }
 
 void GameObject::SetPosition(float x, float y, bool posOnly)
-{    
+{
     position.first = x;
     position.second = y;
 
-    globalPosition.first = x / cameraZoom + cameraPosition.first;
-    globalPosition.second = y / cameraZoom + cameraPosition.second;
+    UpdateGlobalPosition();
 
     if (!posOnly)
     {
-        SetCenter();
-        SetBottomRight();
+        UpdateCenter();
+        UpdateBottomRight();
     }
 }
 
@@ -131,7 +215,7 @@ void GameObject::SetCenter(float x, float y, bool centerOnly)
         if (!centerOnly)
         {
             SetPosition(center.first - (dimensions.first * cameraZoom * scale) / 2, center.second - (dimensions.second * cameraZoom * scale) / 2, true);
-            SetBottomRight();
+            UpdateBottomRight();
         }
     }
 }
@@ -161,7 +245,7 @@ void GameObject::SetBottomRight(float x, float y, bool brOnly)
         if (!brOnly)
         {
             SetPosition(bottomRight.first - (dimensions.first * cameraZoom * scale), bottomRight.second - (dimensions.second * cameraZoom * scale), true);
-            SetCenter();
+            UpdateCenter();
         }
     }
 }
@@ -182,8 +266,8 @@ void GameObject::SetBottomMiddle(float x, float y, bool bmOnly)
         if (!bmOnly)
         {
             SetPosition(center.first - (dimensions.first * cameraZoom * scale) / 2, bottomRight.second - (dimensions.second * cameraZoom * scale), true);
-            SetCenter();
-            SetBottomRight();
+            UpdateCenter();
+            UpdateBottomRight();
         }
     }
 }
@@ -191,11 +275,16 @@ void GameObject::SetBottomMiddle(float x, float y, bool bmOnly)
 void Terrain::RenderGameObject(SDL_Renderer *renderer, Terrain *hoveringTerrain, bool validHover)
 {
     bool hovering = false;
+    bool isStartingTerrain = false;
     if (hoveringTerrain != nullptr)
     {
         if (this == hoveringTerrain)
         {
             hovering = true;
+            if (this == startingTerrain)
+            {
+                isStartingTerrain = true;
+            }
         }
         else if (this != nullptr)
         {
@@ -204,16 +293,27 @@ void Terrain::RenderGameObject(SDL_Renderer *renderer, Terrain *hoveringTerrain,
                 if (connectedTerrain[i] == hoveringTerrain)
                 {
                     hovering = true;
-                    break;
+                    if (connectedTerrain[i] == startingTerrain)
+                    {
+                        isStartingTerrain = true;
+                    }
+                    if (hovering && isStartingTerrain)
+                    {
+                        break;
+                    }
                 }
             }
         }
     }
+
     if (hovering)
     {
         if (validHover)
         {
-            SDL_SetTextureColorMod(pixels, 255 / 2, 255 / 2, 255 / 2);
+            if (!isStartingTerrain)
+            {
+                SDL_SetTextureColorMod(pixels, 255 / 2, 255 / 2, 255 / 2);
+            }
         }
         else
         {

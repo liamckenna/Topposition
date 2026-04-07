@@ -1,4 +1,5 @@
 #include "MouseLogic.h"
+#include <cmath>
 
 void zoom(SDL_MouseWheelEvent &event, Input *playerInput)
 {
@@ -8,24 +9,98 @@ void zoom(SDL_MouseWheelEvent &event, Input *playerInput)
     SDL_GetMouseState(&playerInput->currentMousePosition.first, &playerInput->currentMousePosition.second);
     float mouseX = playerInput->currentMousePosition.first;
     float mouseY = playerInput->currentMousePosition.second;
-    if ((event.y < 0 && cameraZoom <= 0.4) || (event.y > 0 && cameraZoom >= 3.5))
+    if (worldResolution.first > 9599.95f && worldResolution.first < 9600.05f)
     {
-        return;
+        if (event.y < 0)
+        {
+            return;
+        }
+        else
+        {
+            cameraZoom = std::ceil(cameraZoom * 10.0f) / 10.0f;
+            if (cameraZoom == prevCameraZoom)
+            {
+                cameraZoom += 0.1f;
+            }
+        }
     }
-    cameraZoom += (event.y / abs(event.y) * .1);
-    //std::cout << "Camera Zoom: " << cameraZoom << std::endl;
+    else if (worldResolution.first > 1919.95f && worldResolution.first < 1920.05f)
+    {
+        if (event.y > 0)
+        {
+            return;
+        }
+        else
+        {
+            cameraZoom = std::floor(cameraZoom * 10.0f) / 10.0f;
+            if (cameraZoom == prevCameraZoom)
+            {
+                cameraZoom -= 0.1f;
+            }
+        }
+    }
+    else
+    {
+        cameraZoom += (event.y / abs(event.y) * .1);
+        if (cameraZoom <= 0.f)
+        {
+            cameraZoom = SCREEN_WIDTH / 9600.f;
+        }
+        else if (SCREEN_WIDTH / cameraZoom > 9600.f)
+        {
+            cameraZoom = SCREEN_WIDTH / 9600.f;
+        }
+        else if (SCREEN_WIDTH / cameraZoom < 1920.f)
+        {
+            cameraZoom = SCREEN_WIDTH / 1920.f;
+        }
+    }
+    std::cout << "Camera Zoom: " << cameraZoom << std::endl;
 
     cameraPosition.first += (mouseX / prevCameraZoom) - (mouseX / cameraZoom);
     cameraPosition.second += (mouseY / prevCameraZoom) - (mouseY / cameraZoom);
     //std::cout << "Camera Position: " << cameraPosition.first << ", " << cameraPosition.second << std::endl;
 
+    worldResolution.first = SCREEN_WIDTH / cameraZoom;
+    worldResolution.second = SCREEN_HEIGHT / cameraZoom;
+    std::cout << "World Resolution: " << worldResolution.first << ", " << worldResolution.second << std::endl;
+
+    ClampCameraBoundaries();
 }
 
 void scroll(Input *playerInput)
 {
     cameraPosition.first -= (playerInput->currentMousePosition.first - playerInput->prevMousePosition.first) / cameraZoom;
     cameraPosition.second -= (playerInput->currentMousePosition.second - playerInput->prevMousePosition.second) / cameraZoom;
+
+
     //std::cout << "Camera Position: " << cameraPosition.first << ", " << cameraPosition.second << std::endl;
+
+    ClampCameraBoundaries();
+}
+
+void ClampCameraBoundaries()
+{
+    std::pair<float, float> domain = {-2240, 7360};
+    std::pair<float, float> range = {-1210, 4090};
+    
+    if (cameraPosition.first < domain.first)
+    {
+        cameraPosition.first = domain.first;
+    }
+    else if (cameraPosition.first + worldResolution.first > domain.second)
+    {
+        cameraPosition.first = domain.second - worldResolution.first;
+    }
+
+    if (cameraPosition.second < range.first)
+    {
+        cameraPosition.second = range.first;
+    }
+    else if (cameraPosition.second + worldResolution.second > range.second)
+    {
+        cameraPosition.second = range.second - worldResolution.second;
+    }
 }
 
 GameObject *selectObject(int x, int y, bool update)
@@ -209,6 +284,8 @@ void moveSelectedObject(GameObject *gameObject, Input *playerInput)
                               gameObject->GetCenter().second + playerInput->currentMousePosition.second - playerInput->prevMousePosition.second);
 
         Terrain *terrain_under = selectTerrain(gameObject->GetBottomMiddle().first, gameObject->GetBottomMiddle().second);
+        if (terrain_under == nullptr) seaHover = true;
+        else seaHover = false;
         if (hoveringTerrain != terrain_under)
         {
             hoveringTerrain = terrain_under;
