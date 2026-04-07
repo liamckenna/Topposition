@@ -26,7 +26,6 @@ void CalculateFrameRate();
 
 int main(int argc, char *args[])
 {
-    // Start up SDL and create window
 
     if (!init())
     {
@@ -37,7 +36,6 @@ int main(int argc, char *args[])
     LoadMenu();
 
     Input *playerInput = new Input();
-    // While application is running
 
     float fps = 0.0f;
     Uint64 lastUpdate = SDL_GetTicks();
@@ -46,14 +44,12 @@ int main(int argc, char *args[])
     Uint64 start = SDL_GetPerformanceCounter();
     while (!quit)
     {
-        // Handle events on queue
         HandleEvents(playerInput);
         frame++;
         AnimationHandler(fps, lastFrame, lastUpdate);
         RenderScreen();
         CalculateFrameRate();
     }
-    // Free resources and close SDL
     close();
 
     return 0;
