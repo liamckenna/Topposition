@@ -295,6 +295,8 @@ void loadText()
 void loadUI()
 {
 
+    
+
     UIElement *resetButton = new UIElement("reset button", textures["reset"][0], surfaces["reset"], true, true);
     uiElements.push_back(resetButton);
     gameObjects[gameObjects.size() - 1].push_back(resetButton);

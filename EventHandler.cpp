@@ -59,12 +59,10 @@ void EventWindowResized(Input *playerInput, SDL_WindowEvent &event)
     case GAME:
         if (SCREEN_WIDTH / cameraZoom > 9600.f)
         {
-            std::cout << SCREEN_WIDTH / cameraZoom << " > 9600.f" << std::endl;
             cameraZoom = SCREEN_WIDTH / 9600.f;
         }
         else if (SCREEN_WIDTH / cameraZoom < 1920.f)
         {
-            std::cout << SCREEN_WIDTH / cameraZoom << " < 9600.f" << std::endl;
             cameraZoom = SCREEN_WIDTH / 1920.f;
         }
         worldResolution.first = SCREEN_WIDTH / cameraZoom;
@@ -76,12 +74,10 @@ void EventWindowResized(Input *playerInput, SDL_WindowEvent &event)
     case PAUSED:
         if (SCREEN_WIDTH / cameraZoom > 9600.f)
         {
-            std::cout << SCREEN_WIDTH / cameraZoom << " > 9600.f" << std::endl;
             cameraZoom = SCREEN_WIDTH / 9600.f;
         }
         else if (SCREEN_WIDTH / cameraZoom < 1920.f)
         {
-            std::cout << SCREEN_WIDTH / cameraZoom << " < 9600.f" << std::endl;
             cameraZoom = SCREEN_WIDTH / 1920.f;
         }
         worldResolution.first = SCREEN_WIDTH / cameraZoom;

@@ -55,7 +55,7 @@ void zoom(SDL_MouseWheelEvent &event, Input *playerInput)
             cameraZoom = SCREEN_WIDTH / 1920.f;
         }
     }
-    std::cout << "Camera Zoom: " << cameraZoom << std::endl;
+    //std::cout << "Camera Zoom: " << cameraZoom << std::endl;
 
     cameraPosition.first += (mouseX / prevCameraZoom) - (mouseX / cameraZoom);
     cameraPosition.second += (mouseY / prevCameraZoom) - (mouseY / cameraZoom);
@@ -63,7 +63,7 @@ void zoom(SDL_MouseWheelEvent &event, Input *playerInput)
 
     worldResolution.first = SCREEN_WIDTH / cameraZoom;
     worldResolution.second = SCREEN_HEIGHT / cameraZoom;
-    std::cout << "World Resolution: " << worldResolution.first << ", " << worldResolution.second << std::endl;
+    //std::cout << "World Resolution: " << worldResolution.first << ", " << worldResolution.second << std::endl;
 
     ClampCameraBoundaries();
 }
@@ -84,7 +84,7 @@ void ClampCameraBoundaries()
     std::pair<float, float> domain = {-2240, 7360};
     std::pair<float, float> range = {-1210, 4090};
 
-    bool clamp = false;
+    bool clamp = true;
 
     if (clamp)
     {

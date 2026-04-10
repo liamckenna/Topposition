@@ -111,7 +111,7 @@ void renderText()
 
 void renderOcean()
 {
-    int speed = 128;
+    int speed = 32;
     if (deltaTime > 100)
         deltaTime = 5;
     for (int i = 0; i < ocean.size(); i++)
