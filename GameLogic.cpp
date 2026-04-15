@@ -28,6 +28,8 @@ int Roll()
     }
     movesLeft = rollOne + rollTwo;
 
+    movesLeftText->SetRendered(false);
+
     UpdateMovesLeft();
 
     return movesLeft;

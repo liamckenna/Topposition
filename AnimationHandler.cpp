@@ -24,6 +24,7 @@ void AnimationHandler(float fps, Uint64& lastFrame, Uint64& lastUpdate) {
             if (da.currentStep >= da.totalSteps) {
                 da.die->SetTexture(da.finalTexture);
                 da.finished = true;
+                movesLeftText->SetRendered(true);
             } else {
                 int randomFace = rand() % (int)da.faces.size();
                 da.die->SetTexture(da.faces[randomFace]);
