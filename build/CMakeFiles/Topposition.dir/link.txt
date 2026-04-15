@@ -1,0 +1,3 @@
+C:\msys64\ucrt64\bin\cmake.exe -E rm -f CMakeFiles\Topposition.dir/objects.a
+C:\msys64\ucrt64\bin\ar.exe qc CMakeFiles\Topposition.dir/objects.a @CMakeFiles\Topposition.dir\objects1.rsp
+C:\msys64\ucrt64\bin\g++.exe -O3 -DNDEBUG -mwindows -Wl,--whole-archive CMakeFiles\Topposition.dir/objects.a -Wl,--no-whole-archive -o Topposition.exe -Wl,--out-implib,libTopposition.dll.a -Wl,--major-image-version,0,--minor-image-version,0 @CMakeFiles\Topposition.dir\linkLibs.rsp
