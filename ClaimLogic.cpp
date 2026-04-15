@@ -253,18 +253,13 @@ void UpdateBattleSequence()
             break;
         }
 
-        std::cout << std::endl;
-        printf("Attack roll: %d vs Defense roll: %d\n", battleSequence.attackRoll, battleSequence.defenseRoll);
-
         if (battleSequence.attackRoll >= battleSequence.defenseRoll)
         {
-            printf("%s wins the battle!\n", battleSequence.roundAttacker->GetPlayer()->GetName().c_str());
             RetreatPiece(battleSequence.peak, battleSequence.roundDefender);
             battleSequence.defenders.pop_back();
         }
         else
         {
-            printf("%s wins the battle!\n", battleSequence.roundDefender->GetPlayer()->GetName().c_str());
             RetreatPiece(battleSequence.peak, battleSequence.roundAttacker);
             battleSequence.attackers.pop_back();
         }
