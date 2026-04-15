@@ -67,7 +67,12 @@ void updateUIElementPositions()
         else if (uiElements[i]->GetName() == "currentPlayerCircle")
         {
             uiElements[i]->SetScale(1.f * (SCREEN_WIDTH / 3840.f));
-            uiElements[i]->SetGlobalCenter((SCREEN_WIDTH / 2) - (SCREEN_WIDTH / 6.2f), SCREEN_HEIGHT - (uiElements[i]->GetDimensions().second * uiElements[i]->GetScale() / 2) - (SCREEN_HEIGHT / 40));
+            uiElements[i]->SetGlobalCenter((SCREEN_WIDTH / 2) - (SCREEN_WIDTH / 7.50f), SCREEN_HEIGHT - (uiElements[i]->GetDimensions().second * uiElements[i]->GetScale() / 2) - (SCREEN_HEIGHT / 40));
+        }
+        else if (uiElements[i]->GetName() == "opposingPlayerCircle")
+        {
+            uiElements[i]->SetScale(1.f * (SCREEN_WIDTH / 3840.f));
+            uiElements[i]->SetGlobalCenter((SCREEN_WIDTH / 2) + (SCREEN_WIDTH / 7.50f), SCREEN_HEIGHT - (uiElements[i]->GetDimensions().second * uiElements[i]->GetScale() / 2) - (SCREEN_HEIGHT / 40));
         }
         else if (uiElements[i]->GetName() == "dieOne")
         {
@@ -100,9 +105,11 @@ void updateUIElementPositions()
             turnText->SetSize(textSize, renderer);
             endText->SetSize(textSize, renderer);
             turnText->SetPosition((SCREEN_WIDTH / 2) + (SCREEN_WIDTH / 8), SCREEN_HEIGHT - turnText->GetHeight() - (SCREEN_HEIGHT / 40));
+            turnText->SetCenter((SCREEN_WIDTH / 2) + (SCREEN_WIDTH / 7.50f), turnText->GetCenter().second);
             endText->SetPosition((SCREEN_WIDTH / 2) + (SCREEN_WIDTH / 8) + ((turnText->GetWidth() - endText->GetWidth()) / 2), SCREEN_HEIGHT - turnText->GetHeight() - endText->GetHeight() - (SCREEN_HEIGHT / 40));
+            endText->SetCenter((SCREEN_WIDTH / 2) + (SCREEN_WIDTH / 7.50f), endText->GetCenter().second);
             uiElements[i]->SetScale(0.8f * (SCREEN_WIDTH / 3840.f));
-            uiElements[i]->SetGlobalCenter(endText->GetPosition().first + (endText->GetWidth() / 2), endText->GetPosition().second - (SCREEN_HEIGHT / 200) - (uiElements[i]->GetDimensions().second * uiElements[i]->GetScale() / 2));
+            uiElements[i]->SetGlobalCenter((SCREEN_WIDTH / 2) + (SCREEN_WIDTH / 7.50f), endText->GetPosition().second - (SCREEN_HEIGHT / 200) - (uiElements[i]->GetDimensions().second * uiElements[i]->GetScale() / 2));
         }
     }
     UpdateTextElementPositions();

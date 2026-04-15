@@ -144,7 +144,7 @@ UIElement *selectUI(int x, int y, bool update)
 {
     for (int i = 0; i < uiElements.size(); i++)
     {
-        if (!uiElements[i]->GetSelectable())
+        if (!uiElements[i]->GetSelectable() || !uiElements[i]->GetRendered())
         {
             continue;
         }

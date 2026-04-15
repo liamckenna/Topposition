@@ -72,6 +72,8 @@ Player *currentTurn;
 
 UIElement *currentPlayerCircle;
 
+UIElement *opposingPlayerCircle;
+
 Terrain *startingTerrain;
 
 Terrain *hoveringTerrain;
@@ -103,3 +105,9 @@ std::pair<float, float> worldResolution = std::make_pair(SCREEN_WIDTH, SCREEN_HE
 int turnCount = 1;
 
 int unclaimedPeakCount;
+
+Text *turnText;
+
+Text *endText;
+
+UIElement *endTurnArrow;

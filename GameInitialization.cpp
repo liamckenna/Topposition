@@ -297,12 +297,19 @@ void loadText()
     std::string peaksLeftString = "peaks left: " + to_string(unclaimedPeakCount);
     peaksLeftText = new Text("peaksLeftText", "Fonts/yoster.ttf", White, x, y, textSize, renderer, peaksLeftString.c_str());
     text.push_back(peaksLeftText);
-    
+
     currentPlayerCircle = new UIElement("currentPlayerCircle", textures["player circle"][0], surfaces["player circle"], true, false, renderer);
     currentPlayerCircle->SetScale(1.f * (SCREEN_WIDTH / 3840.f));
     uiElements.push_back(currentPlayerCircle);
     gameObjects[gameObjects.size() - 1].push_back(currentPlayerCircle);
-    currentPlayerCircle->SetGlobalCenter((SCREEN_WIDTH / 2) - (SCREEN_WIDTH / 6.2f), SCREEN_HEIGHT - (currentPlayerCircle->GetDimensions().second * currentPlayerCircle->GetScale() / 2) - (SCREEN_HEIGHT / 40));
+    currentPlayerCircle->SetGlobalCenter((SCREEN_WIDTH / 2) - (SCREEN_WIDTH / 7.50f), SCREEN_HEIGHT - (currentPlayerCircle->GetDimensions().second * currentPlayerCircle->GetScale() / 2) - (SCREEN_HEIGHT / 40));
+
+    opposingPlayerCircle = new UIElement("opposingPlayerCircle", textures["opposing player circle"][0], surfaces["opposing player circle"], true, false, renderer);
+    opposingPlayerCircle->SetScale(1.f * (SCREEN_WIDTH / 3840.f));
+    uiElements.push_back(opposingPlayerCircle);
+    gameObjects[gameObjects.size() - 1].push_back(opposingPlayerCircle);
+    opposingPlayerCircle->SetGlobalCenter((SCREEN_WIDTH / 2) + (SCREEN_WIDTH / 7.50f), SCREEN_HEIGHT - (opposingPlayerCircle->GetDimensions().second * opposingPlayerCircle->GetScale() / 2) - (SCREEN_HEIGHT / 40));
+    opposingPlayerCircle->SetRendered(false);
 
     textSize = 125 * (SCREEN_WIDTH / 3840.f);
     y = SCREEN_HEIGHT / 40;
@@ -331,7 +338,7 @@ void loadText()
         if (i == 0)
         {
             playerCircleText->SetRendered(true);
-            SDL_SetTextureColorMod(currentPlayerCircle->GetTexture(), currentTurn->GetSDLColor().r / 2, currentTurn->GetSDLColor().g / 2, currentTurn->GetSDLColor().b / 2);
+            SDL_SetTextureColorMod(currentPlayerCircle->GetTexture(), currentTurn->GetSDLColor().r / 1.5f, currentTurn->GetSDLColor().g / 1.5f, currentTurn->GetSDLColor().b / 1.5f);
         }
     }
 
@@ -347,19 +354,21 @@ void loadText()
 
     textSize = 75 * (SCREEN_WIDTH / 3840.f);
 
-    Text* turnText = new Text("turnText", "Fonts/yoster.ttf", White, 0, 0, textSize, renderer, "Turn");
+    turnText = new Text("turnText", "Fonts/yoster.ttf", White, 0, 0, textSize, renderer, "Turn");
     turnText->SetPosition((SCREEN_WIDTH / 2) + (SCREEN_WIDTH / 8), SCREEN_HEIGHT - turnText->GetHeight() - (SCREEN_HEIGHT / 40));
+    turnText->SetCenter((SCREEN_WIDTH / 2) + (SCREEN_WIDTH / 7.50f), turnText->GetCenter().second);
     text.push_back(turnText);
 
-    Text *endText = new Text("endText", "Fonts/yoster.ttf", White, 0, 0, textSize, renderer, "End");
+    endText = new Text("endText", "Fonts/yoster.ttf", White, 0, 0, textSize, renderer, "End");
     endText->SetPosition((SCREEN_WIDTH / 2) + (SCREEN_WIDTH / 8) + ((turnText->GetWidth() - endText->GetWidth()) / 2), SCREEN_HEIGHT - turnText->GetHeight() - endText->GetHeight() - (SCREEN_HEIGHT / 40));
+    endText->SetCenter((SCREEN_WIDTH / 2) + (SCREEN_WIDTH / 7.50f), endText->GetCenter().second);
     text.push_back(endText);
 
-    UIElement *endTurnArrow = new UIElement("endTurnArrow", textures["end turn arrow"][0], surfaces["end turn arrow"], true, true, renderer);
+    endTurnArrow = new UIElement("endTurnArrow", textures["end turn arrow"][0], surfaces["end turn arrow"], true, true, renderer);
     uiElements.push_back(endTurnArrow);
     endTurnArrow->SetScale(0.8f * (SCREEN_WIDTH / 3840.f));
     gameObjects[gameObjects.size() - 1].push_back(endTurnArrow);
-    endTurnArrow->SetGlobalCenter(endText->GetPosition().first + (endText->GetWidth() / 2), endText->GetPosition().second - (SCREEN_HEIGHT / 200) - (endTurnArrow->GetDimensions().second * endTurnArrow->GetScale() / 2));
+    endTurnArrow->SetGlobalCenter((SCREEN_WIDTH / 2) + (SCREEN_WIDTH / 7.50f), endText->GetPosition().second - (SCREEN_HEIGHT / 200) - (endTurnArrow->GetDimensions().second * endTurnArrow->GetScale() / 2));
     endTurnArrow->SetRenderShadow(true);
 }
 

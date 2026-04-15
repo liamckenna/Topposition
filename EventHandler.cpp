@@ -177,6 +177,10 @@ void MouseMovement(Input *playerInput)
     case LOADING:
         break;
     case GAME:
+        if (IsBattleSequenceActive())
+        {
+            break;
+        }
         if ((playerInput->GetMouseButtonDown("Middle") || playerInput->GetMouseButtonDown("Right")) && !playerInput->GetMouseButtonDown("Left"))
         {
             if (selectedObject == nullptr)
@@ -221,6 +225,11 @@ void MouseButtonDownMainMenu(Input *playerInput, SDL_MouseButtonEvent &event)
 
 void MouseButtonDownGame(Input *playerInput, SDL_MouseButtonEvent &event)
 {
+    if (IsBattleSequenceActive())
+    {
+        return;
+    }
+
     switch (event.button)
     {
     case SDL_BUTTON_LEFT:
@@ -294,6 +303,13 @@ void MouseButtonUpMainMenu(Input *playerInput, SDL_MouseButtonEvent &event)
 
 void MouseButtonUpGame(Input *playerInput, SDL_MouseButtonEvent &event)
 {
+    if (IsBattleSequenceActive())
+    {
+        selectedText = nullptr;
+        selectedObject = nullptr;
+        return;
+    }
+
     switch (event.button)
     {
     case SDL_BUTTON_LEFT:
@@ -324,7 +340,6 @@ void MouseButtonUpGame(Input *playerInput, SDL_MouseButtonEvent &event)
             else if (selectedObject->GetName() == "claim peak button")
             {
                 ClaimPeak(dynamic_cast<UIElement *>(selectedObject));
-                RefreshClaimNotifs();
             }
             else if (selectedObject->type == GameObject::PIECE)
             {
