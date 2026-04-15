@@ -16,8 +16,6 @@ GameObject::GameObject(string name, SDL_Texture *texture, SDL_Surface *surface, 
 
 void GameObject::RenderGameObject(SDL_Renderer *renderer)
 {
-
-
     bool fetch_success = SDL_GetTextureSize(texture, &dimensions.first, &dimensions.second);
 
     if (topLayer)
@@ -68,6 +66,21 @@ void GameObject::RenderGameObject(SDL_Renderer *renderer)
                         SDL_SetTextureColorMod(texture, 255, 255, 255);
                     }   
                 }
+            }
+            else if (type == UI_ELEMENT)
+            {
+                UIElement *uiElement = dynamic_cast<UIElement *>(this);
+                if (uiElement->GetRenderShadow())
+                {
+                    SDL_FRect *shadowRect = uiElement->GetShadowRect();
+                    shadowRect->x = position.first + uiElement->GetShadowOffsetX();
+                    shadowRect->y = position.second + uiElement->GetShadowOffsetY();
+                    shadowRect->w = dimensions.first;
+                    shadowRect->h = dimensions.second;
+                    SDL_RenderTexture(renderer, uiElement->GetShadowTexture(), NULL, shadowRect);
+                }
+
+                SDL_RenderTexture(renderer, texture, NULL, renderRect);
             }
             else
             {
@@ -121,6 +134,17 @@ void GameObject::SetGlobalPosition(float x, float y, bool updateRelative)
         UpdateRelativePositions();
     }
     
+}
+
+void GameObject::SetGlobalCenter(float x, float y, bool updateRelative)
+{
+    globalPosition.first = x - (dimensions.first * scale / 2);
+    globalPosition.second = y - (dimensions.second * scale / 2);
+
+    if (updateRelative)
+    {
+        UpdateRelativePositions();
+    }
 }
 
 void GameObject::UpdateRelativePositions()
@@ -350,6 +374,10 @@ void Peak::Claim(Player *player)
             }
         }
     }
+    else
+    {
+        unclaimedPeakCount--;
+    }
     claimedBy = player;
     player->peaks.push_back(this);
 }
@@ -477,7 +505,7 @@ void OceanTile::FadeIn()
     }
 }
 
-Text::Text(string n, const char *fp, SDL_Color c, int x, int y, int w, int h, int s, SDL_Renderer *r, const char *t)
+Text::Text(string n, const char *fp, SDL_Color c, int x, int y, int s, SDL_Renderer *r, const char *t)
 {
     name = n;
     fontPath = fp;
@@ -486,17 +514,37 @@ Text::Text(string n, const char *fp, SDL_Color c, int x, int y, int w, int h, in
     size = s;
     position.first = x;
     position.second = y;
-    dimensions.first = w;
-    dimensions.second = h;
+    shadowOffsetX = 10;
+    shadowOffsetY = 10;
+    shadowAlpha = 150;
     font = TTF_OpenFont(fontPath, size);
+
+    SDL_Color shadowColor = {0, 0, 0, shadowAlpha};
+    SDL_Surface *shadowSurface = TTF_RenderText_Solid(font, text, 0, shadowColor);
+    shadowTexture = SDL_CreateTextureFromSurface(r, shadowSurface);
+    SDL_SetTextureAlphaMod(shadowTexture, shadowAlpha);
+    SDL_DestroySurface(shadowSurface);
+
     surface = TTF_RenderText_Solid(font, text, 0, color);
     texture = SDL_CreateTextureFromSurface(r, surface);
+
+    dimensions.first = surface->w;
+    dimensions.second = surface->h;
 }
 
 void Text::RenderText(SDL_Renderer *renderer)
 {
     if (rendered)
     {
+        if (renderShadow)
+        {
+            shadowRect->x = position.first + shadowOffsetX;
+            shadowRect->y = position.second + shadowOffsetY;
+            shadowRect->w = dimensions.first;
+            shadowRect->h = dimensions.second;
+            SDL_RenderTexture(renderer, shadowTexture, NULL, shadowRect);
+        }
+        
         rect->x = position.first;
         rect->y = position.second;
         rect->w = dimensions.first;

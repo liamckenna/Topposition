@@ -139,7 +139,6 @@ void CheckOceanTilePositioning()
             if (ocean[i][j]->globalPosition.first >= 7680 || ocean[i][j]->globalPosition.second >= 6560)
             {
                 edgeTiles.push_back(ocean[i][j]);
-                std::cout << "added ocean tile \"" << ocean[i][j]->GetName() << "\" at position (" << ocean[i][j]->globalPosition.first << ", " << ocean[i][j]->globalPosition.second << ") to edgeTiles" << std::endl;
             }
         }
     }
@@ -159,7 +158,4 @@ void ReflectOceanTile(OceanTile *tile)
     float newY = 4000 - x;
 
     tile->SetGlobalPosition(newX, newY);
-    std::cout << "Reflected ocean tile \"" << tile->GetName()
-              << "\" from old position (" << x << ", " << y
-              << ") to new position (" << newX << ", " << newY << ")" << std::endl;
 }

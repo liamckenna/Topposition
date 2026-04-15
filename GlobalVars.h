@@ -64,15 +64,17 @@ extern int currentRoll;
 
 extern int movesLeft;
 
-extern Text *playerOneText;
+extern Text *turnTallyText;
 
-extern Text *playerTwoText;
+extern Text *turnTallyNumText;
 
-extern Text *playerThreeText;
+extern Text *peaksLeftText;
 
-extern Text *playerFourText;
+extern Text *movesLeftText;
 
 extern Player *currentTurn;
+
+extern UIElement *currentPlayerCircle;
 
 extern Terrain *startingTerrain;
 
@@ -114,3 +116,7 @@ extern bool seaHover;
 extern bool hovering;
 
 extern std::pair<float, float> worldResolution;
+
+extern int turnCount;
+
+extern int unclaimedPeakCount;

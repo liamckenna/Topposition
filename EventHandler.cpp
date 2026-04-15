@@ -89,6 +89,8 @@ void EventWindowResized(Input *playerInput, SDL_WindowEvent &event)
     default:
         break;
     }
+
+    std::cout << "New screen dimensions: " << SCREEN_WIDTH << ", " << SCREEN_HEIGHT << std::endl;
     updateUIElementPositions();
 }
 
@@ -300,9 +302,11 @@ void MouseButtonUpGame(Input *playerInput, SDL_MouseButtonEvent &event)
                 currentRoll = Roll();
                 movesLeft = currentRoll;
             }
-            else if (selectedObject->GetName() == "finish turn button")
+            else if (selectedObject->GetName() == "finish turn button" || selectedObject->GetName() == "endTurnArrow")
             {
                 FinishTurn();
+                currentRoll = Roll();
+                movesLeft = currentRoll;
             }
             else if (selectedObject->GetName() == "claim peak button")
             {

@@ -3018,6 +3018,7 @@ CMakeFiles/Topposition.dir/Player.cpp.obj
  C:/msys64/ucrt64/include/SDL3/SDL_tray.h
  C:/msys64/ucrt64/include/SDL3/SDL_version.h
  C:/msys64/ucrt64/include/SDL3/SDL_video.h
+ C:/msys64/ucrt64/include/SDL3_image/SDL_image.h
  C:/msys64/ucrt64/include/SDL3_ttf/SDL_ttf.h
  C:/msys64/ucrt64/include/_mingw.h
  C:/msys64/ucrt64/include/_mingw_mac.h
@@ -3026,16 +3027,20 @@ CMakeFiles/Topposition.dir/Player.cpp.obj
  C:/msys64/ucrt64/include/_mingw_stat64.h
  C:/msys64/ucrt64/include/_mingw_stdarg.h
  C:/msys64/ucrt64/include/_timeval.h
+ C:/msys64/ucrt64/include/c++/15.2.0/atomic
  C:/msys64/ucrt64/include/c++/15.2.0/backward/binders.h
  C:/msys64/ucrt64/include/c++/15.2.0/bit
  C:/msys64/ucrt64/include/c++/15.2.0/bits/alloc_traits.h
  C:/msys64/ucrt64/include/c++/15.2.0/bits/allocator.h
+ C:/msys64/ucrt64/include/c++/15.2.0/bits/atomic_base.h
+ C:/msys64/ucrt64/include/c++/15.2.0/bits/atomic_lockfree_defines.h
  C:/msys64/ucrt64/include/c++/15.2.0/bits/basic_ios.h
  C:/msys64/ucrt64/include/c++/15.2.0/bits/basic_ios.tcc
  C:/msys64/ucrt64/include/c++/15.2.0/bits/basic_string.h
  C:/msys64/ucrt64/include/c++/15.2.0/bits/basic_string.tcc
  C:/msys64/ucrt64/include/c++/15.2.0/bits/char_traits.h
  C:/msys64/ucrt64/include/c++/15.2.0/bits/charconv.h
+ C:/msys64/ucrt64/include/c++/15.2.0/bits/chrono.h
  C:/msys64/ucrt64/include/c++/15.2.0/bits/concept_check.h
  C:/msys64/ucrt64/include/c++/15.2.0/bits/cpp_type_traits.h
  C:/msys64/ucrt64/include/c++/15.2.0/bits/cxxabi_forced.h
@@ -3064,6 +3069,7 @@ CMakeFiles/Topposition.dir/Player.cpp.obj
  C:/msys64/ucrt64/include/c++/15.2.0/bits/ostream.h
  C:/msys64/ucrt64/include/c++/15.2.0/bits/ostream.tcc
  C:/msys64/ucrt64/include/c++/15.2.0/bits/ostream_insert.h
+ C:/msys64/ucrt64/include/c++/15.2.0/bits/parse_numbers.h
  C:/msys64/ucrt64/include/c++/15.2.0/bits/postypes.h
  C:/msys64/ucrt64/include/c++/15.2.0/bits/predefined_ops.h
  C:/msys64/ucrt64/include/c++/15.2.0/bits/ptr_traits.h
@@ -3072,6 +3078,7 @@ CMakeFiles/Topposition.dir/Player.cpp.obj
  C:/msys64/ucrt64/include/c++/15.2.0/bits/requires_hosted.h
  C:/msys64/ucrt64/include/c++/15.2.0/bits/specfun.h
  C:/msys64/ucrt64/include/c++/15.2.0/bits/std_abs.h
+ C:/msys64/ucrt64/include/c++/15.2.0/bits/std_thread.h
  C:/msys64/ucrt64/include/c++/15.2.0/bits/stl_algobase.h
  C:/msys64/ucrt64/include/c++/15.2.0/bits/stl_bvector.h
  C:/msys64/ucrt64/include/c++/15.2.0/bits/stl_construct.h
@@ -3090,6 +3097,8 @@ CMakeFiles/Topposition.dir/Player.cpp.obj
  C:/msys64/ucrt64/include/c++/15.2.0/bits/streambuf_iterator.h
  C:/msys64/ucrt64/include/c++/15.2.0/bits/string_view.tcc
  C:/msys64/ucrt64/include/c++/15.2.0/bits/stringfwd.h
+ C:/msys64/ucrt64/include/c++/15.2.0/bits/this_thread_sleep.h
+ C:/msys64/ucrt64/include/c++/15.2.0/bits/unique_ptr.h
  C:/msys64/ucrt64/include/c++/15.2.0/bits/uses_allocator.h
  C:/msys64/ucrt64/include/c++/15.2.0/bits/uses_allocator_args.h
  C:/msys64/ucrt64/include/c++/15.2.0/bits/utility.h
@@ -3101,8 +3110,10 @@ CMakeFiles/Topposition.dir/Player.cpp.obj
  C:/msys64/ucrt64/include/c++/15.2.0/cmath
  C:/msys64/ucrt64/include/c++/15.2.0/concepts
  C:/msys64/ucrt64/include/c++/15.2.0/cstddef
+ C:/msys64/ucrt64/include/c++/15.2.0/cstdint
  C:/msys64/ucrt64/include/c++/15.2.0/cstdio
  C:/msys64/ucrt64/include/c++/15.2.0/cstdlib
+ C:/msys64/ucrt64/include/c++/15.2.0/ctime
  C:/msys64/ucrt64/include/c++/15.2.0/cwchar
  C:/msys64/ucrt64/include/c++/15.2.0/cwctype
  C:/msys64/ucrt64/include/c++/15.2.0/debug/assertions.h
@@ -3125,12 +3136,14 @@ CMakeFiles/Topposition.dir/Player.cpp.obj
  C:/msys64/ucrt64/include/c++/15.2.0/new
  C:/msys64/ucrt64/include/c++/15.2.0/ostream
  C:/msys64/ucrt64/include/c++/15.2.0/pstl/pstl_config.h
+ C:/msys64/ucrt64/include/c++/15.2.0/ratio
  C:/msys64/ucrt64/include/c++/15.2.0/stdexcept
  C:/msys64/ucrt64/include/c++/15.2.0/stdlib.h
  C:/msys64/ucrt64/include/c++/15.2.0/streambuf
  C:/msys64/ucrt64/include/c++/15.2.0/string
  C:/msys64/ucrt64/include/c++/15.2.0/string_view
  C:/msys64/ucrt64/include/c++/15.2.0/system_error
+ C:/msys64/ucrt64/include/c++/15.2.0/thread
  C:/msys64/ucrt64/include/c++/15.2.0/tr1/bessel_function.tcc
  C:/msys64/ucrt64/include/c++/15.2.0/tr1/beta_function.tcc
  C:/msys64/ucrt64/include/c++/15.2.0/tr1/ell_integral.tcc
@@ -3167,7 +3180,9 @@ CMakeFiles/Topposition.dir/Player.cpp.obj
  C:/msys64/ucrt64/include/corecrt_wstdlib.h
  C:/msys64/ucrt64/include/crtdefs.h
  C:/msys64/ucrt64/include/ctype.h
+ C:/msys64/ucrt64/include/dirent.h
  C:/msys64/ucrt64/include/errno.h
+ C:/msys64/ucrt64/include/io.h
  C:/msys64/ucrt64/include/limits.h
  C:/msys64/ucrt64/include/locale.h
  C:/msys64/ucrt64/include/malloc.h
@@ -3208,6 +3223,7 @@ CMakeFiles/Topposition.dir/Player.cpp.obj
  C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/syslimits.h
  C:/Lee/Repos/Topposition/GameObject.h
  C:/Lee/Repos/Topposition/GameRules.h
+ C:/Lee/Repos/Topposition/GlobalVars.h
  C:/Lee/Repos/Topposition/Player.h
 
 CMakeFiles/Topposition.dir/PlayerMovement.cpp.obj

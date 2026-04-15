@@ -10,13 +10,13 @@ void LoadMenu()
 
 void loadMenuUI()
 {
-    UIElement *logo = new UIElement("logo 1", textures["logo 1"][0], surfaces["logo 1"], true, false);
+    UIElement *logo = new UIElement("logo 1", textures["logo 1"][0], surfaces["logo 1"], true, false, renderer);
     uiElements.push_back(logo);
     gameObjects[0].push_back(logo);
     logo->SetScale((float)SCREEN_HEIGHT / 1152);
     logo->SetGlobalPosition(0, 0);
 
-    UIElement *playButton = new UIElement("play", textures["play"][0], surfaces["play"], true, true);
+    UIElement *playButton = new UIElement("play", textures["play"][0], surfaces["play"], true, true, renderer);
     uiElements.push_back(playButton);
     gameObjects[0].push_back(playButton);
     playButton->SetScale((float)SCREEN_HEIGHT / 1152);
@@ -29,7 +29,7 @@ void loadMenuUI()
     // settingsButton->SetScale((float)SCREEN_HEIGHT / 1152);
     // settingsButton->SetCenter(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 3 * 2 + (settingsButton->GetDimensions().second * settingsButton->GetScale()) - 20);
 
-    UIElement *quitButton = new UIElement("quit", textures["quit"][0], surfaces["quit"], true, true);
+    UIElement *quitButton = new UIElement("quit", textures["quit"][0], surfaces["quit"], true, true, renderer);
     uiElements.push_back(quitButton);
     gameObjects[0].push_back(quitButton);
     quitButton->SetScale((float)SCREEN_HEIGHT / 1152);
@@ -38,12 +38,13 @@ void loadMenuUI()
 
 void loadMenuBackground()
 {
-    UIElement *background = new UIElement("background", textures["background"][0], surfaces["background"], true, false);
+    UIElement *background = new UIElement("background", textures["background"][0], surfaces["background"], true, false, renderer);
     uiElements.push_back(background);
     gameObjects[0].push_back(background);
     background->SetScale((float)SCREEN_HEIGHT / 1152);
     background->SetGlobalPosition(0, 0);
 }
+
 
 void updateUIElementPositions()
 {

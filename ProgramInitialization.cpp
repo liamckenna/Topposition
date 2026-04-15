@@ -82,7 +82,7 @@ SDL_Surface *loadSurface(std::string path)
     else
     {
         // Convert surface to screen format
-        optimizedSurface = SDL_ConvertSurface(loadedSurface, screenSurface->format);
+        optimizedSurface = SDL_ConvertSurface(loadedSurface, SDL_PIXELFORMAT_RGBA8888);
         if (optimizedSurface == NULL)
         {
             printf("Unable to optimize image %s! SDL Error: %s\n", path.c_str(), SDL_GetError());

@@ -75,6 +75,7 @@ public:
     void SetSelectable(bool s) { selectable = s; }
     void SetScale(float s) { scale = s; }
     void SetGlobalPosition(float x, float y, bool updateRelative = true);
+    void SetGlobalCenter(float x, float y, bool updateRelative = true);
     void SetPosition(float x, float y, bool posOnly = false);
     virtual void SetCenter(float x = 0, float y = 0, bool centerOnly = false);
     void SetMovable(bool m);
@@ -156,18 +157,45 @@ bool CheckMovePossibility(Piece *piece, Terrain *targetTerrain);
 class UIElement : public GameObject
 {
     Peak *associatedPeak;
+    SDL_FRect *shadowRect;
+    SDL_Texture *shadowTexture;
+    bool renderShadow = false;
+    int shadowOffsetX;
+    int shadowOffsetY;
+    Uint8 shadowAlpha;
 
 public:
-    UIElement(string name, SDL_Texture *texture, SDL_Surface *surface, bool r, bool s, Peak *ap = nullptr) : GameObject(name, texture, surface, false, r)
+    UIElement(string name, SDL_Texture *texture, SDL_Surface *surface, bool r, bool s, SDL_Renderer *renderer, Peak *ap = nullptr) : GameObject(name, texture, surface, false, r)
     {
         type = UI_ELEMENT;
         associatedPeak = ap;
         resizable = false;
         selectable = s;
         topLayer = true;
+
+        shadowOffsetX = 5;
+        shadowOffsetY = 5;
+        shadowAlpha = 150;
+        shadowRect = new SDL_FRect();
+
+        SDL_Surface *shadowSurface = SDL_DuplicateSurface(surface);
+        shadowTexture = SDL_CreateTextureFromSurface(renderer, shadowSurface);
+        SDL_DestroySurface(shadowSurface);
+
+        SDL_SetTextureColorMod(shadowTexture, 0, 0, 0);
+        SDL_SetTextureAlphaMod(shadowTexture, shadowAlpha / 2);
+        SDL_SetTextureBlendMode(shadowTexture, SDL_BLENDMODE_BLEND);
     }
     Peak *GetAssociatedPeak() { return associatedPeak; }
     void SetAssociatedPeak(Peak *ap) { associatedPeak = ap; }
+    void SetRenderShadow(bool rs) { renderShadow = rs; }
+
+    bool GetRenderShadow() { return renderShadow; }
+    SDL_FRect *GetShadowRect() { return shadowRect; }
+    SDL_Texture *GetShadowTexture() { return shadowTexture; }
+    int GetShadowOffsetX() { return shadowOffsetX; }
+    int GetShadowOffsetY() { return shadowOffsetY; }
+    Uint8 GetShadowAlpha() { return shadowAlpha; }
 };
 
 class Peak : public Terrain
@@ -306,11 +334,68 @@ class Text
     SDL_Texture *texture;
     int size;
     bool rendered = true;
+    SDL_FRect *shadowRect = new SDL_FRect();
+    SDL_Texture *shadowTexture;
+    bool renderShadow = true;
+    int shadowOffsetX;
+    int shadowOffsetY;
+    Uint8 shadowAlpha;
 
 public:
-    Text(string n, const char *fp, SDL_Color c, int x, int y, int w, int h, int s, SDL_Renderer *r, const char *t);
+    Text(string n, const char *fp, SDL_Color c, int x, int y, int s, SDL_Renderer *r, const char *t);
     void RenderText(SDL_Renderer *renderer);
     void SetRendered(bool r) { rendered = r; }
+    void SetRenderShadow(bool rs) { renderShadow = rs; }
+    void SetPosition(int x, int y)
+    {
+        position.first = x;
+        position.second = y;
+        rect->x = x;
+        rect->y = y;
+    }
+    void SetCenter(int x, int y)
+    {
+        position.first = x - (dimensions.first / 2);
+        position.second = y - (dimensions.second / 2);
+        rect->x = position.first;
+        rect->y = position.second;
+    }
+    std::pair<float, float> GetCenter()
+    {
+        return {position.first + (dimensions.first / 2), position.second + (dimensions.second / 2)};
+    }
+    void SetTextContent(const char *t, SDL_Renderer *renderer)
+    {
+        text = t;
+        SDL_DestroyTexture(texture);
+        SDL_DestroyTexture(shadowTexture);
+
+        SDL_Color shadowColor = {0, 0, 0, shadowAlpha};
+        SDL_Surface *shadowSurface = TTF_RenderText_Solid(font, text, 0, shadowColor);
+        shadowTexture = SDL_CreateTextureFromSurface(renderer, shadowSurface);
+        SDL_SetTextureAlphaMod(shadowTexture, shadowAlpha);
+        SDL_DestroySurface(shadowSurface);
+
+        surface = TTF_RenderText_Solid(font, text, 0, color);
+        texture = SDL_CreateTextureFromSurface(renderer, surface);
+
+        dimensions.first = surface->w;
+        dimensions.second = surface->h;
+    }
+    void SetDimensions(int w, int h)
+    {
+        dimensions.first = w;
+        dimensions.second = h;
+        rect->w = w;
+        rect->h = h;
+    }
+    int GetSize() { return size; }
+    int GetWidth() { return dimensions.first; }
+    int GetHeight() { return dimensions.second; }
+    std::pair<int, int> GetPosition() { return position; }
+    std::pair<int, int> GetDimensions() { return dimensions; }
+    string GetName() { return name; }
+
 };
 
 class Animation

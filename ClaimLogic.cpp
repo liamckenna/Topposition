@@ -72,6 +72,8 @@ void ClaimPeak(UIElement *peakNotif)
         }
     }
     UpdateScore();
+    std::string peaksLeftString = "peaks left: " + to_string(unclaimedPeakCount);
+    peaksLeftText->SetTextContent(peaksLeftString.c_str(), renderer);
 }
 
 Player *PeakBattle(Peak *peak, Player *attacker, Player *defender)

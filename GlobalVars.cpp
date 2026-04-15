@@ -56,15 +56,17 @@ GameRules *rules = new GameRules();
 
 int shapeCount = 0;
 
+Text *turnTallyText;
+
+Text *turnTallyNumText;
+
+Text *peaksLeftText;
+
+Text *movesLeftText;
+
 Player *currentTurn;
 
-Text *playerOneText;
-
-Text *playerTwoText;
-
-Text *playerThreeText;
-
-Text *playerFourText;
+UIElement *currentPlayerCircle;
 
 Terrain *startingTerrain;
 
@@ -93,3 +95,7 @@ std::pair<float, float> cameraPosition = {0.f, 0.f};
 bool seaHover = false;
 
 std::pair<float, float> worldResolution = std::make_pair(SCREEN_WIDTH, SCREEN_HEIGHT);
+
+int turnCount = 1;
+
+int unclaimedPeakCount;

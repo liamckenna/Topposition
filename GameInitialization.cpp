@@ -100,15 +100,16 @@ void loadGame()
     cameraZoom = 1.f;
     cameraPosition = {0, 0};
     worldResolution = {SCREEN_WIDTH, SCREEN_HEIGHT};
+    turnCount = 1;
 
     std::cout << "Loading Map..." << std::endl;
     loadMap();
-    std::cout << "Loading UI..." << std::endl;
-    loadUI();
     std::cout << "Loading Game Pieces..." << std::endl;
     loadGamePieces();
     std::cout << "Loading Text..." << std::endl;
     loadText();
+    std::cout << "Loading UI..." << std::endl;
+    loadUI();
     std::cout << "Generating Pixels..." << std::endl;
     GeneratePixels();
     std::cout << "Generating Ocean..." << std::endl;
@@ -146,6 +147,8 @@ bool loadMap()
     }
     GroomTerrain();
 
+    unclaimedPeakCount = peaks.size();
+
     return success;
 }
 
@@ -156,6 +159,7 @@ void loadGamePieces()
     {
         string color;
         string playerNumber;
+        SDL_Color sdlColor;
         bool selectable;
         Player *player = new Player();
         players.push_back(player);
@@ -165,25 +169,30 @@ void loadGamePieces()
             color = "red";
             playerNumber = "playerOne";
             selectable = true;
+            sdlColor = {255, 0, 0};
             break;
         case 1:
             color = "green";
             playerNumber = "playerTwo";
             selectable = false;
+            sdlColor = {0, 255, 0};
             break;
         case 2:
             color = "blue";
             playerNumber = "playerThree";
             selectable = false;
+            sdlColor = {0, 0, 255};
             break;
         case 3:
             color = "yellow";
             playerNumber = "playerFour";
             selectable = false;
+            sdlColor = {255, 255, 0};
             break;
         }
         player->SetName(playerNumber);
         player->SetColor(color);
+        player->SetSDLColor(sdlColor);
         string flagName = playerNumber + " flag";
         for (int i = 0; i < peaks.size(); i++)
         {
@@ -256,86 +265,124 @@ void loadGamePieces()
 void loadText()
 {
     SDL_Color White = {255, 255, 255};
-
-    Text *currentTurnText = new Text("currentTurnText", "Fonts/yoster.ttf", White, 150, 0, 300, 50, 100, renderer, "Current Turn: ");
-    text.push_back(currentTurnText);
     SDL_Color Red = {255, 0, 0};
-
-    playerOneText = new Text("playerOneText", "Fonts/yoster.ttf", Red, 450, 0, 250, 50, 100, renderer, "Player One");
-    text.push_back(playerOneText);
-    if (rules->GetPlayerCount() > 0)
-        players[0]->SetTurnText(playerOneText);
-
     SDL_Color Green = {0, 255, 0};
-
-    playerTwoText = new Text("playerTwoText", "Fonts/yoster.ttf", Green, 450, 0, 250, 50, 100, renderer, "Player Two");
-    text.push_back(playerTwoText);
-    playerTwoText->SetRendered(false);
-
-    if (rules->GetPlayerCount() > 1)
-        players[1]->SetTurnText(playerTwoText);
-
     SDL_Color Blue = {0, 0, 255};
-
-    playerThreeText = new Text("playerThreeText", "Fonts/yoster.ttf", Blue, 450, 0, 300, 50, 100, renderer, "Player Three");
-    text.push_back(playerThreeText);
-    playerThreeText->SetRendered(false);
-    if (rules->GetPlayerCount() > 2)
-        players[2]->SetTurnText(playerThreeText);
-
     SDL_Color Yellow = {255, 255, 0};
 
-    playerFourText = new Text("playerFourText", "Fonts/yoster.ttf", Yellow, 450, 0, 275, 50, 100, renderer, "Player Four");
-    text.push_back(playerFourText);
-    playerFourText->SetRendered(false);
-    if (rules->GetPlayerCount() > 3)
-        players[3]->SetTurnText(playerFourText);
+    
+    int textSize = 125;
+
+    turnTallyText = new Text("turnCountText", "Fonts/yoster.ttf", White, 0, 0, textSize, renderer, "Turn 80");
+
+    int x = SCREEN_WIDTH - turnTallyText->GetWidth() - 50;
+    int y = 50;
+
+    turnTallyText->SetPosition(x, y);
+    text.push_back(turnTallyText);    
+
+    turnTallyNumText = new Text("turnTallyNumText", "Fonts/yoster.ttf", White, x, y, textSize, renderer, to_string(turnCount).c_str());
+
+    x = turnTallyText->GetPosition().first + turnTallyText->GetWidth() - (turnTallyNumText->GetWidth() * 1.5);
+
+    turnTallyNumText->SetPosition(x, y);
+    text.push_back(turnTallyNumText);
+
+    textSize = 65;
+    x = turnTallyText->GetPosition().first + 25;
+    y = turnTallyText->GetPosition().second + turnTallyText->GetHeight() + 10;
+
+    turnTallyText->SetPosition(turnTallyText->GetPosition().first + (turnTallyNumText->GetWidth() / 2), turnTallyText->GetPosition().second);
+
+    turnTallyText->SetTextContent("Turn", renderer);
+
+    std::string peaksLeftString = "peaks left: " + to_string(unclaimedPeakCount);
+    peaksLeftText = new Text("peaksLeftText", "Fonts/yoster.ttf", White, x, y, textSize, renderer, peaksLeftString.c_str());
+    text.push_back(peaksLeftText);
+    
+    currentPlayerCircle = new UIElement("currentPlayerCircle", textures["player circle"][0], surfaces["player circle"], true, false, renderer);
+    uiElements.push_back(currentPlayerCircle);
+    gameObjects[gameObjects.size() - 1].push_back(currentPlayerCircle);
+    currentPlayerCircle->SetGlobalCenter(SCREEN_WIDTH / 2 - 625, SCREEN_HEIGHT - currentPlayerCircle->GetDimensions().second / 2 - (SCREEN_HEIGHT / 40));
+
+    textSize = 125;
+    y = 50;
+
+    for (int i = 0; i < rules->GetPlayerCount(); i++)
+    {
+        x = 50;
+        if (i > 0)
+        {
+            y += players[0]->GetTurnText()->GetDimensions().second;
+        }
+        Text *playerText = new Text("player" + to_string(i) + "Text", "Fonts/yoster.ttf", players[i]->GetSDLColor(), x, y, textSize, renderer, ("P" + to_string(i + 1) + ":").c_str());
+        x = playerText->GetPosition().first + playerText->GetWidth() + 25;
+        y = playerText->GetPosition().second;
+        Text *playerScoreText = new Text("player" + to_string(i) + "ScoreText", "Fonts/yoster.ttf", White, x, y, textSize, renderer, "0");
+        Text *playerCircleText = new Text("player" + to_string(i) + "CircleText", "Fonts/yoster.ttf", White, x, y, textSize, renderer, ("P" + to_string(i + 1)).c_str());
+        playerCircleText->SetCenter(currentPlayerCircle->GetCenter().first, currentPlayerCircle->GetCenter().second);
+        playerCircleText->SetRenderShadow(false);
+        playerCircleText->SetRendered(false);
+        text.push_back(playerText);
+        text.push_back(playerScoreText);
+        text.push_back(playerCircleText);
+        players[i]->SetTurnText(playerText);
+        players[i]->SetScoreText(playerScoreText);
+        players[i]->SetCircleText(playerCircleText);
+        if (i == 0)
+        {
+            playerCircleText->SetRendered(true);
+            SDL_SetTextureColorMod(currentPlayerCircle->GetTexture(), currentTurn->GetSDLColor().r / 2, currentTurn->GetSDLColor().g / 2, currentTurn->GetSDLColor().b / 2);
+        }
+    }
+
+    textSize = 150;
+
+    movesLeftText = new Text("movesLeftText", "Fonts/yoster.ttf", White, 0, 0, textSize, renderer, "11");
+
+    x = SCREEN_WIDTH / 2 - (movesLeftText->GetWidth() / 2);
+    y = SCREEN_HEIGHT - movesLeftText->GetHeight() - 225;
+    movesLeftText->SetPosition(x, y);
+
+    text.push_back(movesLeftText);
+
+    textSize = 75;
+
+    Text* turnText = new Text("turnText", "Fonts/yoster.ttf", White, 0, 0, textSize, renderer, "Turn");
+    turnText->SetPosition((SCREEN_WIDTH / 2) + 500, SCREEN_HEIGHT - turnText->GetHeight() - (SCREEN_HEIGHT / 40));
+    text.push_back(turnText);
+
+    Text *endText = new Text("endText", "Fonts/yoster.ttf", White, 0, 0, textSize, renderer, "End");
+    endText->SetPosition((SCREEN_WIDTH / 2) + 500 + ((turnText->GetWidth() - endText->GetWidth()) / 2), SCREEN_HEIGHT - turnText->GetHeight() - endText->GetHeight() - (SCREEN_HEIGHT / 40));
+    text.push_back(endText);
+
+    UIElement * endTurnArrow = new UIElement("endTurnArrow", textures["end turn arrow"][0], surfaces["end turn arrow"], true, true, renderer);
+    uiElements.push_back(endTurnArrow);
+    endTurnArrow->SetScale(0.8);
+    gameObjects[gameObjects.size() - 1].push_back(endTurnArrow);
+    endTurnArrow->SetGlobalCenter(endText->GetPosition().first + endText->GetWidth() / 2, endText->GetPosition().second - 10 - endTurnArrow->GetDimensions().second / 2);
+    endTurnArrow->SetRenderShadow(true);
+    
 }
 
 void loadUI()
 {
-
-    
-
-    UIElement *resetButton = new UIElement("reset button", textures["reset"][0], surfaces["reset"], true, true);
-    uiElements.push_back(resetButton);
-    gameObjects[gameObjects.size() - 1].push_back(resetButton);
-    resetButton->SetGlobalPosition(0, 0);
-
-    UIElement *die1 = new UIElement("dieOne", textures["die 1"][0], surfaces["die 1"], true, true);
-    die1->SetScale(0.1);
+    UIElement *die1 = new UIElement("dieOne", textures["die 1"][0], surfaces["die 1"], true, true, renderer);
+    die1->SetScale(0.15);
     uiElements.push_back(die1);
     gameObjects[gameObjects.size() - 1].push_back(die1);
-    die1->SetGlobalPosition(SCREEN_WIDTH - (die1->GetDimensions().first * die1->GetScale()) - 10, 10);
+    die1->SetGlobalCenter(SCREEN_WIDTH / 2 - (die1->GetDimensions().first * die1->GetScale() / 1.25f), SCREEN_HEIGHT - (die1->GetDimensions().second * die1->GetScale() / 2) - (SCREEN_HEIGHT / 40));
 
-    UIElement *die2 = new UIElement("dieTwo", textures["die 2"][0], surfaces["die 2"], true, true);
-    die2->SetScale(0.1);
+    UIElement *die2 = new UIElement("dieTwo", textures["die 2"][0], surfaces["die 2"], true, true, renderer);
+    die2->SetScale(0.15);
     uiElements.push_back(die2);
     gameObjects[gameObjects.size() - 1].push_back(die2);
-    die2->SetGlobalPosition(SCREEN_WIDTH - ((die1->GetDimensions().first * die1->GetScale()) + 10) * 2, 10);
+    die2->SetGlobalCenter(SCREEN_WIDTH / 2 + (die2->GetDimensions().first * die2->GetScale() / 1.25f), SCREEN_HEIGHT - (die2->GetDimensions().second * die2->GetScale() / 2) - (SCREEN_HEIGHT / 40));
 
-    UIElement *movesLeftText = new UIElement("movesLeftText", textures["moves left"][0], surfaces["moves left"], true, false);
-    movesLeftText->SetScale(0.1);
-    uiElements.push_back(movesLeftText);
-    gameObjects[gameObjects.size() - 1].push_back(movesLeftText);
-    movesLeftText->SetGlobalPosition(0, SCREEN_HEIGHT - (movesLeftText->GetDimensions().second * movesLeftText->GetScale()));
-
-    UIElement *movesLeftCount = new UIElement("movesLeftCount", textures["moves left 3"][0], surfaces["moves left 3"], true, false);
-    movesLeftCount->SetScale(0.1);
-    uiElements.push_back(movesLeftCount);
-    gameObjects[gameObjects.size() - 1].push_back(movesLeftCount);
-    movesLeftCount->SetGlobalPosition(0, SCREEN_HEIGHT - (movesLeftCount->GetDimensions().second * movesLeftCount->GetScale()));
-
-    UIElement *finishTurnButton = new UIElement("finish turn button", textures["finish turn"][0], surfaces["finish turn"], true, true);
-    finishTurnButton->SetScale(0.1);
-    finishTurnButton->SetGlobalPosition(SCREEN_WIDTH - (finishTurnButton->GetDimensions().first * finishTurnButton->GetScale()) - 10,
-                                  SCREEN_HEIGHT - (finishTurnButton->GetDimensions().second * finishTurnButton->GetScale()) - 10);
-    uiElements.push_back(finishTurnButton);
-    gameObjects[gameObjects.size() - 1].push_back(finishTurnButton);
 
     for (int i = 0; i < peaks.size(); i++)
     {
-        UIElement *claimPeakButton = new UIElement("claim peak button", textures["claim peak"][0], surfaces["claim peak"], false, true, peaks[i]);
+        UIElement *claimPeakButton = new UIElement("claim peak button", textures["claim peak"][0], surfaces["claim peak"], false, true, renderer, peaks[i]);
         claimPeakButton->SetScale(0.1);
         claimPeakButton->SetCenter(peaks[i]->GetCenter().first + 50, peaks[i]->GetCenter().second - 50);
         claimPeakButton->SetResizable(true);

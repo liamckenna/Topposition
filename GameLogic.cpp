@@ -27,7 +27,7 @@ int Roll()
 void RotateTurn()
 {
 
-    currentTurn->GetTurnText()->SetRendered(false);
+    currentTurn->GetCircleText()->SetRendered(false);
 
     for (int i = 0; i < currentTurn->soldiers.size(); i++)
     {
@@ -55,18 +55,21 @@ void RotateTurn()
         currentTurn->soldiers[i]->SetSelectable(true);
     }
 
-    currentTurn->GetTurnText()->SetRendered(true);
+    currentTurn->GetCircleText()->SetRendered(true);
+    SDL_SetTextureColorMod(currentPlayerCircle->GetTexture(), currentTurn->GetSDLColor().r / 2, currentTurn->GetSDLColor().g / 2, currentTurn->GetSDLColor().b / 2);
 }
 
 void UpdateMovesLeft()
 {
-    string movesLeftStr = "moves left " + to_string(movesLeft);
-
-    for (int i = 0; i < uiElements.size(); i++)
+    for (int i = 0; i < text.size(); i++)
     {
-        if (uiElements[i]->GetName() == "movesLeftCount")
+        if (text[i]->GetName() == "movesLeftText")
         {
-            uiElements[i]->SetTexture(textures[movesLeftStr][0]);
+            std::pair<float, float> center = text[i]->GetCenter();
+            text[i]->SetTextContent(to_string(movesLeft).c_str(), renderer);
+            text[i]->SetCenter(center.first, center.second);
+            std::cout << "Setting moves left text to: " << movesLeft << std::endl;
+            break;
         }
     }
 }
@@ -77,6 +80,16 @@ void FinishTurn()
     movesLeft = 0;
     UpdateMovesLeft();
     RefreshClaimNotifs();
+    if (currentTurn == players[0])
+    {
+        turnCount++;
+        if (turnCount == 10)
+        {
+            turnTallyNumText->SetPosition(turnTallyNumText->GetPosition().first - (turnTallyNumText->GetDimensions().first / 2), turnTallyNumText->GetPosition().second);
+            turnTallyText->SetPosition(turnTallyText->GetPosition().first - (turnTallyNumText->GetDimensions().first / 2), turnTallyText->GetPosition().second);
+        }
+        turnTallyNumText->SetTextContent(to_string(turnCount).c_str(), renderer);
+    }
 }
 
 void UpdateScore()
@@ -152,7 +165,7 @@ void GameFinished(Player *winner)
         winnerColor = "winnerYellow";
     }
 
-    UIElement *winnerMessage = new UIElement("winner message", textures[winnerColor][0], surfaces[winnerColor], true, false);
+    UIElement *winnerMessage = new UIElement("winner message", textures[winnerColor][0], surfaces[winnerColor], true, false, renderer);
     winnerMessage->SetCenter(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2);
     uiElements.push_back(winnerMessage);
     gameObjects[gameObjects.size() - 1].push_back(winnerMessage);
