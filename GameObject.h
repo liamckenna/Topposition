@@ -430,3 +430,18 @@ public:
     void Pause() { paused = true; }
     void Unpause() { paused = false; }
 };
+
+struct DiceAnimation
+{
+    UIElement *die;
+    vector<SDL_Texture *> faces;
+    SDL_Texture *finalTexture;
+    Uint64 startTime;
+    Uint64 stepInterval;
+    int totalSteps;
+    int currentStep;
+    bool finished;
+
+    DiceAnimation(UIElement *d, vector<SDL_Texture *> f, SDL_Texture *ft, Uint64 st, Uint64 si = 200, int ts = 5)
+        : die(d), faces(f), finalTexture(ft), startTime(st), stepInterval(si), totalSteps(ts), currentStep(0), finished(false) {}
+};
