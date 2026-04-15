@@ -23,12 +23,6 @@ void loadMenuUI()
     playButton->SetCenter(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 3 * 2);
     playButton->SetSelectable(true);
 
-    // UIElement *settingsButton = new UIElement("settings", textures["settings"][0], surfaces["settings"], true, true);
-    // uiElements.push_back(settingsButton);
-    // gameObjects[0].push_back(settingsButton);
-    // settingsButton->SetScale((float)SCREEN_HEIGHT / 1152);
-    // settingsButton->SetCenter(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 3 * 2 + (settingsButton->GetDimensions().second * settingsButton->GetScale()) - 20);
-
     UIElement *quitButton = new UIElement("quit", textures["quit"][0], surfaces["quit"], true, true, renderer);
     uiElements.push_back(quitButton);
     gameObjects[0].push_back(quitButton);
@@ -111,7 +105,6 @@ void updateUIElementPositions()
             uiElements[i]->SetGlobalCenter(endText->GetPosition().first + (endText->GetWidth() / 2), endText->GetPosition().second - (SCREEN_HEIGHT / 200) - (uiElements[i]->GetDimensions().second * uiElements[i]->GetScale() / 2));
         }
     }
-    std::cout << "Finished updating UI element positions" << std::endl;
     UpdateTextElementPositions();
 }
 
@@ -119,10 +112,8 @@ void UpdateTextElementPositions()
 {
     if (turnTallyText == nullptr || turnTallyNumText == nullptr)
     {
-        std::cout << "Turn tally text elements not initialized yet, skipping position update" << std::endl;
         return;
     }
-    std::cout << "turn tally and num text" << std::endl;
 
     turnTallyText->SetTextContent("Turn 80", renderer);
     turnTallyText->SetSize(125 * (SCREEN_WIDTH / 3840.f), renderer);
@@ -151,27 +142,17 @@ void UpdateTextElementPositions()
     peaksLeftText->SetSize(65 * (SCREEN_WIDTH / 3840.f), renderer);
     peaksLeftText->SetPosition(x, y);
 
-    std::cout << "moves left text" << std::endl;
     movesLeftText->SetTextContent("11", renderer);
-    std::cout << "set text content" << std::endl;
     movesLeftText->SetSize(150 * (SCREEN_WIDTH / 3840.f), renderer);
-    std::cout << "set size" << std::endl;
     x = (SCREEN_WIDTH / 2) - (movesLeftText->GetWidth() / 2);
-    std::cout << "set x" << std::endl;
     y = SCREEN_HEIGHT - movesLeftText->GetHeight() - (SCREEN_HEIGHT / 9);
-    std::cout << "set y" << std::endl;
     movesLeftText->SetPosition(x, y);
-    std::cout << "set position" << std::endl;
     std::pair<float, float> center = movesLeftText->GetCenter();
     movesLeftText->SetTextContent(to_string(movesLeft).c_str(), renderer);
     movesLeftText->SetCenter(center.first, center.second);
 
-    std::cout << "current player circle" << std::endl;
-
     int textSize = 125 * (SCREEN_WIDTH / 3840.f);
     y = SCREEN_HEIGHT / 40;
-
-    std::cout << "player text" << std::endl;
 
     for (int i = 0; i < rules->GetPlayerCount(); i++)
     {

@@ -50,6 +50,8 @@ std::vector<Player *> players;
 
 GameObject *selectedObject = nullptr;
 
+Text *selectedText = nullptr;
+
 Item *selectedItem = nullptr;
 
 GameRules *rules = new GameRules();

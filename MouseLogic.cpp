@@ -184,6 +184,29 @@ UIElement *selectUI(int x, int y, bool update)
     return nullptr;
 }
 
+Text *selectText(int x, int y)
+{
+    for (int i = 0; i < text.size(); i++)
+    {
+        int width_LowerBound = text[i]->GetPosition().first;
+        int width_UpperBound = text[i]->GetBottomRight().first;
+        int height_LowerBound = text[i]->GetPosition().second;
+        int height_UpperBound = text[i]->GetBottomRight().second;
+        if (x >= width_LowerBound && x <= width_UpperBound)
+        {
+            if (y >= height_LowerBound && y <= height_UpperBound)
+            {
+                SDL_Color color = GetPixelColor(text[i]->GetSurface(),
+                                                (x - width_LowerBound) / (cameraZoom),
+                                                (y - height_LowerBound) / (cameraZoom));
+                std::cout << "hit text (" << text[i]->GetName() << ")" << std::endl;
+                return text[i];
+            }
+        }
+    }
+    return nullptr;
+}
+
 Piece *selectPiece(int x, int y, bool update)
 {
     for (int i = pieces.size() - 1; i >= 0; i--)

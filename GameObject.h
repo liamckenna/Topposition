@@ -402,6 +402,9 @@ public:
     std::pair<int, int> GetPosition() { return position; }
     std::pair<int, int> GetDimensions() { return dimensions; }
     string GetName() { return name; }
+    SDL_Surface* GetSurface() { return surface; }
+    SDL_Texture* GetTexture() { return texture; }
+    std::pair<int, int> GetBottomRight() { return {position.first + dimensions.first, position.second + dimensions.second}; }
 
 };
 

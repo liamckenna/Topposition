@@ -204,7 +204,11 @@ void MouseButtonDownMainMenu(Input *playerInput, SDL_MouseButtonEvent &event)
     switch (event.button)
     {
     case SDL_BUTTON_LEFT:
-        selectedObject = selectUI(playerInput->currentMousePosition.first, playerInput->currentMousePosition.second, false);
+        selectedText = selectText(playerInput->currentMousePosition.first, playerInput->currentMousePosition.second);
+        if (selectedText == nullptr)
+        {
+            selectedObject = selectUI(playerInput->currentMousePosition.first, playerInput->currentMousePosition.second);
+        }
         break;
     case SDL_BUTTON_RIGHT:
         break;
@@ -220,25 +224,29 @@ void MouseButtonDownGame(Input *playerInput, SDL_MouseButtonEvent &event)
     switch (event.button)
     {
     case SDL_BUTTON_LEFT:
-        selectedObject = selectUI(playerInput->currentMousePosition.first, playerInput->currentMousePosition.second, false);
-        if (selectedObject == nullptr && !playerInput->GetMouseButtonDown("Middle"))
+        selectedText = selectText(playerInput->currentMousePosition.first, playerInput->currentMousePosition.second);
+        if (selectedText == nullptr)
         {
-            selectedObject = selectItem(playerInput->currentMousePosition.first,
-                                        playerInput->currentMousePosition.second);
-            if (selectedObject == nullptr)
+            selectedObject = selectUI(playerInput->currentMousePosition.first, playerInput->currentMousePosition.second, false);
+            if (selectedObject == nullptr && !playerInput->GetMouseButtonDown("Middle"))
             {
-                selectedObject = selectPiece(playerInput->currentMousePosition.first,
-                                             playerInput->currentMousePosition.second);
-                if (selectedObject != nullptr && selectedObject->type == GameObject::PIECE)
+                selectedObject = selectItem(playerInput->currentMousePosition.first,
+                                            playerInput->currentMousePosition.second);
+                if (selectedObject == nullptr)
                 {
-                    Piece *piece = dynamic_cast<Piece *>(selectedObject);
+                    selectedObject = selectPiece(playerInput->currentMousePosition.first,
+                                                 playerInput->currentMousePosition.second);
+                    if (selectedObject != nullptr && selectedObject->type == GameObject::PIECE)
+                    {
+                        Piece *piece = dynamic_cast<Piece *>(selectedObject);
 
-                    piece->SetDesignatedLocation(piece->GetBottomMiddle().first, piece->GetBottomMiddle().second);
-                    piece->SetScale(piece->GetScale() * 2);
-                    piece->SetBottomMiddle(piece->GetDesignatedLocation().first, piece->GetDesignatedLocation().second);
-                    startingTerrain = selectTerrain(piece->GetDesignatedLocation().first, piece->GetDesignatedLocation().second);
-                    if (piece->GetCurrentAnimation() != NULL)
-                        piece->GetCurrentAnimation()->Pause();
+                        piece->SetDesignatedLocation(piece->GetBottomMiddle().first, piece->GetBottomMiddle().second);
+                        piece->SetScale(piece->GetScale() * 2);
+                        piece->SetBottomMiddle(piece->GetDesignatedLocation().first, piece->GetDesignatedLocation().second);
+                        startingTerrain = selectTerrain(piece->GetDesignatedLocation().first, piece->GetDesignatedLocation().second);
+                        if (piece->GetCurrentAnimation() != NULL)
+                            piece->GetCurrentAnimation()->Pause();
+                    }
                 }
             }
         }
@@ -289,7 +297,14 @@ void MouseButtonUpGame(Input *playerInput, SDL_MouseButtonEvent &event)
     switch (event.button)
     {
     case SDL_BUTTON_LEFT:
-        if (selectedObject != nullptr)
+        if (selectedText != nullptr)
+        {
+            if (selectedText->GetName() == "turnText" || selectedText->GetName() == "endText")
+            {
+                FinishTurn();
+            }
+        }
+        else if (selectedObject != nullptr)
         {
             if (selectedObject->GetName() == "reset button")
             {
@@ -331,6 +346,7 @@ void MouseButtonUpGame(Input *playerInput, SDL_MouseButtonEvent &event)
             {
             }
         }
+        selectedText = nullptr;
         selectedObject = nullptr;
         break;
     case SDL_BUTTON_RIGHT:

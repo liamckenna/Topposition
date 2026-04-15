@@ -13,6 +13,8 @@ GameObject *selectObject(int x, int y, bool update = true);
 
 UIElement *selectUI(int x, int y, bool update = true);
 
+Text *selectText(int x, int y);
+
 Piece *selectPiece(int x, int y, bool update = true);
 
 Terrain *selectTerrain(int x, int y, bool update = true);

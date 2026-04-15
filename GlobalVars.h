@@ -56,6 +56,8 @@ extern std::vector<Player *> players;
 
 extern GameObject *selectedObject;
 
+extern Text *selectedText;
+
 extern GameRules *rules;
 
 extern int shapeCount;
