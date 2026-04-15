@@ -32,7 +32,7 @@ namespace
 
     bool HasActiveDiceAnimation()
     {
-        for (int i = 0; i < diceAnimations.size(); i++)
+        for (size_t i = 0; i < diceAnimations.size(); i++)
         {
             if (!diceAnimations[i].finished)
             {
@@ -44,7 +44,7 @@ namespace
 
     UIElement *FindDieElement(const std::string &name)
     {
-        for (int i = 0; i < uiElements.size(); i++)
+        for (size_t i = 0; i < uiElements.size(); i++)
         {
             if (uiElements[i]->GetName() == name)
             {
@@ -79,7 +79,7 @@ namespace
         battleSequence.attackers.clear();
         battleSequence.defenders.clear();
 
-        for (int i = 0; i < battleSequence.peak->occupants.size(); i++)
+        for (size_t i = 0; i < battleSequence.peak->occupants.size(); i++)
         {
             if (battleSequence.peak->occupants[i]->GetPlayer() == battleSequence.attacker)
             {
@@ -94,7 +94,7 @@ namespace
 
     bool BeginBattleAgainstDefender(Peak *peak, Player *attacker)
     {
-        for (int i = 0; i < peak->occupants.size(); i++)
+        for (size_t i = 0; i < peak->occupants.size(); i++)
         {
             if (peak->occupants[i]->GetPlayer() != attacker)
             {
@@ -132,13 +132,13 @@ namespace
             currentTurn->inventory.push_back(peak->GetItem());
 
             peak->SetItem(nullptr);
-            for (int j = 0; j < currentTurn->inventory.size(); j++)
+            for (size_t j = 0; j < currentTurn->inventory.size(); j++)
             {
                 currentTurn->inventory[j]->SetScale(0.1);
                 currentTurn->inventory[j]->SetGlobalPosition(100 + 70 * j, 10);
             }
         }
-        for (int j = 0; j < peak->flags.size(); j++)
+        for (size_t j = 0; j < peak->flags.size(); j++)
         {
             if (peak->flags[j]->GetPlayer() == currentTurn)
             {
