@@ -70,39 +70,126 @@ void updateUIElementPositions()
             uiElements[i]->SetScale((float)SCREEN_HEIGHT / 1152);
             uiElements[i]->SetGlobalPosition(0, 0);
         }
-        else if (uiElements[i]->GetName() == "reset button")
+        else if (uiElements[i]->GetName() == "currentPlayerCircle")
         {
-            uiElements[i]->SetGlobalPosition(0, 0);
+            uiElements[i]->SetScale(1.f * (SCREEN_WIDTH / 3840.f));
+            uiElements[i]->SetGlobalCenter((SCREEN_WIDTH / 2) - (SCREEN_WIDTH / 6.2f), SCREEN_HEIGHT - (uiElements[i]->GetDimensions().second * uiElements[i]->GetScale() / 2) - (SCREEN_HEIGHT / 40));
         }
         else if (uiElements[i]->GetName() == "dieOne")
         {
-            uiElements[i]->SetGlobalPosition(SCREEN_WIDTH - (uiElements[i]->GetDimensions().first * uiElements[i]->GetScale()) - 10, 10);
+            uiElements[i]->SetScale(0.15 * (SCREEN_WIDTH / 3840.f));
+            uiElements[i]->SetGlobalCenter((SCREEN_WIDTH / 2) - (uiElements[i]->GetDimensions().first * uiElements[i]->GetScale() / 1.25f), SCREEN_HEIGHT - (uiElements[i]->GetDimensions().second * uiElements[i]->GetScale() / 2) - (SCREEN_HEIGHT / 40));
         }
         else if (uiElements[i]->GetName() == "dieTwo")
         {
-            UIElement *die1 = nullptr;
-            for (int j = 0; j < uiElements.size(); j++)
+
+            uiElements[i]->SetScale(0.15 * (SCREEN_WIDTH / 3840.f));
+            uiElements[i]->SetGlobalCenter((SCREEN_WIDTH / 2) + (uiElements[i]->GetDimensions().first * uiElements[i]->GetScale() / 1.25f), SCREEN_HEIGHT - (uiElements[i]->GetDimensions().second * uiElements[i]->GetScale() / 2) - (SCREEN_HEIGHT / 40));
+        }
+        else if (uiElements[i]->GetName() == "endTurnArrow")
+        {
+            Text *turnText = nullptr;
+            Text* endText = nullptr;
+            for (int j = 0; j < text.size(); j++)
             {
-                if (uiElements[j]->GetName() == "dieOne")
+                if (text[j]->GetName() == "turnText")
                 {
-                    die1 = uiElements[j];
+                    turnText = text[j];
+                }
+                else if (text[j]->GetName() == "endText")
+                {
+                    endText = text[j];
                     break;
                 }
             }
-            uiElements[i]->SetGlobalPosition(SCREEN_WIDTH - ((die1->GetDimensions().first * die1->GetScale()) + 10) * 2, 10);
+            int textSize = 75 * (SCREEN_WIDTH / 3840.f);
+            turnText->SetSize(textSize, renderer);
+            endText->SetSize(textSize, renderer);
+            turnText->SetPosition((SCREEN_WIDTH / 2) + (SCREEN_WIDTH / 8), SCREEN_HEIGHT - turnText->GetHeight() - (SCREEN_HEIGHT / 40));
+            endText->SetPosition((SCREEN_WIDTH / 2) + (SCREEN_WIDTH / 8) + ((turnText->GetWidth() - endText->GetWidth()) / 2), SCREEN_HEIGHT - turnText->GetHeight() - endText->GetHeight() - (SCREEN_HEIGHT / 40));
+            uiElements[i]->SetScale(0.8f * (SCREEN_WIDTH / 3840.f));
+            uiElements[i]->SetGlobalCenter(endText->GetPosition().first + (endText->GetWidth() / 2), endText->GetPosition().second - (SCREEN_HEIGHT / 200) - (uiElements[i]->GetDimensions().second * uiElements[i]->GetScale() / 2));
         }
-        else if (uiElements[i]->GetName() == "movesLeftText")
+    }
+    std::cout << "Finished updating UI element positions" << std::endl;
+    UpdateTextElementPositions();
+}
+
+void UpdateTextElementPositions()
+{
+    if (turnTallyText == nullptr || turnTallyNumText == nullptr)
+    {
+        std::cout << "Turn tally text elements not initialized yet, skipping position update" << std::endl;
+        return;
+    }
+    std::cout << "turn tally and num text" << std::endl;
+
+    turnTallyText->SetTextContent("Turn 80", renderer);
+    turnTallyText->SetSize(125 * (SCREEN_WIDTH / 3840.f), renderer);
+    turnTallyText->SetPosition(SCREEN_WIDTH - turnTallyText->GetWidth() - SCREEN_WIDTH / 80, SCREEN_HEIGHT / 40);
+
+    turnTallyNumText->SetTextContent("1", renderer);
+    turnTallyNumText->SetSize(125 * (SCREEN_WIDTH / 3840.f), renderer);
+    turnTallyNumText->SetPosition(turnTallyText->GetPosition().first + turnTallyText->GetWidth() - (turnTallyNumText->GetWidth() * 1.5), SCREEN_HEIGHT / 40);
+
+
+    int x = turnTallyText->GetPosition().first + (SCREEN_WIDTH / 160);
+    int y = turnTallyText->GetPosition().second + turnTallyText->GetHeight() + (SCREEN_HEIGHT / 200);
+
+    turnTallyText->SetPosition(turnTallyText->GetPosition().first + (turnTallyNumText->GetWidth() / 2), turnTallyText->GetPosition().second);
+    turnTallyText->SetTextContent("Turn", renderer);
+    if (turnCount >= 10)
+    {
+        turnTallyNumText->SetPosition(turnTallyNumText->GetPosition().first - (turnTallyNumText->GetDimensions().first / 2), turnTallyNumText->GetPosition().second);
+        turnTallyText->SetPosition(turnTallyText->GetPosition().first - (turnTallyNumText->GetDimensions().first / 2), turnTallyText->GetPosition().second);
+    }
+    turnTallyNumText->SetTextContent(to_string(turnCount).c_str(), renderer);
+
+
+    std::string peaksLeftString = "peaks left: " + to_string(unclaimedPeakCount);
+    peaksLeftText->SetTextContent(peaksLeftString.c_str(), renderer);
+    peaksLeftText->SetSize(65 * (SCREEN_WIDTH / 3840.f), renderer);
+    peaksLeftText->SetPosition(x, y);
+
+    std::cout << "moves left text" << std::endl;
+    movesLeftText->SetTextContent("11", renderer);
+    std::cout << "set text content" << std::endl;
+    movesLeftText->SetSize(150 * (SCREEN_WIDTH / 3840.f), renderer);
+    std::cout << "set size" << std::endl;
+    x = (SCREEN_WIDTH / 2) - (movesLeftText->GetWidth() / 2);
+    std::cout << "set x" << std::endl;
+    y = SCREEN_HEIGHT - movesLeftText->GetHeight() - (SCREEN_HEIGHT / 9);
+    std::cout << "set y" << std::endl;
+    movesLeftText->SetPosition(x, y);
+    std::cout << "set position" << std::endl;
+    std::pair<float, float> center = movesLeftText->GetCenter();
+    movesLeftText->SetTextContent(to_string(movesLeft).c_str(), renderer);
+    movesLeftText->SetCenter(center.first, center.second);
+
+    std::cout << "current player circle" << std::endl;
+
+    int textSize = 125 * (SCREEN_WIDTH / 3840.f);
+    y = SCREEN_HEIGHT / 40;
+
+    std::cout << "player text" << std::endl;
+
+    for (int i = 0; i < rules->GetPlayerCount(); i++)
+    {
+        x = SCREEN_WIDTH / 80;
+        if (i > 0)
         {
-            uiElements[i]->SetGlobalPosition(0, SCREEN_HEIGHT - (uiElements[i]->GetDimensions().second * uiElements[i]->GetScale()));
+            y += players[0]->GetTurnText()->GetDimensions().second;
         }
-        else if (uiElements[i]->GetName() == "movesLeftCount")
-        {
-            uiElements[i]->SetGlobalPosition(0, SCREEN_HEIGHT - (uiElements[i]->GetDimensions().second * uiElements[i]->GetScale()));
-        }
-        else if (uiElements[i]->GetName() == "finish turn button")
-        {
-            uiElements[i]->SetGlobalPosition(SCREEN_WIDTH - (uiElements[i]->GetDimensions().first * uiElements[i]->GetScale()) - 10,
-                                       SCREEN_HEIGHT - (uiElements[i]->GetDimensions().second * uiElements[i]->GetScale()) - 10);
-        }
+        players[i]->GetTurnText()->SetTextContent(("P" + to_string(i + 1) + ":").c_str(), renderer);
+        players[i]->GetTurnText()->SetSize(textSize, renderer);
+        players[i]->GetScoreText()->SetTextContent("0", renderer);
+        players[i]->GetScoreText()->SetSize(textSize, renderer);
+        players[i]->GetCircleText()->SetTextContent(("P" + to_string(i + 1)).c_str(), renderer);
+        players[i]->GetCircleText()->SetSize(textSize, renderer);
+        players[i]->GetTurnText()->SetPosition(x, y);
+        x += players[i]->GetTurnText()->GetWidth() + (SCREEN_WIDTH / 160);
+        players[i]->GetScoreText()->SetPosition(x, y);
+        players[i]->GetCircleText()->SetCenter(currentPlayerCircle->GetCenter().first, currentPlayerCircle->GetCenter().second);
+        players[i]->GetScoreText()->SetTextContent(to_string(players[i]->GetScore()).c_str(), renderer);
     }
 }

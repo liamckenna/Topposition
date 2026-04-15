@@ -68,7 +68,6 @@ void UpdateMovesLeft()
             std::pair<float, float> center = text[i]->GetCenter();
             text[i]->SetTextContent(to_string(movesLeft).c_str(), renderer);
             text[i]->SetCenter(center.first, center.second);
-            std::cout << "Setting moves left text to: " << movesLeft << std::endl;
             break;
         }
     }
@@ -90,6 +89,8 @@ void FinishTurn()
         }
         turnTallyNumText->SetTextContent(to_string(turnCount).c_str(), renderer);
     }
+    currentRoll = Roll();
+    movesLeft = currentRoll;
 }
 
 void UpdateScore()

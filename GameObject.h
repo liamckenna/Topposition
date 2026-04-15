@@ -173,8 +173,8 @@ public:
         selectable = s;
         topLayer = true;
 
-        shadowOffsetX = 5;
-        shadowOffsetY = 5;
+        shadowOffsetX = 10;
+        shadowOffsetY = 10;
         shadowAlpha = 150;
         shadowRect = new SDL_FRect();
 
@@ -388,6 +388,13 @@ public:
         dimensions.second = h;
         rect->w = w;
         rect->h = h;
+    }
+    void SetSize(int s, SDL_Renderer *renderer)
+    {
+        size = s;
+        TTF_CloseFont(font);
+        font = TTF_OpenFont(fontPath, size);
+        SetTextContent(text, renderer);
     }
     int GetSize() { return size; }
     int GetWidth() { return dimensions.first; }

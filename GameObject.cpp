@@ -73,10 +73,10 @@ void GameObject::RenderGameObject(SDL_Renderer *renderer)
                 if (uiElement->GetRenderShadow())
                 {
                     SDL_FRect *shadowRect = uiElement->GetShadowRect();
-                    shadowRect->x = position.first + uiElement->GetShadowOffsetX();
-                    shadowRect->y = position.second + uiElement->GetShadowOffsetY();
-                    shadowRect->w = dimensions.first;
-                    shadowRect->h = dimensions.second;
+                    shadowRect->x = position.first + (uiElement->GetShadowOffsetX() * SCREEN_WIDTH / 3840.f);
+                    shadowRect->y = position.second + (uiElement->GetShadowOffsetY() * SCREEN_HEIGHT / 2160.f);
+                    shadowRect->w = dimensions.first * scale;
+                    shadowRect->h = dimensions.second * scale;
                     SDL_RenderTexture(renderer, uiElement->GetShadowTexture(), NULL, shadowRect);
                 }
 
@@ -538,8 +538,8 @@ void Text::RenderText(SDL_Renderer *renderer)
     {
         if (renderShadow)
         {
-            shadowRect->x = position.first + shadowOffsetX;
-            shadowRect->y = position.second + shadowOffsetY;
+            shadowRect->x = position.first + (shadowOffsetX * SCREEN_WIDTH / 3840.f);
+            shadowRect->y = position.second + (shadowOffsetY * SCREEN_HEIGHT / 2160.f);
             shadowRect->w = dimensions.first;
             shadowRect->h = dimensions.second;
             SDL_RenderTexture(renderer, shadowTexture, NULL, shadowRect);

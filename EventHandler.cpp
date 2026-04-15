@@ -305,8 +305,6 @@ void MouseButtonUpGame(Input *playerInput, SDL_MouseButtonEvent &event)
             else if (selectedObject->GetName() == "finish turn button" || selectedObject->GetName() == "endTurnArrow")
             {
                 FinishTurn();
-                currentRoll = Roll();
-                movesLeft = currentRoll;
             }
             else if (selectedObject->GetName() == "claim peak button")
             {

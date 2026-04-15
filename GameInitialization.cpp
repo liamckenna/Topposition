@@ -270,16 +270,15 @@ void loadText()
     SDL_Color Blue = {0, 0, 255};
     SDL_Color Yellow = {255, 255, 0};
 
-    
-    int textSize = 125;
+    int textSize = 125 * (SCREEN_WIDTH / 3840.f);
 
-    turnTallyText = new Text("turnCountText", "Fonts/yoster.ttf", White, 0, 0, textSize, renderer, "Turn 80");
+    turnTallyText = new Text("turnTallyText", "Fonts/yoster.ttf", White, 0, 0, textSize, renderer, "Turn 80");
 
-    int x = SCREEN_WIDTH - turnTallyText->GetWidth() - 50;
-    int y = 50;
+    int x = SCREEN_WIDTH - turnTallyText->GetWidth() - SCREEN_WIDTH / 80;
+    int y = SCREEN_HEIGHT / 40;
 
     turnTallyText->SetPosition(x, y);
-    text.push_back(turnTallyText);    
+    text.push_back(turnTallyText);
 
     turnTallyNumText = new Text("turnTallyNumText", "Fonts/yoster.ttf", White, x, y, textSize, renderer, to_string(turnCount).c_str());
 
@@ -288,12 +287,11 @@ void loadText()
     turnTallyNumText->SetPosition(x, y);
     text.push_back(turnTallyNumText);
 
-    textSize = 65;
-    x = turnTallyText->GetPosition().first + 25;
-    y = turnTallyText->GetPosition().second + turnTallyText->GetHeight() + 10;
+    textSize = 65 * (SCREEN_WIDTH / 3840.f);
+    x = turnTallyText->GetPosition().first + (SCREEN_WIDTH / 160);
+    y = turnTallyText->GetPosition().second + turnTallyText->GetHeight() + (SCREEN_HEIGHT / 200);
 
     turnTallyText->SetPosition(turnTallyText->GetPosition().first + (turnTallyNumText->GetWidth() / 2), turnTallyText->GetPosition().second);
-
     turnTallyText->SetTextContent("Turn", renderer);
 
     std::string peaksLeftString = "peaks left: " + to_string(unclaimedPeakCount);
@@ -301,22 +299,23 @@ void loadText()
     text.push_back(peaksLeftText);
     
     currentPlayerCircle = new UIElement("currentPlayerCircle", textures["player circle"][0], surfaces["player circle"], true, false, renderer);
+    currentPlayerCircle->SetScale(1.f * (SCREEN_WIDTH / 3840.f));
     uiElements.push_back(currentPlayerCircle);
     gameObjects[gameObjects.size() - 1].push_back(currentPlayerCircle);
-    currentPlayerCircle->SetGlobalCenter(SCREEN_WIDTH / 2 - 625, SCREEN_HEIGHT - currentPlayerCircle->GetDimensions().second / 2 - (SCREEN_HEIGHT / 40));
+    currentPlayerCircle->SetGlobalCenter((SCREEN_WIDTH / 2) - (SCREEN_WIDTH / 6.2f), SCREEN_HEIGHT - (currentPlayerCircle->GetDimensions().second * currentPlayerCircle->GetScale() / 2) - (SCREEN_HEIGHT / 40));
 
-    textSize = 125;
-    y = 50;
+    textSize = 125 * (SCREEN_WIDTH / 3840.f);
+    y = SCREEN_HEIGHT / 40;
 
     for (int i = 0; i < rules->GetPlayerCount(); i++)
     {
-        x = 50;
+        x = SCREEN_WIDTH / 80;
         if (i > 0)
         {
             y += players[0]->GetTurnText()->GetDimensions().second;
         }
         Text *playerText = new Text("player" + to_string(i) + "Text", "Fonts/yoster.ttf", players[i]->GetSDLColor(), x, y, textSize, renderer, ("P" + to_string(i + 1) + ":").c_str());
-        x = playerText->GetPosition().first + playerText->GetWidth() + 25;
+        x = playerText->GetPosition().first + playerText->GetWidth() + (SCREEN_WIDTH / 160);
         y = playerText->GetPosition().second;
         Text *playerScoreText = new Text("player" + to_string(i) + "ScoreText", "Fonts/yoster.ttf", White, x, y, textSize, renderer, "0");
         Text *playerCircleText = new Text("player" + to_string(i) + "CircleText", "Fonts/yoster.ttf", White, x, y, textSize, renderer, ("P" + to_string(i + 1)).c_str());
@@ -336,48 +335,47 @@ void loadText()
         }
     }
 
-    textSize = 150;
+    textSize = 150 * (SCREEN_WIDTH / 3840.f);
 
     movesLeftText = new Text("movesLeftText", "Fonts/yoster.ttf", White, 0, 0, textSize, renderer, "11");
 
-    x = SCREEN_WIDTH / 2 - (movesLeftText->GetWidth() / 2);
-    y = SCREEN_HEIGHT - movesLeftText->GetHeight() - 225;
+    x = (SCREEN_WIDTH / 2) - (movesLeftText->GetWidth() / 2);
+    y = SCREEN_HEIGHT - movesLeftText->GetHeight() - (SCREEN_HEIGHT / 9);
     movesLeftText->SetPosition(x, y);
 
     text.push_back(movesLeftText);
 
-    textSize = 75;
+    textSize = 75 * (SCREEN_WIDTH / 3840.f);
 
     Text* turnText = new Text("turnText", "Fonts/yoster.ttf", White, 0, 0, textSize, renderer, "Turn");
-    turnText->SetPosition((SCREEN_WIDTH / 2) + 500, SCREEN_HEIGHT - turnText->GetHeight() - (SCREEN_HEIGHT / 40));
+    turnText->SetPosition((SCREEN_WIDTH / 2) + (SCREEN_WIDTH / 8), SCREEN_HEIGHT - turnText->GetHeight() - (SCREEN_HEIGHT / 40));
     text.push_back(turnText);
 
     Text *endText = new Text("endText", "Fonts/yoster.ttf", White, 0, 0, textSize, renderer, "End");
-    endText->SetPosition((SCREEN_WIDTH / 2) + 500 + ((turnText->GetWidth() - endText->GetWidth()) / 2), SCREEN_HEIGHT - turnText->GetHeight() - endText->GetHeight() - (SCREEN_HEIGHT / 40));
+    endText->SetPosition((SCREEN_WIDTH / 2) + (SCREEN_WIDTH / 8) + ((turnText->GetWidth() - endText->GetWidth()) / 2), SCREEN_HEIGHT - turnText->GetHeight() - endText->GetHeight() - (SCREEN_HEIGHT / 40));
     text.push_back(endText);
 
-    UIElement * endTurnArrow = new UIElement("endTurnArrow", textures["end turn arrow"][0], surfaces["end turn arrow"], true, true, renderer);
+    UIElement *endTurnArrow = new UIElement("endTurnArrow", textures["end turn arrow"][0], surfaces["end turn arrow"], true, true, renderer);
     uiElements.push_back(endTurnArrow);
-    endTurnArrow->SetScale(0.8);
+    endTurnArrow->SetScale(0.8f * (SCREEN_WIDTH / 3840.f));
     gameObjects[gameObjects.size() - 1].push_back(endTurnArrow);
-    endTurnArrow->SetGlobalCenter(endText->GetPosition().first + endText->GetWidth() / 2, endText->GetPosition().second - 10 - endTurnArrow->GetDimensions().second / 2);
+    endTurnArrow->SetGlobalCenter(endText->GetPosition().first + (endText->GetWidth() / 2), endText->GetPosition().second - (SCREEN_HEIGHT / 200) - (endTurnArrow->GetDimensions().second * endTurnArrow->GetScale() / 2));
     endTurnArrow->SetRenderShadow(true);
-    
 }
 
 void loadUI()
 {
     UIElement *die1 = new UIElement("dieOne", textures["die 1"][0], surfaces["die 1"], true, true, renderer);
-    die1->SetScale(0.15);
+    die1->SetScale(0.15 * (SCREEN_WIDTH / 3840.f));
     uiElements.push_back(die1);
     gameObjects[gameObjects.size() - 1].push_back(die1);
-    die1->SetGlobalCenter(SCREEN_WIDTH / 2 - (die1->GetDimensions().first * die1->GetScale() / 1.25f), SCREEN_HEIGHT - (die1->GetDimensions().second * die1->GetScale() / 2) - (SCREEN_HEIGHT / 40));
+    die1->SetGlobalCenter((SCREEN_WIDTH / 2) - (die1->GetDimensions().first * die1->GetScale() / 1.25f), SCREEN_HEIGHT - (die1->GetDimensions().second * die1->GetScale() / 2) - (SCREEN_HEIGHT / 40));
 
     UIElement *die2 = new UIElement("dieTwo", textures["die 2"][0], surfaces["die 2"], true, true, renderer);
-    die2->SetScale(0.15);
+    die2->SetScale(0.15 * (SCREEN_WIDTH / 3840.f));
     uiElements.push_back(die2);
     gameObjects[gameObjects.size() - 1].push_back(die2);
-    die2->SetGlobalCenter(SCREEN_WIDTH / 2 + (die2->GetDimensions().first * die2->GetScale() / 1.25f), SCREEN_HEIGHT - (die2->GetDimensions().second * die2->GetScale() / 2) - (SCREEN_HEIGHT / 40));
+    die2->SetGlobalCenter((SCREEN_WIDTH / 2) + (die2->GetDimensions().first * die2->GetScale() / 1.25f), SCREEN_HEIGHT - (die2->GetDimensions().second * die2->GetScale() / 2) - (SCREEN_HEIGHT / 40));
 
 
     for (int i = 0; i < peaks.size(); i++)
