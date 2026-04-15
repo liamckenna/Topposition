@@ -18,3 +18,7 @@ void RetreatPlayer(Peak *peak, Player *player);
 bool LastPlayerStanding(Peak *peak, Player *player);
 
 bool IsOccupyingPeak(Peak *peak, Player *player);
+
+void UpdateBattleSequence();
+
+bool IsBattleSequenceActive();
