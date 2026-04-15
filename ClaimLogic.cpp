@@ -2,6 +2,8 @@
 
 namespace
 {
+    constexpr int BATTLE_ROUND_DELAY_MS = 250;
+
     enum BattlePhase
     {
         BATTLE_IDLE,
@@ -29,6 +31,11 @@ namespace
     };
 
     BattleSequenceState battleSequence;
+
+    int RollDie()
+    {
+        return rand() % 6 + 1;
+    }
 
     bool HasActiveDiceAnimation()
     {
@@ -227,7 +234,7 @@ void UpdateBattleSequence()
 
         battleSequence.roundAttacker = battleSequence.attackers[battleSequence.attackers.size() - 1];
         battleSequence.roundDefender = battleSequence.defenders[battleSequence.defenders.size() - 1];
-        battleSequence.attackRoll = rand() % 6 + 1;
+        battleSequence.attackRoll = RollDie();
         StartSingleDieRoll("dieOne", battleSequence.attackRoll);
         battleSequence.phase = BATTLE_WAIT_ATTACK_ROLL;
         break;
@@ -235,7 +242,7 @@ void UpdateBattleSequence()
         if (HasActiveDiceAnimation())
             break;
 
-        battleSequence.defenseRoll = rand() % 6 + 1;
+        battleSequence.defenseRoll = RollDie();
         StartSingleDieRoll("dieTwo", battleSequence.defenseRoll);
         battleSequence.phase = BATTLE_WAIT_DEFENSE_ROLL;
         break;
@@ -271,7 +278,7 @@ void UpdateBattleSequence()
         break;
     }
     case BATTLE_ADVANCE:
-        if (SDL_GetTicks() - battleSequence.phaseStart < 250)
+        if (SDL_GetTicks() - battleSequence.phaseStart < BATTLE_ROUND_DELAY_MS)
         {
             break;
         }
