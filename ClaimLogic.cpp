@@ -2,7 +2,7 @@
 
 namespace
 {
-    constexpr int BATTLE_ROUND_DELAY_MS = 250;
+    constexpr int BATTLE_ROUND_DELAY_MS = 1000;
 
     enum BattlePhase
     {
@@ -116,6 +116,15 @@ namespace
                 battleSequence.phaseStart = SDL_GetTicks();
                 battleSequence.phase = BATTLE_START_ROUND;
                 RefreshBattleParticipants();
+                opposingPlayerCircle->SetRendered(true);
+                SDL_SetTextureColorMod(opposingPlayerCircle->GetTexture(), battleSequence.defender->GetSDLColor().r / 1.5f, battleSequence.defender->GetSDLColor().g / 1.5f, battleSequence.defender->GetSDLColor().b / 1.5f);
+                battleSequence.defender->GetCircleText()->SetCenter(opposingPlayerCircle->GetCenter().first, opposingPlayerCircle->GetCenter().second);
+                battleSequence.defender->GetCircleText()->SetRendered(true);
+                endTurnArrow->SetRendered(false);
+                endText->SetRendered(false);
+                turnText->SetRendered(false);
+                battleSequence.peak->GetClaimNotif()->SetRendered(false);
+                std::cout << "Battle sequence started between " << battleSequence.attacker->GetName() << " and " << battleSequence.defender->GetName() << std::endl;
                 return true;
             }
         }
@@ -124,6 +133,12 @@ namespace
 
     void EndBattleSequence()
     {
+        battleSequence.defender->GetCircleText()->SetRendered(false);
+        battleSequence.defender->GetCircleText()->SetCenter(currentPlayerCircle->GetCenter().first, currentPlayerCircle->GetCenter().second);
+        opposingPlayerCircle->SetRendered(false);
+        endTurnArrow->SetRendered(true);
+        endText->SetRendered(true);
+        turnText->SetRendered(true);
         battleSequence = BattleSequenceState();
     }
 
@@ -157,6 +172,7 @@ namespace
             }
         }
         UpdateScore();
+        RefreshClaimNotifs();
         std::string peaksLeftString = "peaks left: " + to_string(unclaimedPeakCount);
         peaksLeftText->SetTextContent(peaksLeftString.c_str(), renderer);
     }
@@ -206,6 +222,7 @@ void ClaimPeak(UIElement *peakNotif)
     }
 
     BeginBattleAgainstDefender(peak, currentTurn);
+    std::cout << "called from ClaimPeak" << std::endl;
 }
 
 void UpdateBattleSequence()
@@ -278,6 +295,15 @@ void UpdateBattleSequence()
         break;
     }
     case BATTLE_ADVANCE:
+
+        if (LastPlayerStanding(battleSequence.peak, battleSequence.attacker))
+        {
+            FinalizePeakClaim(battleSequence.peak);
+            EndBattleSequence();
+            RefreshClaimNotifs();
+            break;
+        }
+
         if (SDL_GetTicks() - battleSequence.phaseStart < BATTLE_ROUND_DELAY_MS)
         {
             break;
@@ -292,14 +318,8 @@ void UpdateBattleSequence()
         if (battleSequence.defenders.size() < 1)
         {
             RetreatPlayer(battleSequence.peak, battleSequence.defender);
-        }
-
-        if (LastPlayerStanding(battleSequence.peak, battleSequence.attacker))
-        {
-            FinalizePeakClaim(battleSequence.peak);
-            EndBattleSequence();
-            RefreshClaimNotifs();
-            break;
+            battleSequence.defender->GetCircleText()->SetRendered(false);
+            battleSequence.defender->GetCircleText()->SetCenter(currentPlayerCircle->GetCenter().first, currentPlayerCircle->GetCenter().second);
         }
 
         if (!BeginBattleAgainstDefender(battleSequence.peak, battleSequence.attacker))

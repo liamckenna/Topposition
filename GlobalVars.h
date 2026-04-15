@@ -80,6 +80,8 @@ extern Player *currentTurn;
 
 extern UIElement *currentPlayerCircle;
 
+extern UIElement *opposingPlayerCircle;
+
 extern Terrain *startingTerrain;
 
 extern Terrain *hoveringTerrain;
@@ -124,3 +126,9 @@ extern std::pair<float, float> worldResolution;
 extern int turnCount;
 
 extern int unclaimedPeakCount;
+
+extern Text *turnText;
+
+extern Text *endText;
+
+extern UIElement *endTurnArrow;

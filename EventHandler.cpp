@@ -340,7 +340,6 @@ void MouseButtonUpGame(Input *playerInput, SDL_MouseButtonEvent &event)
             else if (selectedObject->GetName() == "claim peak button")
             {
                 ClaimPeak(dynamic_cast<UIElement *>(selectedObject));
-                RefreshClaimNotifs();
             }
             else if (selectedObject->type == GameObject::PIECE)
             {
