@@ -6,15 +6,24 @@ int Roll()
     string rollOneStr = "die " + to_string(rollOne);
     int rollTwo = (rand() % 6) + 1;
     string rollTwoStr = "die " + to_string(rollTwo);
+
+    vector<SDL_Texture *> dieFaces;
+    for (int i = 1; i <= 6; i++) {
+        dieFaces.push_back(textures["die " + to_string(i)][0]);
+    }
+
+    diceAnimations.clear();
+
+    Uint64 now = SDL_GetTicks();
     for (int i = 0; i < uiElements.size(); i++)
     {
         if (uiElements[i]->GetName() == "dieOne")
         {
-            uiElements[i]->SetTexture(textures[rollOneStr][0]);
+            diceAnimations.emplace_back(uiElements[i], dieFaces, textures[rollOneStr][0], now);
         }
         else if (uiElements[i]->GetName() == "dieTwo")
         {
-            uiElements[i]->SetTexture(textures[rollTwoStr][0]);
+            diceAnimations.emplace_back(uiElements[i], dieFaces, textures[rollTwoStr][0], now);
         }
     }
     movesLeft = rollOne + rollTwo;

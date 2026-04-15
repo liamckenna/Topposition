@@ -52,6 +52,8 @@ extern std::vector<std::vector<OceanTile *>> ocean;
 
 extern std::vector<Animation *> animations;
 
+extern std::vector<DiceAnimation> diceAnimations;
+
 extern std::vector<Player *> players;
 
 extern GameObject *selectedObject;

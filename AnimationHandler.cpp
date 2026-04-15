@@ -10,4 +10,24 @@ void AnimationHandler(float fps, Uint64& lastFrame, Uint64& lastUpdate) {
 
         }
     }
+
+    for (int i = 0; i < diceAnimations.size(); i++) {
+        DiceAnimation &da = diceAnimations[i];
+        if (da.finished)
+            continue;
+
+        Uint64 elapsed = current - da.startTime;
+        Uint64 stepReached = elapsed / da.stepInterval;
+
+        if (stepReached > (Uint64)da.currentStep) {
+            da.currentStep = (int)stepReached;
+            if (da.currentStep >= da.totalSteps) {
+                da.die->SetTexture(da.finalTexture);
+                da.finished = true;
+            } else {
+                int randomFace = rand() % (int)da.faces.size();
+                da.die->SetTexture(da.faces[randomFace]);
+            }
+        }
+    }
 }

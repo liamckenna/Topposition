@@ -46,6 +46,8 @@ std::vector<Text *> text;
 
 std::vector<Animation *> animations;
 
+std::vector<DiceAnimation> diceAnimations;
+
 std::vector<Player *> players;
 
 GameObject *selectedObject = nullptr;
