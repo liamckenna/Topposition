@@ -67,7 +67,7 @@ void RotateTurn()
     }
 
     currentTurn->GetCircleText()->SetRendered(true);
-    SDL_SetTextureColorMod(currentPlayerCircle->GetTexture(), currentTurn->GetSDLColor().r / 2, currentTurn->GetSDLColor().g / 2, currentTurn->GetSDLColor().b / 2);
+    SDL_SetTextureColorMod(currentPlayerCircle->GetTexture(), currentTurn->GetSDLColor().r / 1.5f, currentTurn->GetSDLColor().g / 1.5f, currentTurn->GetSDLColor().b / 1.5f);
 }
 
 void UpdateMovesLeft()

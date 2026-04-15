@@ -331,7 +331,7 @@ void loadText()
         if (i == 0)
         {
             playerCircleText->SetRendered(true);
-            SDL_SetTextureColorMod(currentPlayerCircle->GetTexture(), currentTurn->GetSDLColor().r / 2, currentTurn->GetSDLColor().g / 2, currentTurn->GetSDLColor().b / 2);
+            SDL_SetTextureColorMod(currentPlayerCircle->GetTexture(), currentTurn->GetSDLColor().r / 1.5f, currentTurn->GetSDLColor().g / 1.5f, currentTurn->GetSDLColor().b / 1.5f);
         }
     }
 
