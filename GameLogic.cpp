@@ -86,6 +86,7 @@ void UpdateMovesLeft()
 
 void FinishTurn()
 {
+    crown->SetRendered(false);
     RotateTurn();
     movesLeft = 0;
     UpdateMovesLeft();
@@ -120,36 +121,35 @@ void UpdateScore()
     firstPlace = nullptr;
     for (int i = 0; i < players.size(); i++)
     {
+        players[i]->GetFirstText()->SetRendered(false);
+        players[i]->GetTieText()->SetRendered(false);
         if (firstPlace == nullptr || players[i]->GetScore() > firstPlace->GetScore())
         {
             firstPlace = players[i];
         }
     }
+    if (firstPlace->GetScore() != 0)
+    {
+        firstPlace->GetFirstText()->SetRendered(true);
+    }
+    bool tie = false;
     for (int i = 0; i < players.size(); i++)
     {
-        if (players[i]->GetScore() == firstPlace->GetScore())
+        if (players[i]->GetScore() == firstPlace->GetScore() && firstPlace->GetScore() != 0)
         {
-            if (firstPlace->GetColor() != players[i]->GetColor())
+            if (players[i] != firstPlace)
             {
-                firstPlace = nullptr;
-                break;
+                firstPlace->GetFirstText()->SetRendered(false);
+                firstPlace->GetTieText()->SetRendered(true);
+                players[i]->GetTieText()->SetRendered(true);
+                tie = true;
             }
         }
     }
-    std::cout << std::endl;
-    for (int i = 0; i < players.size(); i++)
+    if (tie)
     {
-        std::cout << "Player " << i + 1 << ": " << players[i]->GetScore();
-        if (players[i] == firstPlace)
-        {
-            std::cout << " (First Place!)" << std::endl;
-        }
-        else
-        {
-            std::cout << std::endl;
-        }
+        firstPlace = nullptr;
     }
-    std::cout << std::endl;
     if (pointsLeft == 0)
     {
         if (firstPlace != nullptr)

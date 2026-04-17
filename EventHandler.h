@@ -19,6 +19,8 @@ void EventMouseButtonDown(Input *playerInput, SDL_MouseButtonEvent &event);
 
 void EventMouseButtonUp(Input *playerInput, SDL_MouseButtonEvent &event);
 
+void EventKeyDown(Input *playerInput, SDL_KeyboardEvent &event);
+
 void MouseMovement(Input *playerInput);
 
 void MouseButtonDownMainMenu(Input *playerInput, SDL_MouseButtonEvent &event);
@@ -28,3 +30,4 @@ void MouseButtonDownGame(Input *playerInput, SDL_MouseButtonEvent &event);
 void MouseButtonUpMainMenu(Input *playerInput, SDL_MouseButtonEvent &event);
 
 void MouseButtonUpGame(Input *playerInput, SDL_MouseButtonEvent &event);
+

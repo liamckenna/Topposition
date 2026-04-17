@@ -112,6 +112,22 @@ void updateUIElementPositions()
             uiElements[i]->SetGlobalCenter((SCREEN_WIDTH / 2) + (SCREEN_WIDTH / 7.50f), endText->GetPosition().second - (SCREEN_HEIGHT / 200) - (uiElements[i]->GetDimensions().second * uiElements[i]->GetScale() / 2));
         }
     }
+    if (crown)
+    {
+        crown->SetScale(8 * (SCREEN_WIDTH / 3840.f));
+        if (crown->GetRendered())
+        {
+            if (crown->GetRotation() == -45)
+            {
+                crown->SetGlobalPosition(die1->GetGlobalCenter().first - (die1->GetDimensions().first * die1->GetScale() / 2) - (crown->GetDimensions().first * crown->GetScale()), die1->GetGlobalCenter().second - (die1->GetDimensions().second * die1->GetScale() / 2) - (crown->GetDimensions().second * crown->GetScale()));
+            }
+            else
+            {
+                crown->SetGlobalPosition(die2->GetGlobalCenter().first + (die2->GetDimensions().first * die2->GetScale() / 2), die2->GetGlobalCenter().second - (die2->GetDimensions().second * die2->GetScale() / 2) - (crown->GetDimensions().second * crown->GetScale()));
+            }
+        }
+    }
+    
     UpdateTextElementPositions();
 }
 
@@ -172,6 +188,12 @@ void UpdateTextElementPositions()
         players[i]->GetTurnText()->SetSize(textSize, renderer);
         players[i]->GetScoreText()->SetTextContent("0", renderer);
         players[i]->GetScoreText()->SetSize(textSize, renderer);
+        textSize = 75 * (SCREEN_WIDTH / 3840.f);
+        players[i]->GetFirstText()->SetTextContent("1st!", renderer);
+        players[i]->GetFirstText()->SetSize(textSize, renderer);
+        players[i]->GetTieText()->SetTextContent("Tie!", renderer);
+        players[i]->GetTieText()->SetSize(textSize, renderer);
+        textSize = 125 * (SCREEN_WIDTH / 3840.f);
         players[i]->GetCircleText()->SetTextContent(("P" + to_string(i + 1)).c_str(), renderer);
         players[i]->GetCircleText()->SetSize(textSize, renderer);
         players[i]->GetTurnText()->SetPosition(x, y);
@@ -179,5 +201,8 @@ void UpdateTextElementPositions()
         players[i]->GetScoreText()->SetPosition(x, y);
         players[i]->GetCircleText()->SetCenter(currentPlayerCircle->GetCenter().first, currentPlayerCircle->GetCenter().second);
         players[i]->GetScoreText()->SetTextContent(to_string(players[i]->GetScore()).c_str(), renderer);
+        x += players[i]->GetScoreText()->GetWidth();
+        players[i]->GetFirstText()->SetPosition(x, y - (players[i]->GetFirstText()->GetHeight() / 4));
+        players[i]->GetTieText()->SetPosition(x, y - (players[i]->GetTieText()->GetHeight() / 4));
     }
 }

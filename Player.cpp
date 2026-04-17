@@ -11,5 +11,7 @@ void Player::SetScore(int s)
     if (scoreText != nullptr)
     {
         scoreText->SetTextContent((to_string(score)).c_str(), renderer);
+        firstText->SetPosition(scoreText->GetPosition().first + scoreText->GetWidth(), firstText->GetPosition().second);
+        tieText->SetPosition(scoreText->GetPosition().first + scoreText->GetWidth(), tieText->GetPosition().second);
     }
 }

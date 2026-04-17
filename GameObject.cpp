@@ -77,10 +77,23 @@ void GameObject::RenderGameObject(SDL_Renderer *renderer)
                     shadowRect->y = position.second + (uiElement->GetShadowOffsetY() * SCREEN_HEIGHT / 2160.f);
                     shadowRect->w = dimensions.first * scale;
                     shadowRect->h = dimensions.second * scale;
-                    SDL_RenderTexture(renderer, uiElement->GetShadowTexture(), NULL, shadowRect);
+                    if (uiElement->GetName() == "crown")
+                    {
+                        SDL_RenderTextureRotated(renderer, uiElement->GetShadowTexture(), NULL, shadowRect, uiElement->GetRotation(), NULL, SDL_FLIP_NONE);
+                    }
+                    else 
+                    {
+                        SDL_RenderTexture(renderer, uiElement->GetShadowTexture(), NULL, shadowRect);
+                    }
                 }
-
-                SDL_RenderTexture(renderer, texture, NULL, renderRect);
+                if (uiElement->GetName() == "crown")
+                {
+                    SDL_RenderTextureRotated(renderer, texture, NULL, renderRect, uiElement->GetRotation(), NULL, SDL_FLIP_NONE);
+                }
+                else
+                {
+                    SDL_RenderTexture(renderer, texture, NULL, renderRect);
+                }
             }
             else
             {
@@ -134,6 +147,11 @@ void GameObject::SetGlobalPosition(float x, float y, bool updateRelative)
         UpdateRelativePositions();
     }
     
+}
+
+pair<float, float> GameObject::GetGlobalCenter()
+{
+    return {globalPosition.first + (dimensions.first * scale / 2), globalPosition.second + (dimensions.second * scale / 2)};
 }
 
 void GameObject::SetGlobalCenter(float x, float y, bool updateRelative)
