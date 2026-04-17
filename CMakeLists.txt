@@ -4,27 +4,19 @@ project(Topposition LANGUAGES CXX)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
+# 1. Automatically find all source and header files
+# CONFIGURE_DEPENDS ensures CMake notices when you add or delete files
+file(GLOB_RECURSE SOURCES CONFIGURE_DEPENDS "src/*.cpp")
+file(GLOB_RECURSE HEADERS CONFIGURE_DEPENDS "include/*.h")
+
+# 2. Pass the variables containing your files to the executable
 add_executable(Topposition WIN32
     icon.rc
-    main.cpp
-    GameObject.cpp GameObject.h
-    Input.cpp Input.h
-    GameRules.cpp GameRules.h
-    GlobalVars.cpp GlobalVars.h
-    Player.cpp Player.h
-    TerrainGeneration.cpp TerrainGeneration.h
-    ProgramInitialization.cpp ProgramInitialization.h
-    Rendering.cpp Rendering.h
-    GameInitialization.cpp GameInitialization.h
-    MouseLogic.cpp MouseLogic.h
-    PlayerMovement.cpp PlayerMovement.h
-    GameLogic.cpp GameLogic.h
-    ClaimLogic.cpp ClaimLogic.h
-    EventHandler.cpp EventHandler.h
-    MultiPurposeFunctions.cpp MultiPurposeFunctions.h
-    AnimationHandler.cpp AnimationHandler.h
-    MenuInitialization.cpp MenuInitialization.h
+    ${SOURCES}
+    ${HEADERS}
 )
+
+target_include_directories(Topposition PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include)
 
 find_package(SDL3 CONFIG REQUIRED)
 find_package(SDL3_image CONFIG REQUIRED)
