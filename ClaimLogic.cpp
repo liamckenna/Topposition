@@ -3,15 +3,18 @@
 namespace
 {
     constexpr int BATTLE_ROUND_DELAY_MS = 1000;
+    constexpr int BATTLE_ADVANCE_DELAY_MS = 1000;
 
     enum BattlePhase
     {
         BATTLE_IDLE,
         BATTLE_START_ROUND,
         BATTLE_WAIT_ATTACK_ROLL,
+        BATTLE_REVEAL_ATTACK,
         BATTLE_WAIT_DEFENSE_ROLL,
         BATTLE_RESOLVE_ROUND,
-        BATTLE_ADVANCE
+        BATTLE_ADVANCE,
+        BATTLE_END
     };
 
     struct BattleSequenceState
@@ -26,7 +29,7 @@ namespace
         Piece *roundDefender = nullptr;
         int attackRoll = 0;
         int defenseRoll = 0;
-        Uint64 phaseStart = 0;
+        Uint64 phaseStart = SDL_GetTicks();
         BattlePhase phase = BATTLE_IDLE;
     };
 
@@ -78,7 +81,7 @@ namespace
         std::string finalFaceName = "die " + std::to_string(roll);
         Uint64 now = SDL_GetTicks();
         diceAnimations.clear();
-        diceAnimations.emplace_back(die, dieFaces, textures[finalFaceName][0], now, 200, 5, false);
+        diceAnimations.emplace_back(die, dieFaces, textures[finalFaceName][0], now, 125, 8, false);
     }
 
     void RefreshBattleParticipants()
@@ -124,7 +127,7 @@ namespace
                 endText->SetRendered(false);
                 turnText->SetRendered(false);
                 battleSequence.peak->GetClaimNotif()->SetRendered(false);
-                std::cout << "Battle sequence started between " << battleSequence.attacker->GetName() << " and " << battleSequence.defender->GetName() << std::endl;
+                crown->SetRendered(false);
                 return true;
             }
         }
@@ -139,6 +142,7 @@ namespace
         endTurnArrow->SetRendered(true);
         endText->SetRendered(true);
         turnText->SetRendered(true);
+        crown->SetRendered(false);
         battleSequence = BattleSequenceState();
     }
 
@@ -222,7 +226,6 @@ void ClaimPeak(UIElement *peakNotif)
     }
 
     BeginBattleAgainstDefender(peak, currentTurn);
-    std::cout << "called from ClaimPeak" << std::endl;
 }
 
 void UpdateBattleSequence()
@@ -232,10 +235,10 @@ void UpdateBattleSequence()
         return;
     }
 
-    if (battleSequence.peak == nullptr || battleSequence.attacker == nullptr || !IsOccupyingPeak(battleSequence.peak, battleSequence.attacker))
+    if (battleSequence.peak == nullptr || battleSequence.attacker == nullptr || !IsOccupyingPeak(battleSequence.peak, battleSequence.attacker) && battleSequence.phase != BATTLE_END)
     {
-        EndBattleSequence();
-        RefreshClaimNotifs();
+        battleSequence.phase = BATTLE_END;
+        battleSequence.phaseStart = SDL_GetTicks();
         return;
     }
 
@@ -259,9 +262,18 @@ void UpdateBattleSequence()
         if (HasActiveDiceAnimation())
             break;
 
+        battleSequence.phase = BATTLE_REVEAL_ATTACK;
+        battleSequence.phaseStart = SDL_GetTicks();
+        break;
+    case BATTLE_REVEAL_ATTACK:
+        if (SDL_GetTicks() - battleSequence.phaseStart < BATTLE_ADVANCE_DELAY_MS)
+        {
+            break;
+        }
         battleSequence.defenseRoll = RollDie();
         StartSingleDieRoll("dieTwo", battleSequence.defenseRoll);
         battleSequence.phase = BATTLE_WAIT_DEFENSE_ROLL;
+        battleSequence.phaseStart = SDL_GetTicks();
         break;
     case BATTLE_WAIT_DEFENSE_ROLL:
         if (HasActiveDiceAnimation())
@@ -279,11 +291,18 @@ void UpdateBattleSequence()
 
         if (battleSequence.attackRoll >= battleSequence.defenseRoll)
         {
+
+            crown->SetGlobalPosition(die1->GetGlobalCenter().first - (die1->GetDimensions().first * die1->GetScale() / 2) - (crown->GetDimensions().first * crown->GetScale()), die1->GetGlobalCenter().second - (die1->GetDimensions().second * die1->GetScale() / 2) - (crown->GetDimensions().second * crown->GetScale()));
+            crown->SetRotation(-45);
+            crown->SetRendered(true);
             RetreatPiece(battleSequence.peak, battleSequence.roundDefender);
             battleSequence.defenders.pop_back();
         }
         else
         {
+            crown->SetGlobalPosition(die2->GetGlobalCenter().first + (die2->GetDimensions().first * die2->GetScale() / 2), die2->GetGlobalCenter().second - (die2->GetDimensions().second * die2->GetScale() / 2) - (crown->GetDimensions().second * crown->GetScale()));
+            crown->SetRotation(45);
+            crown->SetRendered(true);
             RetreatPiece(battleSequence.peak, battleSequence.roundAttacker);
             battleSequence.attackers.pop_back();
         }
@@ -299,8 +318,8 @@ void UpdateBattleSequence()
         if (LastPlayerStanding(battleSequence.peak, battleSequence.attacker))
         {
             FinalizePeakClaim(battleSequence.peak);
-            EndBattleSequence();
-            RefreshClaimNotifs();
+            battleSequence.phase = BATTLE_END;
+            battleSequence.phaseStart = SDL_GetTicks();
             break;
         }
 
@@ -308,6 +327,7 @@ void UpdateBattleSequence()
         {
             break;
         }
+        crown->SetRendered(false);
 
         if (battleSequence.attackers.size() > 0 && battleSequence.defenders.size() > 0)
         {
@@ -324,11 +344,21 @@ void UpdateBattleSequence()
 
         if (!BeginBattleAgainstDefender(battleSequence.peak, battleSequence.attacker))
         {
-            EndBattleSequence();
-            RefreshClaimNotifs();
+            battleSequence.phase = BATTLE_END;
+            battleSequence.phaseStart = SDL_GetTicks();
         }
         break;
     case BATTLE_IDLE:
+        break;
+    case BATTLE_END:
+
+        if (SDL_GetTicks() - battleSequence.phaseStart < BATTLE_ROUND_DELAY_MS)
+        {
+            break;
+        }
+        EndBattleSequence();
+        RefreshClaimNotifs();
+        break;
     default:
         break;
     }

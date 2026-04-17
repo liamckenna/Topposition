@@ -188,6 +188,10 @@ Text *selectText(int x, int y)
 {
     for (int i = 0; i < text.size(); i++)
     {
+        if (!text[i]->GetSelectable() || !text[i]->GetRendered())
+        {
+            continue;
+        }
         int width_LowerBound = text[i]->GetPosition().first;
         int width_UpperBound = text[i]->GetBottomRight().first;
         int height_LowerBound = text[i]->GetPosition().second;
@@ -199,7 +203,6 @@ Text *selectText(int x, int y)
                 SDL_Color color = GetPixelColor(text[i]->GetSurface(),
                                                 (x - width_LowerBound) / (cameraZoom),
                                                 (y - height_LowerBound) / (cameraZoom));
-                std::cout << "hit text (" << text[i]->GetName() << ")" << std::endl;
                 return text[i];
             }
         }

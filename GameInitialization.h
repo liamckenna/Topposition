@@ -21,3 +21,5 @@ void renderPixels();
 void ResetMap();
 
 void loadGame();
+
+void SetCameraAtCenter();

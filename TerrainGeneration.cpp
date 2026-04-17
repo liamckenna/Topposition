@@ -7,8 +7,16 @@ void GeneratePeak()
 
     int shape = rand() % (int)(shapeCount);
     int height = (rand() % rules->GetMaxHeight()) + 1;
+    if (height < rules->GetMaxHeight() / 2)
+    {
+        height = (rand() % rules->GetMaxHeight()) + 1;
+    }
     if (rules->GetRemainingPoints() <= rules->GetMaxHeight())
+    {
         height = rules->GetRemainingPoints();
+    }
+    
+    
     rules->SetRemainingPoints(rules->GetRemainingPoints() - height);
     string name = to_string(height) + ", " + to_string(peaks.size() + 1);
     Peak *peak = new Peak(name, textures[to_string(shape)][height], surfaces[to_string(shape)], false, true, height, renderer);
@@ -17,7 +25,6 @@ void GeneratePeak()
     peak->SetScale(0.1);
     peak->SetScale(peak->GetScale() * 2);
     peak->SetCenter(x, y);
-    //peak->globalPosition = std::make_pair(peak->GetCenter().first - (peak->GetDimensions().first * peak->GetScale()) / 2, peak->GetCenter().second - (peak->GetDimensions().second * peak->GetScale()) / 2);
     peaks.push_back(peak);
     peak->SetPeakID(peaks.size());
     terrain[height].push_back(peak);
@@ -42,7 +49,6 @@ void GeneratePeak()
             pieces.push_back(item);
             item->SetScale(0.05);
             item->SetCenter(peak->GetCenter().first, peak->GetCenter().second);
-            //item->globalPosition = std::make_pair(item->GetCenter().first - (item->GetDimensions().first * item->GetScale()) / 2, item->GetCenter().second - (item->GetDimensions().second * item->GetScale()) / 2);
             gameObjects[height].push_back(item);
             peak->SetItem(item);
         }

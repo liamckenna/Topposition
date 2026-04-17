@@ -111,3 +111,9 @@ Text *turnText;
 Text *endText;
 
 UIElement *endTurnArrow;
+
+UIElement *crown;
+
+UIElement *die1;
+
+UIElement *die2;

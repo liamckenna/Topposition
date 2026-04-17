@@ -27,6 +27,9 @@ void HandleEvents(Input *playerInput)
         case SDL_EVENT_MOUSE_BUTTON_UP:
             EventMouseButtonUp(playerInput, event.button);
             break;
+        case SDL_EVENT_KEY_DOWN:
+            EventKeyDown(playerInput, event.key);
+            break;
         }
     }
 
@@ -92,6 +95,36 @@ void EventWindowResized(Input *playerInput, SDL_WindowEvent &event)
 
     std::cout << "New screen dimensions: " << SCREEN_WIDTH << ", " << SCREEN_HEIGHT << std::endl;
     updateUIElementPositions();
+}
+
+void EventKeyDown(Input *playerInput, SDL_KeyboardEvent &event)
+{
+    switch (state)
+    {
+    case MAIN_MENU:
+        break;
+    case SETTINGS:
+        break;
+    case LOADING:
+        break;
+    case GAME:
+        if (event.key == SDLK_ESCAPE)
+        {
+            if (SDL_GetTicks() - gameStartTime >= 1000)
+            {
+                ResetMap();
+            }
+        }
+        break;
+    case PAUSED:
+        if (event.key == SDLK_ESCAPE)
+        {
+            state = GAME;
+        }
+        break;
+    default:
+        break;
+    }
 }
 
 void EventMouseWheel(Input *playerInput, SDL_MouseWheelEvent &event)

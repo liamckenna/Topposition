@@ -132,3 +132,9 @@ extern Text *turnText;
 extern Text *endText;
 
 extern UIElement *endTurnArrow;
+
+extern UIElement *crown;
+
+extern UIElement *die1;
+
+extern UIElement *die2;

@@ -51,6 +51,7 @@ public:
     GameObject(string name, SDL_Texture *texture, SDL_Surface *surface, bool m, bool r);
     pair<float, float> GetPosition(bool update = true);
     pair<float, float> GetDimensions() { return dimensions; }
+    pair<float, float> GetGlobalCenter();
     string GetName() { return name; }
     SDL_Texture *GetTexture() { return texture; }
     std::map<string, Animation *> animations;
@@ -163,6 +164,7 @@ class UIElement : public GameObject
     int shadowOffsetX;
     int shadowOffsetY;
     Uint8 shadowAlpha;
+    int rotation;
 
 public:
     UIElement(string name, SDL_Texture *texture, SDL_Surface *surface, bool r, bool s, SDL_Renderer *renderer, Peak *ap = nullptr) : GameObject(name, texture, surface, false, r)
@@ -172,6 +174,7 @@ public:
         resizable = false;
         selectable = s;
         topLayer = true;
+        rotation = 0;
 
         shadowOffsetX = 10;
         shadowOffsetY = 10;
@@ -189,7 +192,8 @@ public:
     Peak *GetAssociatedPeak() { return associatedPeak; }
     void SetAssociatedPeak(Peak *ap) { associatedPeak = ap; }
     void SetRenderShadow(bool rs) { renderShadow = rs; }
-
+    void SetRotation(int r) { rotation = r; }
+    int GetRotation() { return rotation; }
     bool GetRenderShadow() { return renderShadow; }
     SDL_FRect *GetShadowRect() { return shadowRect; }
     SDL_Texture *GetShadowTexture() { return shadowTexture; }
@@ -322,6 +326,7 @@ public:
 
 class Text
 {
+    bool selectable = false;
     string name;
     const char *fontPath;
     TTF_Font *font;
@@ -346,6 +351,7 @@ public:
     void RenderText(SDL_Renderer *renderer);
     void SetRendered(bool r) { rendered = r; }
     void SetRenderShadow(bool rs) { renderShadow = rs; }
+    void SetSelectable(bool s) { selectable = s; }
     void SetPosition(int x, int y)
     {
         position.first = x;
@@ -399,6 +405,8 @@ public:
     int GetSize() { return size; }
     int GetWidth() { return dimensions.first; }
     int GetHeight() { return dimensions.second; }
+    bool GetSelectable() { return selectable; }
+    bool GetRendered() { return rendered; }
     std::pair<int, int> GetPosition() { return position; }
     std::pair<int, int> GetDimensions() { return dimensions; }
     string GetName() { return name; }
@@ -443,6 +451,6 @@ struct DiceAnimation
     bool finished;
     bool revealMovesLeftOnFinish;
 
-    DiceAnimation(UIElement *d, vector<SDL_Texture *> f, SDL_Texture *ft, Uint64 st, Uint64 si = 200, int ts = 5, bool showMoves = true)
+    DiceAnimation(UIElement *d, vector<SDL_Texture *> f, SDL_Texture *ft, Uint64 st, Uint64 si = 125, int ts = 8, bool showMoves = true)
         : die(d), faces(f), finalTexture(ft), startTime(st), stepInterval(si), totalSteps(ts), currentStep(0), finished(false), revealMovesLeftOnFinish(showMoves) {}
 };

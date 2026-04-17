@@ -15,6 +15,8 @@ class Player {
     Text* turnText;
     Text *scoreText;
     Text *circleText;
+    Text *firstText;
+    Text *tieText;
     std::string color;
     SDL_Color sdlColor;
 public:
@@ -30,6 +32,10 @@ public:
     void SetTurnText(Text* tt) {turnText = tt;}
     Text* GetScoreText() {return scoreText;}
     void SetScoreText(Text* st) {scoreText = st;}
+    Text* GetFirstText() {return firstText;}
+    void SetFirstText(Text* ft) {firstText = ft;}
+    Text* GetTieText() {return tieText;}
+    void SetTieText(Text* tt) {tieText = tt;}
     std::string GetColor() {return color;}
     void SetColor(std::string c) {color = c;}
     Text* GetCircleText() {return circleText;}

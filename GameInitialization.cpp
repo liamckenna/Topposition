@@ -102,25 +102,54 @@ void loadGame()
     worldResolution = {SCREEN_WIDTH, SCREEN_HEIGHT};
     turnCount = 1;
 
-    std::cout << "Loading Map..." << std::endl;
+    //std::cout << "Loading Map..." << std::endl;
+    Uint64 mapStartTime = SDL_GetTicks();
     loadMap();
-    std::cout << "Loading Game Pieces..." << std::endl;
+    Uint64 mapEndTime = SDL_GetTicks();
+    std::cout << "Map Loaded in " << (mapEndTime - mapStartTime) / 1000.f << " seconds!" << std::endl;
+    //std::cout << "Loading Game Pieces..." << std::endl;
+    Uint64 gamePiecesStartTime = SDL_GetTicks();
     loadGamePieces();
-    std::cout << "Loading Text..." << std::endl;
+    Uint64 gamePiecesEndTime = SDL_GetTicks();
+    std::cout << "Game Pieces Loaded in " << (gamePiecesEndTime - gamePiecesStartTime) / 1000.f << " seconds!" << std::endl;
+    //std::cout << "Loading Text..." << std::endl;
+    Uint64 textStartTime = SDL_GetTicks();
     loadText();
-    std::cout << "Loading UI..." << std::endl;
+    Uint64 textEndTime = SDL_GetTicks();
+    std::cout << "Text Loaded in " << (textEndTime - textStartTime) / 1000.f << " seconds!" << std::endl;
+    //std::cout << "Loading UI..." << std::endl;
+    Uint64 uiStartTime = SDL_GetTicks();
     loadUI();
-    std::cout << "Generating Pixels..." << std::endl;
+    Uint64 uiEndTime = SDL_GetTicks();
+    std::cout << "UI Loaded in " << (uiEndTime - uiStartTime) / 1000.f << " seconds!" << std::endl;
+    //std::cout << "Generating Pixels..." << std::endl;
+    Uint64 pixelsStartTime = SDL_GetTicks();
     GeneratePixels();
-    std::cout << "Generating Ocean..." << std::endl;
+    Uint64 pixelsEndTime = SDL_GetTicks();
+    std::cout << "Pixels Generated in " << (pixelsEndTime - pixelsStartTime) / 1000.f << " seconds!" << std::endl;
+    //std::cout << "Generating Ocean..." << std::endl;
+    Uint64 oceanStartTime = SDL_GetTicks();
     GenerateOcean();
-    std::cout << "Rendering Pixels..." << std::endl;
+    Uint64 oceanEndTime = SDL_GetTicks();
+    std::cout << "Ocean Generated in " << (oceanEndTime - oceanStartTime) / 1000.f << " seconds!" << std::endl;
+    //std::cout << "Rendering Pixels..." << std::endl;
+    Uint64 renderPixelsStartTime = SDL_GetTicks();
     renderPixels();
-
     SDL_SetRenderTarget(renderer, NULL);
-
-    std::cout << "Game Loaded!" << std::endl;
+    Uint64 renderPixelsEndTime = SDL_GetTicks();
+    std::cout << "Pixels Rendered in " << (renderPixelsEndTime - renderPixelsStartTime) / 1000.f << " seconds!" << std::endl;
+    //std::cout << "Game Loaded!" << std::endl;
     gameStartTime = SDL_GetTicks();
+    std::cout << "Total Load Time: " << (gameStartTime - mapStartTime) / 1000.f << " seconds!" << std::endl;
+
+    std::cout << "World Resolution: " << worldResolution.first << ", " << worldResolution.second << std::endl;
+    SetCameraAtCenter();
+}
+
+void SetCameraAtCenter()
+{
+    cameraPosition.first = (2560.f) - (worldResolution.first / 2);
+    cameraPosition.second = (1440.f) - (worldResolution.second / 2);
 }
 
 bool loadMap()
@@ -211,32 +240,63 @@ void loadGamePieces()
         {
             int x;
             int y;
-
+            int tries = 0;
+            int maxTries = 1000;
             do
             {
-                x = (rand() % (int)(MAP_WIDTH * 2 / 9));
-                y = (rand() % (int)(MAP_HEIGHT * 2 / 9));
+                x = (rand() % (int)(MAP_WIDTH * 2) / 2);
+                y = (rand() % (int)(MAP_HEIGHT * 2) / 2);
+                
                 switch (j % 4)
                 {
                 case 0:
-                    x += MAP_WIDTH / 9 * 8;
-                    y -= MAP_HEIGHT / 9 * 2;
+                    //x += MAP_WIDTH;
+                    //y += MAP_HEIGHT;
                     break;
                 case 1:
-                    x += MAP_WIDTH / 9 * 8;
-                    y += MAP_HEIGHT / 9 * 18;
+                    x += MAP_WIDTH;
+                    //y += MAP_HEIGHT;
                     break;
                 case 2:
-                    x -= MAP_WIDTH / 9 * 2;
-                    y += MAP_HEIGHT / 9 * 8;
+                    x += MAP_WIDTH;
+                    y += MAP_HEIGHT;
                     break;
                 case 3:
-                    x += MAP_WIDTH / 9 * 18;
-                    y += MAP_HEIGHT / 9 * 8;
+                    //x += MAP_WIDTH;
+                    y += MAP_HEIGHT;
                     break;
                 default:
-                    x = (rand() % (int)(MAP_WIDTH * 3)) - MAP_WIDTH / 4;
-                    y = (rand() % (int)(MAP_HEIGHT * 3)) - MAP_HEIGHT / 4;
+                    break;
+                    //x = (rand() % (int)(MAP_WIDTH * 3)) - MAP_WIDTH / 4;
+                    //y = (rand() % (int)(MAP_HEIGHT * 3)) - MAP_HEIGHT / 4;
+                }
+                tries++;
+                if (tries > maxTries)
+                {
+                    std::cout << "Failed to place piece for " << playerNumber << " after " << maxTries << " tries!" << std::endl;
+                    switch (j % 4)
+                    {
+                        case 0:
+                            x = (rand() % (int)(MAP_WIDTH * 2) / 2) - (MAP_WIDTH / 2);
+                            y = (rand() % (int)(MAP_HEIGHT * 2) / 2) - (MAP_HEIGHT / 2);
+                            break;
+                        case 1:
+                            x = (rand() % (int)(MAP_WIDTH * 2) / 2) + MAP_WIDTH + (MAP_WIDTH / 2);
+                            y = (rand() % (int)(MAP_HEIGHT * 2) / 2) - (MAP_HEIGHT / 2);
+                            break;
+                        case 2:
+                            x = (rand() % (int)(MAP_WIDTH * 2) / 2) + MAP_WIDTH  + (MAP_WIDTH / 2);
+                            y = (rand() % (int)(MAP_HEIGHT * 2) / 2) + MAP_HEIGHT  + (MAP_HEIGHT / 2);
+                            break;
+                        case 3:
+                            x = (rand() % (int)(MAP_WIDTH * 2) / 2) - (MAP_WIDTH / 2);
+                            y = (rand() % (int)(MAP_HEIGHT * 2) / 2) + MAP_HEIGHT  + (MAP_HEIGHT / 2);
+                            break;
+                        default:
+                            x = (rand() % (int)(MAP_WIDTH * 3)) - MAP_WIDTH / 4;
+                            y = (rand() % (int)(MAP_HEIGHT * 3)) - MAP_HEIGHT / 4;
+                    }
+                    break;
                 }
             } while (selectTerrain(x, y, false) != NULL || selectUI(x, y, false) != NULL);
 
@@ -269,6 +329,7 @@ void loadText()
     SDL_Color Green = {0, 255, 0};
     SDL_Color Blue = {0, 0, 255};
     SDL_Color Yellow = {255, 255, 0};
+    SDL_Color Gold = {239, 191, 4};
 
     int textSize = 125 * (SCREEN_WIDTH / 3840.f);
 
@@ -303,6 +364,7 @@ void loadText()
     uiElements.push_back(currentPlayerCircle);
     gameObjects[gameObjects.size() - 1].push_back(currentPlayerCircle);
     currentPlayerCircle->SetGlobalCenter((SCREEN_WIDTH / 2) - (SCREEN_WIDTH / 7.50f), SCREEN_HEIGHT - (currentPlayerCircle->GetDimensions().second * currentPlayerCircle->GetScale() / 2) - (SCREEN_HEIGHT / 40));
+    currentPlayerCircle->SetRenderShadow(true);
 
     opposingPlayerCircle = new UIElement("opposingPlayerCircle", textures["opposing player circle"][0], surfaces["opposing player circle"], true, false, renderer);
     opposingPlayerCircle->SetScale(1.f * (SCREEN_WIDTH / 3840.f));
@@ -310,6 +372,7 @@ void loadText()
     gameObjects[gameObjects.size() - 1].push_back(opposingPlayerCircle);
     opposingPlayerCircle->SetGlobalCenter((SCREEN_WIDTH / 2) + (SCREEN_WIDTH / 7.50f), SCREEN_HEIGHT - (opposingPlayerCircle->GetDimensions().second * opposingPlayerCircle->GetScale() / 2) - (SCREEN_HEIGHT / 40));
     opposingPlayerCircle->SetRendered(false);
+    opposingPlayerCircle->SetRenderShadow(true);
 
     textSize = 125 * (SCREEN_WIDTH / 3840.f);
     y = SCREEN_HEIGHT / 40;
@@ -325,15 +388,29 @@ void loadText()
         x = playerText->GetPosition().first + playerText->GetWidth() + (SCREEN_WIDTH / 160);
         y = playerText->GetPosition().second;
         Text *playerScoreText = new Text("player" + to_string(i) + "ScoreText", "Fonts/yoster.ttf", White, x, y, textSize, renderer, "0");
+        x += playerScoreText->GetWidth();
+        textSize = 75 * (SCREEN_WIDTH / 3840.f);
+        Text *playerFirstText = new Text("player" + to_string(i) + "FirstText", "Fonts/yoster.ttf", Gold, x, y, textSize, renderer, "1st!");
+        playerFirstText->SetPosition(x, y - (playerFirstText->GetHeight() / 4));
+        playerFirstText->SetRendered(false);
+        Text *playerTieText = new Text("player" + to_string(i) + "TieText", "Fonts/yoster.ttf", Gold, x, y, textSize, renderer, "Tie!");
+        playerTieText->SetPosition(x, y - (playerTieText->GetHeight() / 4));
+        playerTieText->SetRendered(false);
+        textSize = 125 * (SCREEN_WIDTH / 3840.f);
         Text *playerCircleText = new Text("player" + to_string(i) + "CircleText", "Fonts/yoster.ttf", White, x, y, textSize, renderer, ("P" + to_string(i + 1)).c_str());
         playerCircleText->SetCenter(currentPlayerCircle->GetCenter().first, currentPlayerCircle->GetCenter().second);
         playerCircleText->SetRenderShadow(false);
         playerCircleText->SetRendered(false);
+        
         text.push_back(playerText);
         text.push_back(playerScoreText);
+        text.push_back(playerFirstText);
+        text.push_back(playerTieText);
         text.push_back(playerCircleText);
         players[i]->SetTurnText(playerText);
         players[i]->SetScoreText(playerScoreText);
+        players[i]->SetFirstText(playerFirstText);
+        players[i]->SetTieText(playerTieText);
         players[i]->SetCircleText(playerCircleText);
         if (i == 0)
         {
@@ -357,11 +434,13 @@ void loadText()
     turnText = new Text("turnText", "Fonts/yoster.ttf", White, 0, 0, textSize, renderer, "Turn");
     turnText->SetPosition((SCREEN_WIDTH / 2) + (SCREEN_WIDTH / 8), SCREEN_HEIGHT - turnText->GetHeight() - (SCREEN_HEIGHT / 40));
     turnText->SetCenter((SCREEN_WIDTH / 2) + (SCREEN_WIDTH / 7.50f), turnText->GetCenter().second);
+    turnText->SetSelectable(true);
     text.push_back(turnText);
 
     endText = new Text("endText", "Fonts/yoster.ttf", White, 0, 0, textSize, renderer, "End");
     endText->SetPosition((SCREEN_WIDTH / 2) + (SCREEN_WIDTH / 8) + ((turnText->GetWidth() - endText->GetWidth()) / 2), SCREEN_HEIGHT - turnText->GetHeight() - endText->GetHeight() - (SCREEN_HEIGHT / 40));
     endText->SetCenter((SCREEN_WIDTH / 2) + (SCREEN_WIDTH / 7.50f), endText->GetCenter().second);
+    endText->SetSelectable(true);
     text.push_back(endText);
 
     endTurnArrow = new UIElement("endTurnArrow", textures["end turn arrow"][0], surfaces["end turn arrow"], true, true, renderer);
@@ -374,18 +453,29 @@ void loadText()
 
 void loadUI()
 {
-    UIElement *die1 = new UIElement("dieOne", textures["die 1"][0], surfaces["die 1"], true, true, renderer);
+    die1 = new UIElement("dieOne", textures["die 1"][0], surfaces["die 1"], true, true, renderer);
     die1->SetScale(0.15 * (SCREEN_WIDTH / 3840.f));
     uiElements.push_back(die1);
     gameObjects[gameObjects.size() - 1].push_back(die1);
     die1->SetGlobalCenter((SCREEN_WIDTH / 2) - (die1->GetDimensions().first * die1->GetScale() / 1.25f), SCREEN_HEIGHT - (die1->GetDimensions().second * die1->GetScale() / 2) - (SCREEN_HEIGHT / 40));
+    die1->SetRenderShadow(true);
 
-    UIElement *die2 = new UIElement("dieTwo", textures["die 2"][0], surfaces["die 2"], true, true, renderer);
+
+    die2 = new UIElement("dieTwo", textures["die 2"][0], surfaces["die 2"], true, true, renderer);
     die2->SetScale(0.15 * (SCREEN_WIDTH / 3840.f));
     uiElements.push_back(die2);
     gameObjects[gameObjects.size() - 1].push_back(die2);
     die2->SetGlobalCenter((SCREEN_WIDTH / 2) + (die2->GetDimensions().first * die2->GetScale() / 1.25f), SCREEN_HEIGHT - (die2->GetDimensions().second * die2->GetScale() / 2) - (SCREEN_HEIGHT / 40));
+    die2->SetRenderShadow(true);
 
+    crown = new UIElement("crown", textures["crown"][0], surfaces["crown"], true, false, renderer);
+    uiElements.push_back(crown);
+    gameObjects[gameObjects.size() - 1].push_back(crown);
+    crown->SetScale(8 * (SCREEN_WIDTH / 3840.f));
+    crown->SetGlobalPosition(die1->GetGlobalCenter().first - (die1->GetDimensions().first * die1->GetScale() / 2) - (crown->GetDimensions().first * crown->GetScale()), die1->GetGlobalCenter().second - (die1->GetDimensions().second * die1->GetScale() / 2) - (crown->GetDimensions().second * crown->GetScale()));
+    
+    crown->SetRenderShadow(true);
+    crown->SetRendered(false);
 
     for (int i = 0; i < peaks.size(); i++)
     {
