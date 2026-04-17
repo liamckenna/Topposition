@@ -1,11 +1,15 @@
 #include "ProgramInitialization.h"
+#define WIN32_LEAN_AND_MEAN
+#define NOBYTE
+#include <windows.h>
 
 bool init()
 {
+    SetDllDirectoryA("libs");
     // Initialization flag
     bool success = true;
     srand((unsigned)time(NULL));
-
+    
     // Initialize SDL
     if (SDL_Init(SDL_INIT_VIDEO) < 0)
     {

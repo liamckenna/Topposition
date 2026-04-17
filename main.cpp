@@ -7,6 +7,7 @@
 #include <utility>
 #include <map>
 #include <math.h>
+#include <random>
 #include "GameObject.h"
 #include "Input.h"
 #include "GameRules.h"
@@ -17,7 +18,6 @@
 #include "MenuInitialization.h"
 #include "EventHandler.h"
 #include "AnimationHandler.h"
-#include <random>
 
 float last_fps_time = 0.f;
 int frame_count = 0;
@@ -26,7 +26,6 @@ void CalculateFrameRate();
 
 int main(int argc, char *args[])
 {
-
     if (!init())
     {
         printf("Failed to initialize!\n");
