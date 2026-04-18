@@ -37,11 +37,28 @@ if(WIN32)
         "@echo off\r\nset \"PATH=%~dp0libs;%PATH%\"\r\n\"%~dp0$<TARGET_FILE_NAME:Topposition>\" %*\r\n"
     )
 
+    # Locate the MinGW bin directory from the compiler path so we can copy
+    # runtime DLLs (libgcc_s_seh-1.dll, libstdc++-6.dll, libwinpthread-1.dll)
+    # that are NOT captured by TARGET_RUNTIME_DLLS.
+    get_filename_component(MINGW_BIN_DIR "${CMAKE_CXX_COMPILER}" DIRECTORY)
+
     add_custom_command(TARGET Topposition POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E make_directory "${RELEASE_DIR}/libs"
         COMMAND ${CMAKE_COMMAND} -E make_directory "${RELEASE_DIR}/textures"
         COMMAND ${CMAKE_COMMAND} -E make_directory "${RELEASE_DIR}/fonts"
+        # Copy SDL3 / SDL3_image / SDL3_ttf runtime DLLs (direct CMake targets)
         COMMAND ${CMAKE_COMMAND} -E copy_if_different $<TARGET_RUNTIME_DLLS:Topposition> "${RELEASE_DIR}/libs"
+        # Copy MinGW C/C++ runtime DLLs
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different
+            "${MINGW_BIN_DIR}/libgcc_s_seh-1.dll"
+            "${MINGW_BIN_DIR}/libstdc++-6.dll"
+            "${MINGW_BIN_DIR}/libwinpthread-1.dll"
+            "${RELEASE_DIR}/libs"
+        # Copy FreeType / HarfBuzz (indirect SDL3_ttf dependencies)
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different
+            "${MINGW_BIN_DIR}/libfreetype-6.dll"
+            "${MINGW_BIN_DIR}/libharfbuzz-0.dll"
+            "${RELEASE_DIR}/libs"
         COMMAND ${CMAKE_COMMAND} -E copy_directory "${CMAKE_SOURCE_DIR}/Textures" "${RELEASE_DIR}/textures"
         COMMAND ${CMAKE_COMMAND} -E copy_directory "${CMAKE_SOURCE_DIR}/Fonts" "${RELEASE_DIR}/fonts"
         COMMAND_EXPAND_LISTS
