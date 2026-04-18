@@ -9,6 +9,15 @@
 # copies every resolved dependency into RELEASE_DIR/libs/, and removes any
 # DLLs that SDL3's cmake package may have auto-dropped into RELEASE_DIR root.
 
+# Remove any DLLs that vcpkg's applocal.ps1 or SDL3's cmake package may have
+# auto-dropped into the release/ root BEFORE resolving dependencies.
+# If these stale copies sit next to the .exe they are found by the dependency
+# walker and conflict with the canonical copies in MINGW_BIN_DIR.
+file(GLOB _STALE_ROOT_DLLS "${RELEASE_DIR}/*.dll")
+foreach(_DLL IN LISTS _STALE_ROOT_DLLS)
+    file(REMOVE "${_DLL}")
+endforeach()
+
 # Recursively resolve all runtime DLL dependencies of the executable.
 file(GET_RUNTIME_DEPENDENCIES
     EXECUTABLES    "${EXE_PATH}"
@@ -33,10 +42,3 @@ endforeach()
 if(UNRESOLVED_DEPS)
     message(WARNING "Unresolved runtime dependencies (not copied):\n  ${UNRESOLVED_DEPS}")
 endif()
-
-# Remove any DLLs that SDL3's cmake package auto-dropped into the release/
-# root so that all DLLs live exclusively in release/libs/.
-file(GLOB ROOT_DLLS "${RELEASE_DIR}/*.dll")
-foreach(DLL IN LISTS ROOT_DLLS)
-    file(REMOVE "${DLL}")
-endforeach()
