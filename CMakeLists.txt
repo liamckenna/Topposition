@@ -34,9 +34,7 @@ if(WIN32)
     file(MAKE_DIRECTORY "${RELEASE_DIR}")
     set(RELEASE_LAUNCHER "${RELEASE_DIR}/run_topposition.bat")
     file(GENERATE OUTPUT "${RELEASE_LAUNCHER}" CONTENT
-        "@echo off\r\n"
-        "set \"PATH=%~dp0libs;%PATH%\"\r\n"
-        "\"%~dp0$<TARGET_FILE_NAME:Topposition>\" %*\r\n"
+        "@echo off\r\nset \"PATH=%~dp0libs;%PATH%\"\r\n\"%~dp0$<TARGET_FILE_NAME:Topposition>\" %*\r\n"
     )
 
     add_custom_command(TARGET Topposition POST_BUILD
