@@ -333,7 +333,7 @@ void loadText()
 
     int textSize = 125 * (SCREEN_WIDTH / 3840.f);
 
-    turnTallyText = new Text("turnTallyText", "Fonts/yoster.ttf", White, 0, 0, textSize, renderer, "Turn 80");
+    turnTallyText = new Text("turnTallyText", "fonts/yoster.ttf", White, 0, 0, textSize, renderer, "Turn 80");
 
     int x = SCREEN_WIDTH - turnTallyText->GetWidth() - SCREEN_WIDTH / 80;
     int y = SCREEN_HEIGHT / 40;
@@ -341,7 +341,7 @@ void loadText()
     turnTallyText->SetPosition(x, y);
     text.push_back(turnTallyText);
 
-    turnTallyNumText = new Text("turnTallyNumText", "Fonts/yoster.ttf", White, x, y, textSize, renderer, to_string(turnCount).c_str());
+    turnTallyNumText = new Text("turnTallyNumText", "fonts/yoster.ttf", White, x, y, textSize, renderer, to_string(turnCount).c_str());
 
     x = turnTallyText->GetPosition().first + turnTallyText->GetWidth() - (turnTallyNumText->GetWidth() * 1.5);
 
@@ -356,7 +356,7 @@ void loadText()
     turnTallyText->SetTextContent("Turn", renderer);
 
     std::string peaksLeftString = "peaks left: " + to_string(unclaimedPeakCount);
-    peaksLeftText = new Text("peaksLeftText", "Fonts/yoster.ttf", White, x, y, textSize, renderer, peaksLeftString.c_str());
+    peaksLeftText = new Text("peaksLeftText", "fonts/yoster.ttf", White, x, y, textSize, renderer, peaksLeftString.c_str());
     text.push_back(peaksLeftText);
 
     currentPlayerCircle = new UIElement("currentPlayerCircle", textures["player circle"][0], surfaces["player circle"], true, false, renderer);
@@ -384,20 +384,20 @@ void loadText()
         {
             y += players[0]->GetTurnText()->GetDimensions().second;
         }
-        Text *playerText = new Text("player" + to_string(i) + "Text", "Fonts/yoster.ttf", players[i]->GetSDLColor(), x, y, textSize, renderer, ("P" + to_string(i + 1) + ":").c_str());
+        Text *playerText = new Text("player" + to_string(i) + "Text", "fonts/yoster.ttf", players[i]->GetSDLColor(), x, y, textSize, renderer, ("P" + to_string(i + 1) + ":").c_str());
         x = playerText->GetPosition().first + playerText->GetWidth() + (SCREEN_WIDTH / 160);
         y = playerText->GetPosition().second;
-        Text *playerScoreText = new Text("player" + to_string(i) + "ScoreText", "Fonts/yoster.ttf", White, x, y, textSize, renderer, "0");
+        Text *playerScoreText = new Text("player" + to_string(i) + "ScoreText", "fonts/yoster.ttf", White, x, y, textSize, renderer, "0");
         x += playerScoreText->GetWidth();
         textSize = 75 * (SCREEN_WIDTH / 3840.f);
-        Text *playerFirstText = new Text("player" + to_string(i) + "FirstText", "Fonts/yoster.ttf", Gold, x, y, textSize, renderer, "1st!");
+        Text *playerFirstText = new Text("player" + to_string(i) + "FirstText", "fonts/yoster.ttf", Gold, x, y, textSize, renderer, "1st!");
         playerFirstText->SetPosition(x, y - (playerFirstText->GetHeight() / 4));
         playerFirstText->SetRendered(false);
-        Text *playerTieText = new Text("player" + to_string(i) + "TieText", "Fonts/yoster.ttf", Gold, x, y, textSize, renderer, "Tie!");
+        Text *playerTieText = new Text("player" + to_string(i) + "TieText", "fonts/yoster.ttf", Gold, x, y, textSize, renderer, "Tie!");
         playerTieText->SetPosition(x, y - (playerTieText->GetHeight() / 4));
         playerTieText->SetRendered(false);
         textSize = 125 * (SCREEN_WIDTH / 3840.f);
-        Text *playerCircleText = new Text("player" + to_string(i) + "CircleText", "Fonts/yoster.ttf", White, x, y, textSize, renderer, ("P" + to_string(i + 1)).c_str());
+        Text *playerCircleText = new Text("player" + to_string(i) + "CircleText", "fonts/yoster.ttf", White, x, y, textSize, renderer, ("P" + to_string(i + 1)).c_str());
         playerCircleText->SetCenter(currentPlayerCircle->GetCenter().first, currentPlayerCircle->GetCenter().second);
         playerCircleText->SetRenderShadow(false);
         playerCircleText->SetRendered(false);
@@ -421,7 +421,7 @@ void loadText()
 
     textSize = 150 * (SCREEN_WIDTH / 3840.f);
 
-    movesLeftText = new Text("movesLeftText", "Fonts/yoster.ttf", White, 0, 0, textSize, renderer, "11");
+    movesLeftText = new Text("movesLeftText", "fonts/yoster.ttf", White, 0, 0, textSize, renderer, "11");
 
     x = (SCREEN_WIDTH / 2) - (movesLeftText->GetWidth() / 2);
     y = SCREEN_HEIGHT - movesLeftText->GetHeight() - (SCREEN_HEIGHT / 9);
@@ -431,13 +431,13 @@ void loadText()
 
     textSize = 75 * (SCREEN_WIDTH / 3840.f);
 
-    turnText = new Text("turnText", "Fonts/yoster.ttf", White, 0, 0, textSize, renderer, "Turn");
+    turnText = new Text("turnText", "fonts/yoster.ttf", White, 0, 0, textSize, renderer, "Turn");
     turnText->SetPosition((SCREEN_WIDTH / 2) + (SCREEN_WIDTH / 8), SCREEN_HEIGHT - turnText->GetHeight() - (SCREEN_HEIGHT / 40));
     turnText->SetCenter((SCREEN_WIDTH / 2) + (SCREEN_WIDTH / 7.50f), turnText->GetCenter().second);
     turnText->SetSelectable(true);
     text.push_back(turnText);
 
-    endText = new Text("endText", "Fonts/yoster.ttf", White, 0, 0, textSize, renderer, "End");
+    endText = new Text("endText", "fonts/yoster.ttf", White, 0, 0, textSize, renderer, "End");
     endText->SetPosition((SCREEN_WIDTH / 2) + (SCREEN_WIDTH / 8) + ((turnText->GetWidth() - endText->GetWidth()) / 2), SCREEN_HEIGHT - turnText->GetHeight() - endText->GetHeight() - (SCREEN_HEIGHT / 40));
     endText->SetCenter((SCREEN_WIDTH / 2) + (SCREEN_WIDTH / 7.50f), endText->GetCenter().second);
     endText->SetSelectable(true);

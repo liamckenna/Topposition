@@ -137,7 +137,7 @@ void TextureLoader()
     DIR *iidp = nullptr;
     const char *innerDir = "";
     const char *innerx2Dir = "";
-    odp = opendir("Textures");
+    odp = opendir("textures");
     int textureCount = 0;
     if (odp != nullptr)
     {
@@ -145,7 +145,7 @@ void TextureLoader()
         {
             if (entry->d_namlen == 1 || entry->d_namlen == 2)
                 continue;
-            string fp = "Textures/" + (string)entry->d_name + "/";
+            string fp = "textures/" + (string)entry->d_name + "/";
             innerDir = fp.c_str();
             idp = opendir(innerDir);
             while (innerEntry = readdir(idp))
@@ -175,7 +175,7 @@ void TextureLoader()
                 }
                 string shorthand = fileName.substr(0, pos);
                 string texturePath = fp + fileName;
-                if ((string)entry->d_name == "Terrain")
+                if ((string)entry->d_name == "terrain")
                 {
                     for (int j = 0; j < rules->GetMaxHeight() + 1; j++)
                     {
