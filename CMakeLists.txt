@@ -61,6 +61,12 @@ if(WIN32)
             "${RELEASE_DIR}/libs"
         COMMAND ${CMAKE_COMMAND} -E copy_directory "${CMAKE_SOURCE_DIR}/Textures" "${RELEASE_DIR}/textures"
         COMMAND ${CMAKE_COMMAND} -E copy_directory "${CMAKE_SOURCE_DIR}/Fonts" "${RELEASE_DIR}/fonts"
+        # Remove any DLLs that SDL3's cmake config auto-copied into the root
+        # release/ folder; all DLLs should only live in release/libs/.
+        COMMAND ${CMAKE_COMMAND}
+            "-DRELEASE_DIR=${RELEASE_DIR}"
+            "-DEXE_NAME=$<TARGET_FILE_NAME:Topposition>"
+            -P "${CMAKE_CURRENT_SOURCE_DIR}/cmake/CleanRootDlls.cmake"
         COMMAND_EXPAND_LISTS
         COMMENT "Packaging Topposition release folder"
     )
