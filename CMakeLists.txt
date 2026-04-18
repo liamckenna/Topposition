@@ -46,27 +46,16 @@ if(WIN32)
         COMMAND ${CMAKE_COMMAND} -E make_directory "${RELEASE_DIR}/libs"
         COMMAND ${CMAKE_COMMAND} -E make_directory "${RELEASE_DIR}/textures"
         COMMAND ${CMAKE_COMMAND} -E make_directory "${RELEASE_DIR}/fonts"
-        # Copy SDL3 / SDL3_image / SDL3_ttf runtime DLLs (direct CMake targets)
-        COMMAND ${CMAKE_COMMAND} -E copy_if_different $<TARGET_RUNTIME_DLLS:Topposition> "${RELEASE_DIR}/libs"
-        # Copy MinGW C/C++ runtime DLLs
-        COMMAND ${CMAKE_COMMAND} -E copy_if_different
-            "${MINGW_BIN_DIR}/libgcc_s_seh-1.dll"
-            "${MINGW_BIN_DIR}/libstdc++-6.dll"
-            "${MINGW_BIN_DIR}/libwinpthread-1.dll"
-            "${RELEASE_DIR}/libs"
-        # Copy FreeType / HarfBuzz (indirect SDL3_ttf dependencies)
-        COMMAND ${CMAKE_COMMAND} -E copy_if_different
-            "${MINGW_BIN_DIR}/libfreetype-6.dll"
-            "${MINGW_BIN_DIR}/libharfbuzz-0.dll"
-            "${RELEASE_DIR}/libs"
+        # Recursively collect every transitive DLL dependency and copy to libs/.
+        # Also removes any DLLs auto-dropped into the release/ root by SDL3's
+        # cmake package config so all DLLs live only in release/libs/.
+        COMMAND ${CMAKE_COMMAND}
+            "-DEXE_PATH=$<TARGET_FILE:Topposition>"
+            "-DMINGW_BIN_DIR=${MINGW_BIN_DIR}"
+            "-DRELEASE_DIR=${RELEASE_DIR}"
+            -P "${CMAKE_CURRENT_SOURCE_DIR}/cmake/CopyRuntimeDeps.cmake"
         COMMAND ${CMAKE_COMMAND} -E copy_directory "${CMAKE_SOURCE_DIR}/Textures" "${RELEASE_DIR}/textures"
         COMMAND ${CMAKE_COMMAND} -E copy_directory "${CMAKE_SOURCE_DIR}/Fonts" "${RELEASE_DIR}/fonts"
-        # Remove any DLLs that SDL3's cmake config auto-copied into the root
-        # release/ folder; all DLLs should only live in release/libs/.
-        COMMAND ${CMAKE_COMMAND}
-            "-DRELEASE_DIR=${RELEASE_DIR}"
-            "-DEXE_NAME=$<TARGET_FILE_NAME:Topposition>"
-            -P "${CMAKE_CURRENT_SOURCE_DIR}/cmake/CleanRootDlls.cmake"
         COMMAND_EXPAND_LISTS
         COMMENT "Packaging Topposition release folder"
     )
