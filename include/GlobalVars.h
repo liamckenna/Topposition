@@ -9,8 +9,8 @@
 #include <dirent.h>
 #include <typeinfo>
 #include <thread>
-#include "GameObject.h"
 #include <atomic>
+#include "GameObject.h"
 
 extern SDL_Window *window;
 // The surface contained by the window
