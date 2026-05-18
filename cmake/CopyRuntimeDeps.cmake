@@ -1,9 +1,9 @@
 # CopyRuntimeDeps.cmake
 #
 # Invoked at POST_BUILD time with:
-#   -DEXE_PATH=<path to built .exe>
-#   -DMINGW_BIN_DIR=<MinGW bin/ directory>
-#   -DRELEASE_DIR=<release output directory>
+# -DEXE_PATH=<path to built .exe>
+# -DMINGW_BIN_DIR=<MinGW bin/ directory>
+# -DRELEASE_DIR=<release output directory>
 #
 # Uses file(GET_RUNTIME_DEPENDENCIES) to walk the full transitive DLL tree,
 # copies every resolved dependency into RELEASE_DIR/libs/, and removes any
@@ -13,6 +13,7 @@
 # auto-dropped into the release/ root BEFORE resolving dependencies.
 # If these stale copies sit next to the .exe they are found by the dependency
 # walker and conflict with the canonical copies in MINGW_BIN_DIR.
+cmake_policy(SET CMP0207 NEW)
 file(GLOB _STALE_ROOT_DLLS "${RELEASE_DIR}/*.dll")
 foreach(_DLL IN LISTS _STALE_ROOT_DLLS)
     file(REMOVE "${_DLL}")

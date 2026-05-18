@@ -27,7 +27,11 @@ void MouseButtonDownMainMenu(Input *playerInput, SDL_MouseButtonEvent &event);
 
 void MouseButtonDownGame(Input *playerInput, SDL_MouseButtonEvent &event);
 
+void MouseButtonDownPaused(Input *playerInput, SDL_MouseButtonEvent &event);
+
 void MouseButtonUpMainMenu(Input *playerInput, SDL_MouseButtonEvent &event);
 
 void MouseButtonUpGame(Input *playerInput, SDL_MouseButtonEvent &event);
+
+void MouseButtonUpPaused(Input *playerInput, SDL_MouseButtonEvent &event);
 

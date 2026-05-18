@@ -13,22 +13,12 @@
 #include "GameObject.h"
 
 extern SDL_Window *window;
-// The surface contained by the window
+
 extern SDL_Surface *screenSurface;
-// The window renderer
+
 extern std::atomic<SDL_Renderer *> renderer;
-// Current displayed texture
+
 extern SDL_Texture *texture;
-
-extern int SCREEN_WIDTH;
-
-extern int SCREEN_HEIGHT;
-
-extern int MAP_WIDTH;
-
-extern int MAP_HEIGHT;
-
-extern bool quit;
 
 extern std::map<std::string, std::map<int, SDL_Texture *>> textures;
 
@@ -58,9 +48,35 @@ extern std::vector<Player *> players;
 
 extern GameObject *selectedObject;
 
-extern Text *selectedText;
+extern gameState state;
 
 extern GameRules *rules;
+
+extern Player *currentTurn;
+
+extern Player *firstPlace;
+
+extern std::pair<float, float> worldResolution;
+
+extern std::pair<float, float> cameraPosition;
+
+extern bool quit;
+
+extern bool seaHover;
+
+extern bool hovering;
+
+extern bool validMove;
+
+extern float cameraZoom;
+
+extern int SCREEN_WIDTH;
+
+extern int SCREEN_HEIGHT;
+
+extern int MAP_WIDTH;
+
+extern int MAP_HEIGHT;
 
 extern int shapeCount;
 
@@ -68,25 +84,11 @@ extern int currentRoll;
 
 extern int movesLeft;
 
-extern Text *turnTallyText;
+extern int turnCount;
 
-extern Text *turnTallyNumText;
+extern int unclaimedPeakCount;
 
-extern Text *peaksLeftText;
-
-extern Text *movesLeftText;
-
-extern Player *currentTurn;
-
-extern UIElement *currentPlayerCircle;
-
-extern UIElement *opposingPlayerCircle;
-
-extern Terrain *startingTerrain;
-
-extern Terrain *hoveringTerrain;
-
-extern bool validMove;
+extern int frameCounter;
 
 extern Uint64 currentTime;
 
@@ -98,38 +100,13 @@ extern Uint64 gameStartTime;
 
 extern Uint64 frameCountTime;
 
-extern int frameCounter;
+extern Terrain *startingTerrain;
 
-enum gameState
-{
-    MAIN_MENU = 0,
-    SETTINGS = 1,
-    LOADING = 2,
-    GAME = 3,
-    PAUSED = 4
-};
+extern Terrain *hoveringTerrain;
 
-extern gameState state;
+extern UIElement *currentPlayerCircle;
 
-extern Player *firstPlace;
-
-extern float cameraZoom;
-
-extern std::pair<float, float> cameraPosition;
-
-extern bool seaHover;
-
-extern bool hovering;
-
-extern std::pair<float, float> worldResolution;
-
-extern int turnCount;
-
-extern int unclaimedPeakCount;
-
-extern Text *turnText;
-
-extern Text *endText;
+extern UIElement *opposingPlayerCircle;
 
 extern UIElement *endTurnArrow;
 
@@ -138,3 +115,23 @@ extern UIElement *crown;
 extern UIElement *die1;
 
 extern UIElement *die2;
+
+extern Text *turnText;
+
+extern Text *endText;
+
+extern Text *selectedText;
+
+extern Text *turnTallyText;
+
+extern Text *turnTallyNumText;
+
+extern Text *peaksLeftText;
+
+extern Text *movesLeftText;
+
+extern Text *pausedText;
+
+extern Text *resetMapText;
+
+extern Text *exitToMainMenuText;

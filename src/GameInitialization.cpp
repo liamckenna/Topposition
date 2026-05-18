@@ -87,7 +87,11 @@ void ResetMap()
     terrain = newTerrain;
     gameObjects = newGameObjects;
     peaks = newPeaks;
-    if (state == GAME)
+    cameraZoom = 1.f;
+    cameraPosition = {0, 0};
+    worldResolution = {SCREEN_WIDTH, SCREEN_HEIGHT};
+    turnCount = 1;
+    if (state == GAME || state == PAUSED)
     {
         state = LOADING;
         loadGame();
@@ -97,11 +101,6 @@ void ResetMap()
 
 void loadGame()
 {
-    cameraZoom = 1.f;
-    cameraPosition = {0, 0};
-    worldResolution = {SCREEN_WIDTH, SCREEN_HEIGHT};
-    turnCount = 1;
-
     //std::cout << "Loading Map..." << std::endl;
     Uint64 mapStartTime = SDL_GetTicks();
     loadMap();
@@ -449,6 +448,28 @@ void loadText()
     gameObjects[gameObjects.size() - 1].push_back(endTurnArrow);
     endTurnArrow->SetGlobalCenter((SCREEN_WIDTH / 2) + (SCREEN_WIDTH / 7.50f), endText->GetPosition().second - (SCREEN_HEIGHT / 200) - (endTurnArrow->GetDimensions().second * endTurnArrow->GetScale() / 2));
     endTurnArrow->SetRenderShadow(true);
+
+    textSize = 200 * (SCREEN_WIDTH / 3840.f);
+    pausedText = new Text("pausedText", "fonts/yoster.ttf", White, 0, 0, textSize, renderer, "Paused");
+    pausedText->SetCenter(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 - SCREEN_HEIGHT / 10);
+    pausedText->SetRenderShadow(false);
+    pausedText->SetGameStateContext(PAUSED);
+    text.push_back(pausedText);
+
+    textSize = 150 * (SCREEN_WIDTH / 3840.f);
+    resetMapText = new Text("resetMapText", "fonts/yoster.ttf", White, 0, 0, textSize, renderer, "Reset");
+    resetMapText->SetCenter(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 + SCREEN_HEIGHT / 8);
+    resetMapText->SetRenderShadow(false);
+    resetMapText->SetGameStateContext(PAUSED);
+    resetMapText->SetSelectable(true);
+    text.push_back(resetMapText);
+
+    exitToMainMenuText = new Text("exitToMainMenuText", "fonts/yoster.ttf", White, 0, 0, textSize, renderer, "Main Menu");
+    exitToMainMenuText->SetCenter(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 + SCREEN_HEIGHT / 8 + SCREEN_HEIGHT / 10);
+    exitToMainMenuText->SetRenderShadow(false);
+    exitToMainMenuText->SetGameStateContext(PAUSED);
+    exitToMainMenuText->SetSelectable(true);
+    text.push_back(exitToMainMenuText);
 }
 
 void loadUI()

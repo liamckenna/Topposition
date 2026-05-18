@@ -13,6 +13,15 @@
 class Animation;
 class Player;
 
+enum gameState
+{
+    MAIN_MENU = 0,
+    SETTINGS = 1,
+    LOADING = 2,
+    GAME = 3,
+    PAUSED = 4
+};
+
 using namespace std;
 class GameObject
 {
@@ -345,6 +354,7 @@ class Text
     int shadowOffsetX;
     int shadowOffsetY;
     Uint8 shadowAlpha;
+    gameState gameStateContext = GAME;
 
 public:
     Text(string n, const char *fp, SDL_Color c, int x, int y, int s, SDL_Renderer *r, const char *t);
@@ -352,6 +362,7 @@ public:
     void SetRendered(bool r) { rendered = r; }
     void SetRenderShadow(bool rs) { renderShadow = rs; }
     void SetSelectable(bool s) { selectable = s; }
+    void SetGameStateContext(gameState gs) { gameStateContext = gs; }
     void SetPosition(int x, int y)
     {
         position.first = x;
@@ -413,6 +424,7 @@ public:
     SDL_Surface* GetSurface() { return surface; }
     SDL_Texture* GetTexture() { return texture; }
     std::pair<int, int> GetBottomRight() { return {position.first + dimensions.first, position.second + dimensions.second}; }
+    gameState GetGameStateContext() { return gameStateContext; }
 
 };
 
@@ -437,6 +449,8 @@ public:
     SDL_Texture *GetSpriteSheet() { return spriteSheet; }
     void Pause() { paused = true; }
     void Unpause() { paused = false; }
+    void SetLastUpdate(Uint64 lu) { lastUpdate = lu; }
+    Uint64 GetLastUpdate() { return lastUpdate; }
 };
 
 struct DiceAnimation
@@ -445,6 +459,8 @@ struct DiceAnimation
     vector<SDL_Texture *> faces;
     SDL_Texture *finalTexture;
     Uint64 startTime;
+    Uint64 elapsed;
+    Uint64 lastTime;
     Uint64 stepInterval;
     int totalSteps;
     int currentStep;
@@ -452,5 +468,5 @@ struct DiceAnimation
     bool revealMovesLeftOnFinish;
 
     DiceAnimation(UIElement *d, vector<SDL_Texture *> f, SDL_Texture *ft, Uint64 st, Uint64 si = 125, int ts = 8, bool showMoves = true)
-        : die(d), faces(f), finalTexture(ft), startTime(st), stepInterval(si), totalSteps(ts), currentStep(0), finished(false), revealMovesLeftOnFinish(showMoves) {}
+        : die(d), faces(f), finalTexture(ft), startTime(st), lastTime(st), elapsed(0),stepInterval(si), totalSteps(ts), currentStep(0), finished(false), revealMovesLeftOnFinish(showMoves) {}
 };

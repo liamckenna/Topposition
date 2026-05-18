@@ -2,6 +2,7 @@
 
 void LoadMenu()
 {
+    state = MAIN_MENU;
     ResetMap();
     gameObjects.push_back(vector<GameObject *>());
     loadMenuBackground();
@@ -127,82 +128,98 @@ void updateUIElementPositions()
             }
         }
     }
-    
     UpdateTextElementPositions();
 }
 
 void UpdateTextElementPositions()
 {
-    if (turnTallyText == nullptr || turnTallyNumText == nullptr)
+
+    switch (state)
     {
-        return;
-    }
-
-    turnTallyText->SetTextContent("Turn 80", renderer);
-    turnTallyText->SetSize(125 * (SCREEN_WIDTH / 3840.f), renderer);
-    turnTallyText->SetPosition(SCREEN_WIDTH - turnTallyText->GetWidth() - SCREEN_WIDTH / 80, SCREEN_HEIGHT / 40);
-
-    turnTallyNumText->SetTextContent("1", renderer);
-    turnTallyNumText->SetSize(125 * (SCREEN_WIDTH / 3840.f), renderer);
-    turnTallyNumText->SetPosition(turnTallyText->GetPosition().first + turnTallyText->GetWidth() - (turnTallyNumText->GetWidth() * 1.5), SCREEN_HEIGHT / 40);
-
-
-    int x = turnTallyText->GetPosition().first + (SCREEN_WIDTH / 160);
-    int y = turnTallyText->GetPosition().second + turnTallyText->GetHeight() + (SCREEN_HEIGHT / 200);
-
-    turnTallyText->SetPosition(turnTallyText->GetPosition().first + (turnTallyNumText->GetWidth() / 2), turnTallyText->GetPosition().second);
-    turnTallyText->SetTextContent("Turn", renderer);
-    if (turnCount >= 10)
-    {
-        turnTallyNumText->SetPosition(turnTallyNumText->GetPosition().first - (turnTallyNumText->GetDimensions().first / 2), turnTallyNumText->GetPosition().second);
-        turnTallyText->SetPosition(turnTallyText->GetPosition().first - (turnTallyNumText->GetDimensions().first / 2), turnTallyText->GetPosition().second);
-    }
-    turnTallyNumText->SetTextContent(to_string(turnCount).c_str(), renderer);
-
-
-    std::string peaksLeftString = "peaks left: " + to_string(unclaimedPeakCount);
-    peaksLeftText->SetTextContent(peaksLeftString.c_str(), renderer);
-    peaksLeftText->SetSize(65 * (SCREEN_WIDTH / 3840.f), renderer);
-    peaksLeftText->SetPosition(x, y);
-
-    movesLeftText->SetTextContent("11", renderer);
-    movesLeftText->SetSize(150 * (SCREEN_WIDTH / 3840.f), renderer);
-    x = (SCREEN_WIDTH / 2) - (movesLeftText->GetWidth() / 2);
-    y = SCREEN_HEIGHT - movesLeftText->GetHeight() - (SCREEN_HEIGHT / 9);
-    movesLeftText->SetPosition(x, y);
-    std::pair<float, float> center = movesLeftText->GetCenter();
-    movesLeftText->SetTextContent(to_string(movesLeft).c_str(), renderer);
-    movesLeftText->SetCenter(center.first, center.second);
-
-    int textSize = 125 * (SCREEN_WIDTH / 3840.f);
-    y = SCREEN_HEIGHT / 40;
-
-    for (int i = 0; i < rules->GetPlayerCount(); i++)
-    {
-        x = SCREEN_WIDTH / 80;
-        if (i > 0)
+        case MAIN_MENU:
+            break;
+        case GAME:
+        case PAUSED:
         {
-            y += players[0]->GetTurnText()->GetDimensions().second;
+            turnTallyText->SetTextContent("Turn 80", renderer);
+            turnTallyText->SetSize(125 * (SCREEN_WIDTH / 3840.f), renderer);
+            turnTallyText->SetPosition(SCREEN_WIDTH - turnTallyText->GetWidth() - SCREEN_WIDTH / 80, SCREEN_HEIGHT / 40);
+
+            turnTallyNumText->SetTextContent("1", renderer);
+            turnTallyNumText->SetSize(125 * (SCREEN_WIDTH / 3840.f), renderer);
+            turnTallyNumText->SetPosition(turnTallyText->GetPosition().first + turnTallyText->GetWidth() - (turnTallyNumText->GetWidth() * 1.5), SCREEN_HEIGHT / 40);
+
+            int x = turnTallyText->GetPosition().first + (SCREEN_WIDTH / 160);
+            int y = turnTallyText->GetPosition().second + turnTallyText->GetHeight() + (SCREEN_HEIGHT / 200);
+
+            turnTallyText->SetPosition(turnTallyText->GetPosition().first + (turnTallyNumText->GetWidth() / 2), turnTallyText->GetPosition().second);
+            turnTallyText->SetTextContent("Turn", renderer);
+            if (turnCount >= 10)
+            {
+                turnTallyNumText->SetPosition(turnTallyNumText->GetPosition().first - (turnTallyNumText->GetDimensions().first / 2), turnTallyNumText->GetPosition().second);
+                turnTallyText->SetPosition(turnTallyText->GetPosition().first - (turnTallyNumText->GetDimensions().first / 2), turnTallyText->GetPosition().second);
+            }
+            turnTallyNumText->SetTextContent(to_string(turnCount).c_str(), renderer);
+
+            std::string peaksLeftString = "peaks left: " + to_string(unclaimedPeakCount);
+            peaksLeftText->SetTextContent(peaksLeftString.c_str(), renderer);
+            peaksLeftText->SetSize(65 * (SCREEN_WIDTH / 3840.f), renderer);
+            peaksLeftText->SetPosition(x, y);
+
+            movesLeftText->SetTextContent("11", renderer);
+            movesLeftText->SetSize(150 * (SCREEN_WIDTH / 3840.f), renderer);
+            x = (SCREEN_WIDTH / 2) - (movesLeftText->GetWidth() / 2);
+            y = SCREEN_HEIGHT - movesLeftText->GetHeight() - (SCREEN_HEIGHT / 9);
+            movesLeftText->SetPosition(x, y);
+            std::pair<float, float> center = movesLeftText->GetCenter();
+            movesLeftText->SetTextContent(to_string(movesLeft).c_str(), renderer);
+            movesLeftText->SetCenter(center.first, center.second);
+
+            pausedText->SetSize(200 * (SCREEN_WIDTH / 3840.f), renderer);
+            pausedText->SetCenter(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 - SCREEN_HEIGHT / 10);
+
+            resetMapText->SetSize(150 * (SCREEN_WIDTH / 3840.f), renderer);
+            resetMapText->SetCenter(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 + SCREEN_HEIGHT / 8);
+
+            exitToMainMenuText->SetSize(150 * (SCREEN_WIDTH / 3840.f), renderer);
+            exitToMainMenuText->SetCenter(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 + SCREEN_HEIGHT / 8 + SCREEN_HEIGHT / 10);
+
+            int textSize = 125 * (SCREEN_WIDTH / 3840.f);
+            y = SCREEN_HEIGHT / 40;
+
+            for (int i = 0; i < rules->GetPlayerCount(); i++)
+            {
+                x = SCREEN_WIDTH / 80;
+                if (i > 0)
+                {
+                    y += players[0]->GetTurnText()->GetDimensions().second;
+                }
+                players[i]->GetTurnText()->SetTextContent(("P" + to_string(i + 1) + ":").c_str(), renderer);
+                players[i]->GetTurnText()->SetSize(textSize, renderer);
+                players[i]->GetScoreText()->SetTextContent("0", renderer);
+                players[i]->GetScoreText()->SetSize(textSize, renderer);
+                textSize = 75 * (SCREEN_WIDTH / 3840.f);
+                players[i]->GetFirstText()->SetTextContent("1st!", renderer);
+                players[i]->GetFirstText()->SetSize(textSize, renderer);
+                players[i]->GetTieText()->SetTextContent("Tie!", renderer);
+                players[i]->GetTieText()->SetSize(textSize, renderer);
+                textSize = 125 * (SCREEN_WIDTH / 3840.f);
+                players[i]->GetCircleText()->SetTextContent(("P" + to_string(i + 1)).c_str(), renderer);
+                players[i]->GetCircleText()->SetSize(textSize, renderer);
+                players[i]->GetTurnText()->SetPosition(x, y);
+                x += players[i]->GetTurnText()->GetWidth() + (SCREEN_WIDTH / 160);
+                players[i]->GetScoreText()->SetPosition(x, y);
+                players[i]->GetCircleText()->SetCenter(currentPlayerCircle->GetCenter().first, currentPlayerCircle->GetCenter().second);
+                players[i]->GetScoreText()->SetTextContent(to_string(players[i]->GetScore()).c_str(), renderer);
+                x += players[i]->GetScoreText()->GetWidth();
+                players[i]->GetFirstText()->SetPosition(x, y - (players[i]->GetFirstText()->GetHeight() / 4));
+                players[i]->GetTieText()->SetPosition(x, y - (players[i]->GetTieText()->GetHeight() / 4));
+            }
+            break;
         }
-        players[i]->GetTurnText()->SetTextContent(("P" + to_string(i + 1) + ":").c_str(), renderer);
-        players[i]->GetTurnText()->SetSize(textSize, renderer);
-        players[i]->GetScoreText()->SetTextContent("0", renderer);
-        players[i]->GetScoreText()->SetSize(textSize, renderer);
-        textSize = 75 * (SCREEN_WIDTH / 3840.f);
-        players[i]->GetFirstText()->SetTextContent("1st!", renderer);
-        players[i]->GetFirstText()->SetSize(textSize, renderer);
-        players[i]->GetTieText()->SetTextContent("Tie!", renderer);
-        players[i]->GetTieText()->SetSize(textSize, renderer);
-        textSize = 125 * (SCREEN_WIDTH / 3840.f);
-        players[i]->GetCircleText()->SetTextContent(("P" + to_string(i + 1)).c_str(), renderer);
-        players[i]->GetCircleText()->SetSize(textSize, renderer);
-        players[i]->GetTurnText()->SetPosition(x, y);
-        x += players[i]->GetTurnText()->GetWidth() + (SCREEN_WIDTH / 160);
-        players[i]->GetScoreText()->SetPosition(x, y);
-        players[i]->GetCircleText()->SetCenter(currentPlayerCircle->GetCenter().first, currentPlayerCircle->GetCenter().second);
-        players[i]->GetScoreText()->SetTextContent(to_string(players[i]->GetScore()).c_str(), renderer);
-        x += players[i]->GetScoreText()->GetWidth();
-        players[i]->GetFirstText()->SetPosition(x, y - (players[i]->GetFirstText()->GetHeight() / 4));
-        players[i]->GetTieText()->SetPosition(x, y - (players[i]->GetTieText()->GetHeight() / 4));
+        default:
+            break;
     }
+
+    
 }
