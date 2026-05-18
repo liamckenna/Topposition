@@ -110,10 +110,7 @@ void EventKeyDown(Input *playerInput, SDL_KeyboardEvent &event)
     case GAME:
         if (event.key == SDLK_ESCAPE)
         {
-            if (SDL_GetTicks() - gameStartTime >= 1000)
-            {
-                state = PAUSED;
-            }
+            state = PAUSED;
         }
         break;
     case PAUSED:
@@ -325,23 +322,23 @@ void MouseButtonUpMainMenu(Input *playerInput, SDL_MouseButtonEvent &event)
     switch (event.button)
     {
     case SDL_BUTTON_LEFT:
-        if (selectedObject != nullptr)
+        if (selectedText != nullptr)
         {
-            if (selectedObject->GetName() == "play")
+            if (selectedText->GetName() == "playButtonText")
             {
                 std::cout << "hit play button" << std::endl;
                 state = GAME;
                 ResetMap();
             }
-            else if (selectedObject->GetName() == "settings")
+            else if (selectedText->GetName() == "settings")
             {
             }
-            else if (selectedObject->GetName() == "quit")
+            else if (selectedText->GetName() == "quitButtonText")
             {
                 quit = true;
             }
         }
-        selectedObject = nullptr;
+        selectedText = nullptr;
         break;
     case SDL_BUTTON_RIGHT:
         break;

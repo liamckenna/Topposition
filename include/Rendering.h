@@ -3,6 +3,10 @@
 
 void RenderScreen();
 
+void renderMenuBackground();
+
+void renderPauseOverlay();
+
 void renderUI();
 
 void renderClaimNotifs();

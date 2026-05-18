@@ -32,7 +32,10 @@ void RenderScreen()
     switch (state)
     {   
         case MAIN_MENU:
+            renderMenuBackground();
+            renderPauseOverlay();
             renderUI();
+            renderText();
             break;
         case GAME:
             renderOcean();
@@ -58,11 +61,22 @@ void RenderScreen()
     SDL_RenderPresent(renderer);
 }
 
+void renderMenuBackground()
+{
+    for (int i = 0; i < uiElements.size(); i++)
+    {
+        if (uiElements[i]->GetName() == "background")
+        {
+            uiElements[i]->RenderGameObject(renderer);
+        }
+    }
+}
+
 void renderUI()
 {
     for (int i = 0; i < uiElements.size(); i++)
     {
-        if (uiElements[i]->GetAssociatedPeak() == nullptr)
+        if (uiElements[i]->GetAssociatedPeak() == nullptr && uiElements[i]->GetName() != "background")
         {
             uiElements[i]->RenderGameObject(renderer);
         }
@@ -154,11 +168,7 @@ void renderText()
 
     if (state == PAUSED)
     {
-        SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
-        SDL_SetRenderDrawColor(renderer, 0, 0, 0, 150);
-        SDL_FRect overlay = {0, 0, (float)SCREEN_WIDTH, (float)SCREEN_HEIGHT};
-        SDL_RenderFillRect(renderer, &overlay);
-        SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_NONE);
+        renderPauseOverlay();
         pausedText->RenderText(renderer);
         resetMapText->RenderText(renderer);
         exitToMainMenuText->RenderText(renderer);

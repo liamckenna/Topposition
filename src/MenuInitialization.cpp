@@ -11,24 +11,31 @@ void LoadMenu()
 
 void loadMenuUI()
 {
+    SDL_Color White = {255, 255, 255};
+
     UIElement *logo = new UIElement("logo 1", textures["logo 1"][0], surfaces["logo 1"], true, false, renderer);
     uiElements.push_back(logo);
     gameObjects[0].push_back(logo);
     logo->SetScale((float)SCREEN_HEIGHT / 1152);
     logo->SetGlobalPosition(0, 0);
 
-    UIElement *playButton = new UIElement("play", textures["play"][0], surfaces["play"], true, true, renderer);
-    uiElements.push_back(playButton);
-    gameObjects[0].push_back(playButton);
-    playButton->SetScale((float)SCREEN_HEIGHT / 1152);
-    playButton->SetCenter(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 3 * 2);
-    playButton->SetSelectable(true);
+    int textSize = 250 * (SCREEN_WIDTH / 3840.f);
+    Text *playButtonText = new Text("playButtonText", "fonts/yoster.ttf", White, 0, 0, textSize, renderer, "Play");
+    playButtonText->SetCenter(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 + SCREEN_HEIGHT / 8);
+    playButtonText->SetRenderShadow(false);
+    playButtonText->SetSelectable(true);
+    playButtonText->SetGameStateContext(MAIN_MENU);
+    text.push_back(playButtonText);
+    playButtonText->SetRendered(true);
 
-    UIElement *quitButton = new UIElement("quit", textures["quit"][0], surfaces["quit"], true, true, renderer);
-    uiElements.push_back(quitButton);
-    gameObjects[0].push_back(quitButton);
-    quitButton->SetScale((float)SCREEN_HEIGHT / 1152);
-    quitButton->SetCenter(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 3 * 2 + ((quitButton->GetDimensions().second * quitButton->GetScale()) * 2));
+    textSize = 175 * (SCREEN_WIDTH / 3840.f);
+    Text *quitButtonText = new Text("quitButtonText", "fonts/yoster.ttf", White, 0, 0, textSize, renderer, "Quit");
+    quitButtonText->SetCenter(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 + SCREEN_HEIGHT / 8 + SCREEN_HEIGHT / 4);
+    quitButtonText->SetRenderShadow(false);
+    quitButtonText->SetSelectable(true);
+    quitButtonText->SetGameStateContext(MAIN_MENU);
+    text.push_back(quitButtonText);
+    playButtonText->SetRendered(true);
 };
 
 void loadMenuBackground()
@@ -137,6 +144,24 @@ void UpdateTextElementPositions()
     switch (state)
     {
         case MAIN_MENU:
+            for (int i = 0; i < text.size(); i++)
+            {
+                if (text[i]->GetName() == "playButtonText")
+                {
+                    text[i]->SetSize(250 * (SCREEN_WIDTH / 3840.f), renderer);
+                    text[i]->SetCenter(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 + SCREEN_HEIGHT / 8);
+                }
+                else if (text[i]->GetName() == "settings")
+                {
+                    text[i]->SetSize(250 * (SCREEN_WIDTH / 3840.f), renderer);
+                    text[i]->SetCenter(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 3 * 2);
+                }
+                else if (text[i]->GetName() == "quitButtonText")
+                {
+                    text[i]->SetSize(175 * (SCREEN_WIDTH / 3840.f), renderer);
+                    text[i]->SetCenter(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 + SCREEN_HEIGHT / 8 + SCREEN_HEIGHT / 4);
+                }
+            }
             break;
         case GAME:
         case PAUSED:
