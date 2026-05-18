@@ -174,6 +174,8 @@ void UpdateTextElementPositions()
     movesLeftText->SetTextContent(to_string(movesLeft).c_str(), renderer);
     movesLeftText->SetCenter(center.first, center.second);
 
+    pausedText->SetCenter(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2);
+
     int textSize = 125 * (SCREEN_WIDTH / 3840.f);
     y = SCREEN_HEIGHT / 40;
 
