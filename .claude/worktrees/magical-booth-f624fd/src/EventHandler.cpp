@@ -52,7 +52,7 @@ void EventWindowResized(Input *playerInput, SDL_WindowEvent &event)
     int oldScreenHeight = SCREEN_HEIGHT;
     SCREEN_WIDTH = event.data1;
     SCREEN_HEIGHT = event.data2;
-
+    
     switch (state)
     {
     case MAIN_MENU:
@@ -324,9 +324,7 @@ void MouseButtonUpMainMenu(Input *playerInput, SDL_MouseButtonEvent &event)
     switch (event.button)
     {
     case SDL_BUTTON_LEFT:
-    {
-        Text *newSelectedText = selectText(playerInput->currentMousePosition.first, playerInput->currentMousePosition.second);
-        if (selectedText != nullptr && selectedText == newSelectedText)
+        if (selectedText != nullptr)
         {
             if (selectedText->GetName() == "playButtonText")
             {
@@ -341,9 +339,6 @@ void MouseButtonUpMainMenu(Input *playerInput, SDL_MouseButtonEvent &event)
             {
                 quit = true;
             }
-        }
-        if (selectedText != nullptr)
-        {
             selectedText->SetSelected(false);
             if (selectedText == endText)
             {
@@ -354,22 +349,8 @@ void MouseButtonUpMainMenu(Input *playerInput, SDL_MouseButtonEvent &event)
                 endText->SetSelected(false);
             }
         }
-        if (newSelectedText != nullptr)
-        {
-            newSelectedText->SetSelected(false);
-            if (newSelectedText == endText)
-            {
-                turnText->SetSelected(false);
-            }
-            else if (newSelectedText == turnText)
-            {
-                endText->SetSelected(false);
-            }
-        }
-        newSelectedText = nullptr;
         selectedText = nullptr;
         break;
-    }
     case SDL_BUTTON_RIGHT:
         break;
     case SDL_BUTTON_MIDDLE:
@@ -403,13 +384,20 @@ void MouseButtonUpGame(Input *playerInput, SDL_MouseButtonEvent &event)
     switch (event.button)
     {
     case SDL_BUTTON_LEFT:
-    {
-        Text *newSelectedText = selectText(playerInput->currentMousePosition.first, playerInput->currentMousePosition.second);
-        if (selectedText != nullptr && selectedText == newSelectedText)
+        if (selectedText != nullptr)
         {
             if (selectedText->GetName() == "turnText" || selectedText->GetName() == "endText")
             {
                 FinishTurn();
+            }
+            selectedText->SetSelected(false);
+            if (selectedText == endText)
+            {
+                turnText->SetSelected(false);
+            }
+            else if (selectedText == turnText)
+            {
+                endText->SetSelected(false);
             }
         }
         else if (selectedObject != nullptr)
@@ -439,7 +427,7 @@ void MouseButtonUpGame(Input *playerInput, SDL_MouseButtonEvent &event)
                 pair<float, float> bottom_middle = piece->GetBottomMiddle();
                 piece->SetScale(piece->GetScale() / 2.f);
                 piece->SetBottomMiddle(bottom_middle.first, bottom_middle.second);
-                // Terrain *startingTerrain = selectTerrain(piece->GetDesignatedLocation().first, piece->GetDesignatedLocation().second);
+                //Terrain *startingTerrain = selectTerrain(piece->GetDesignatedLocation().first, piece->GetDesignatedLocation().second);
                 Terrain *targetTerrain = selectTerrain(piece->GetBottomMiddle().first, piece->GetBottomMiddle().second);
                 if (piece->GetCurrentAnimation() != NULL)
                     piece->GetCurrentAnimation()->Unpause();
@@ -453,35 +441,9 @@ void MouseButtonUpGame(Input *playerInput, SDL_MouseButtonEvent &event)
             {
             }
         }
-        if (selectedText != nullptr)
-        {
-            selectedText->SetSelected(false);
-            if (selectedText == endText)
-            {
-                turnText->SetSelected(false);
-            }
-            else if (selectedText == turnText)
-            {
-                endText->SetSelected(false);
-            }
-        }
-        if (newSelectedText != nullptr)
-        {
-            newSelectedText->SetSelected(false);
-            if (newSelectedText == endText)
-            {
-                turnText->SetSelected(false);
-            }
-            else if (newSelectedText == turnText)
-            {
-                endText->SetSelected(false);
-            }
-        }
         selectedText = nullptr;
-        newSelectedText = nullptr;
         selectedObject = nullptr;
         break;
-    }
     case SDL_BUTTON_RIGHT:
         break;
     case SDL_BUTTON_MIDDLE:

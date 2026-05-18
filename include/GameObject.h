@@ -336,6 +336,8 @@ public:
 class Text
 {
     bool selectable = false;
+    bool hovered = false;
+    bool selected = false;
     string name;
     const char *fontPath;
     TTF_Font *font;
@@ -418,6 +420,10 @@ public:
     int GetHeight() { return dimensions.second; }
     bool GetSelectable() { return selectable; }
     bool GetRendered() { return rendered; }
+    bool GetHovered() { return hovered; }
+    bool GetSelected() { return selected; }
+    void SetHovered(bool h) { hovered = h; }
+    void SetSelected(bool s) { selected = s; }
     std::pair<int, int> GetPosition() { return position; }
     std::pair<int, int> GetDimensions() { return dimensions; }
     string GetName() { return name; }

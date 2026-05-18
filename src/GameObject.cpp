@@ -567,7 +567,13 @@ void Text::RenderText(SDL_Renderer *renderer)
         rect->y = position.second;
         rect->w = dimensions.first;
         rect->h = dimensions.second;
+        if (selected)
+            SDL_SetTextureColorMod(texture, color.r / 2, color.g / 2, color.b / 2);
+        else if (hovered)
+            SDL_SetTextureColorMod(texture, color.r / 1.5, color.g / 1.5, color.b / 1.5);
         SDL_RenderTexture(renderer, texture, NULL, rect);
+        if (selected || hovered)
+            SDL_SetTextureColorMod(texture, 255, 255, 255);
     }
 }
 

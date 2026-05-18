@@ -184,7 +184,7 @@ UIElement *selectUI(int x, int y, bool update)
     return nullptr;
 }
 
-Text *selectText(int x, int y)
+Text *selectText(int x, int y, bool selecting)
 {
     for (int i = 0; i < text.size(); i++)
     {
@@ -203,6 +203,18 @@ Text *selectText(int x, int y)
                 SDL_Color color = GetPixelColor(text[i]->GetSurface(),
                                                 (x - width_LowerBound) / (cameraZoom),
                                                 (y - height_LowerBound) / (cameraZoom));
+                if (selecting)
+                {
+                    text[i]->SetSelected(true);
+                    if (text[i] == endText)
+                    {
+                        turnText->SetSelected(true);
+                    }
+                    else if (text[i] == turnText)
+                    {
+                        endText->SetSelected(true);
+                    }
+                }
                 return text[i];
             }
         }
@@ -305,6 +317,26 @@ Item *selectItem(int x, int y, bool update)
         }
     }
     return nullptr;
+}
+
+void updateTextHoverState(int x, int y)
+{
+    Text *hoveredText = selectText(x, y, false);
+    for (int i = 0; i < text.size(); i++)
+    {
+        if (text[i]->GetSelectable() && text[i]->GetRendered())
+        {
+            text[i]->SetHovered(text[i] == hoveredText);
+        }
+    }
+    if (endText != nullptr && turnText != nullptr)
+    {
+        if (endText->GetHovered() || turnText->GetHovered())
+        {
+            endText->SetHovered(true);
+            turnText->SetHovered(true);
+        }
+    }
 }
 
 void moveSelectedObject(GameObject *gameObject, Input *playerInput)

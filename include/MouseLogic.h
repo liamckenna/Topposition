@@ -13,7 +13,7 @@ GameObject *selectObject(int x, int y, bool update = true);
 
 UIElement *selectUI(int x, int y, bool update = true);
 
-Text *selectText(int x, int y);
+Text *selectText(int x, int y, bool selecting = true);
 
 Piece *selectPiece(int x, int y, bool update = true);
 
@@ -24,3 +24,5 @@ Item *selectItem(int x, int y, bool update = true);
 void moveSelectedObject(GameObject *gameObject, Input *playerInput);
 
 void ClampCameraBoundaries();
+
+void updateTextHoverState(int x, int y);
