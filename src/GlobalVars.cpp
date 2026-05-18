@@ -117,3 +117,5 @@ UIElement *crown;
 UIElement *die1;
 
 UIElement *die2;
+
+Text *pausedText;

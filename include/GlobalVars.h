@@ -138,3 +138,5 @@ extern UIElement *crown;
 extern UIElement *die1;
 
 extern UIElement *die2;
+
+extern Text *pausedText;

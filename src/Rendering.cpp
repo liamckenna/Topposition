@@ -44,6 +44,16 @@ void RenderScreen()
         renderText();
         //renderInventory();
     }
+    else if (state == PAUSED)
+    {
+        renderOcean();
+        renderTerrain();
+        renderClaimNotifs();
+        renderPieces();
+        renderUI();
+        renderText();
+        renderPauseOverlay();
+    }
 
     // Update screen
     SDL_RenderPresent(renderer);
@@ -145,6 +155,21 @@ void CheckOceanTilePositioning()
     for (int i = 0; i < edgeTiles.size(); i++)
     {
         ReflectOceanTile(edgeTiles[i]);
+    }
+}
+
+void renderPauseOverlay()
+{
+    SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
+    SDL_SetRenderDrawColor(renderer, 0, 0, 0, 150);
+    SDL_FRect overlay = {0, 0, (float)SCREEN_WIDTH, (float)SCREEN_HEIGHT};
+    SDL_RenderFillRect(renderer, &overlay);
+    SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_NONE);
+
+    if (pausedText != nullptr)
+    {
+        pausedText->SetCenter(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2);
+        pausedText->RenderText(renderer);
     }
 }
 

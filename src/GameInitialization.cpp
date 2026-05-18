@@ -449,6 +449,10 @@ void loadText()
     gameObjects[gameObjects.size() - 1].push_back(endTurnArrow);
     endTurnArrow->SetGlobalCenter((SCREEN_WIDTH / 2) + (SCREEN_WIDTH / 7.50f), endText->GetPosition().second - (SCREEN_HEIGHT / 200) - (endTurnArrow->GetDimensions().second * endTurnArrow->GetScale() / 2));
     endTurnArrow->SetRenderShadow(true);
+
+    int pauseTextSize = 200 * (SCREEN_WIDTH / 3840.f);
+    pausedText = new Text("pausedText", "fonts/yoster.ttf", White, 0, 0, pauseTextSize, renderer, "Paused");
+    pausedText->SetCenter(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2);
 }
 
 void loadUI()

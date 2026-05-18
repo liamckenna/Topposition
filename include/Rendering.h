@@ -20,3 +20,5 @@ void renderOcean();
 void CheckOceanTilePositioning();
 
 void ReflectOceanTile(OceanTile *tile);
+
+void renderPauseOverlay();

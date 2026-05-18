@@ -112,7 +112,7 @@ void EventKeyDown(Input *playerInput, SDL_KeyboardEvent &event)
         {
             if (SDL_GetTicks() - gameStartTime >= 1000)
             {
-                ResetMap();
+                state = PAUSED;
             }
         }
         break;
