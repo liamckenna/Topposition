@@ -437,6 +437,8 @@ public:
     SDL_Texture *GetSpriteSheet() { return spriteSheet; }
     void Pause() { paused = true; }
     void Unpause() { paused = false; }
+    void SetLastUpdate(Uint64 lu) { lastUpdate = lu; }
+    Uint64 GetLastUpdate() { return lastUpdate; }
 };
 
 struct DiceAnimation
@@ -445,6 +447,8 @@ struct DiceAnimation
     vector<SDL_Texture *> faces;
     SDL_Texture *finalTexture;
     Uint64 startTime;
+    Uint64 elapsed;
+    Uint64 lastTime;
     Uint64 stepInterval;
     int totalSteps;
     int currentStep;
@@ -452,5 +456,5 @@ struct DiceAnimation
     bool revealMovesLeftOnFinish;
 
     DiceAnimation(UIElement *d, vector<SDL_Texture *> f, SDL_Texture *ft, Uint64 st, Uint64 si = 125, int ts = 8, bool showMoves = true)
-        : die(d), faces(f), finalTexture(ft), startTime(st), stepInterval(si), totalSteps(ts), currentStep(0), finished(false), revealMovesLeftOnFinish(showMoves) {}
+        : die(d), faces(f), finalTexture(ft), startTime(st), lastTime(st), elapsed(0),stepInterval(si), totalSteps(ts), currentStep(0), finished(false), revealMovesLeftOnFinish(showMoves) {}
 };

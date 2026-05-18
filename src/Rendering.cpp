@@ -46,7 +46,7 @@ void RenderScreen()
     }
     else if (state == PAUSED)
     {
-        renderOcean();
+        renderOceanFrozen();
         renderTerrain();
         renderClaimNotifs();
         renderPieces();
@@ -137,6 +137,17 @@ void renderOcean()
         }
     }
     CheckOceanTilePositioning();
+}
+
+void renderOceanFrozen()
+{
+    for (int i = 0; i < ocean.size(); i++)
+    {
+        for (int j = 0; j < ocean[i].size(); j++)
+        {
+            ocean[i][j]->RenderGameObject(renderer);
+        }
+    }
 }
 
 void CheckOceanTilePositioning()
