@@ -29,33 +29,32 @@ void RenderScreen()
         SDL_SetRenderDrawColor(renderer, 2, 120, 150, 100);
     }
     SDL_RenderClear(renderer);
-    // Render texture to screen
-    if (state == MAIN_MENU)
-    {
-        renderUI();
+    switch (state)
+    {   
+        case MAIN_MENU:
+            renderUI();
+            break;
+        case GAME:
+            renderOcean();
+            renderTerrain();
+            renderClaimNotifs();
+            renderPieces();
+            renderUI();
+            renderText();
+            //renderInventory();
+            break;
+        case PAUSED:
+            renderOceanFrozen();
+            renderTerrain();
+            renderClaimNotifs();
+            renderPieces();
+            renderUI();
+            renderText();
+            break;
+        default:
+            break;
     }
-    else if (state == GAME)
-    {
-        renderOcean();
-        renderTerrain();
-        renderClaimNotifs();
-        renderPieces();
-        renderUI();
-        renderText();
-        //renderInventory();
-    }
-    else if (state == PAUSED)
-    {
-        renderOceanFrozen();
-        renderTerrain();
-        renderClaimNotifs();
-        renderPieces();
-        renderUI();
-        renderText();
-        renderPauseOverlay();
-    }
-
-    // Update screen
+    
     SDL_RenderPresent(renderer);
 }
 
@@ -115,7 +114,54 @@ void renderText()
 {
     for (int i = 0; i < text.size(); i++)
     {
-        text[i]->RenderText(renderer);
+        switch (state)
+        {
+            case MAIN_MENU:
+                if (text[i]->GetGameStateContext() == MAIN_MENU)
+                {
+                    text[i]->RenderText(renderer);
+                }
+                break;
+            case SETTINGS:
+                if (text[i]->GetGameStateContext() == SETTINGS)
+                {
+                    text[i]->RenderText(renderer);
+                }
+                break;
+            case LOADING:
+                if (text[i]->GetGameStateContext() == LOADING)
+                {
+                    text[i]->RenderText(renderer);
+                }
+                break;
+            case GAME:
+                if (text[i]->GetGameStateContext() == GAME)
+                {
+                    text[i]->RenderText(renderer);
+                }
+                break;
+            case PAUSED:
+                if (text[i]->GetGameStateContext() == GAME)
+                {
+                    text[i]->RenderText(renderer);
+                }
+                break;
+            default:
+                text[i]->RenderText(renderer);
+                break;
+        }
+    }
+
+    if (state == PAUSED)
+    {
+        SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
+        SDL_SetRenderDrawColor(renderer, 0, 0, 0, 150);
+        SDL_FRect overlay = {0, 0, (float)SCREEN_WIDTH, (float)SCREEN_HEIGHT};
+        SDL_RenderFillRect(renderer, &overlay);
+        SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_NONE);
+        pausedText->RenderText(renderer);
+        resetMapText->RenderText(renderer);
+        exitToMainMenuText->RenderText(renderer);
     }
 }
 
@@ -176,12 +222,6 @@ void renderPauseOverlay()
     SDL_FRect overlay = {0, 0, (float)SCREEN_WIDTH, (float)SCREEN_HEIGHT};
     SDL_RenderFillRect(renderer, &overlay);
     SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_NONE);
-
-    if (pausedText != nullptr)
-    {
-        pausedText->SetCenter(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2);
-        pausedText->RenderText(renderer);
-    }
 }
 
 void ReflectOceanTile(OceanTile *tile)

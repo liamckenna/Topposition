@@ -170,6 +170,7 @@ void EventMouseButtonDown(Input *playerInput, SDL_MouseButtonEvent &event)
         MouseButtonDownGame(playerInput, event);
         break;
     case PAUSED:
+        MouseButtonDownPaused(playerInput, event);
         break;
     default:
         break;
@@ -192,6 +193,7 @@ void EventMouseButtonUp(Input *playerInput, SDL_MouseButtonEvent &event)
         MouseButtonUpGame(playerInput, event);
         break;
     case PAUSED:
+        MouseButtonUpPaused(playerInput, event);
         break;
     default:
         break;
@@ -302,6 +304,22 @@ void MouseButtonDownGame(Input *playerInput, SDL_MouseButtonEvent &event)
     }
 }
 
+void MouseButtonDownPaused(Input *playerInput, SDL_MouseButtonEvent &event)
+{
+    switch (event.button)
+    {
+    case SDL_BUTTON_LEFT:
+        selectedText = selectText(playerInput->currentMousePosition.first, playerInput->currentMousePosition.second);
+        break;
+    case SDL_BUTTON_RIGHT:
+        break;
+    case SDL_BUTTON_MIDDLE:
+        break;
+    default:
+        break;
+    }
+}
+
 void MouseButtonUpMainMenu(Input *playerInput, SDL_MouseButtonEvent &event)
 {
     switch (event.button)
@@ -397,6 +415,43 @@ void MouseButtonUpGame(Input *playerInput, SDL_MouseButtonEvent &event)
         selectedText = nullptr;
         selectedObject = nullptr;
         break;
+    case SDL_BUTTON_RIGHT:
+        break;
+    case SDL_BUTTON_MIDDLE:
+        break;
+    default:
+        break;
+    }
+}
+
+void MouseButtonUpPaused(Input *playerInput, SDL_MouseButtonEvent &event)
+{
+    switch (event.button)
+    {
+    case SDL_BUTTON_LEFT:
+    {
+        std::cout << "Mouse button up in paused state" << std::endl;
+        Text *newSelectedText = selectText(playerInput->currentMousePosition.first, playerInput->currentMousePosition.second);
+        if (selectedText != nullptr)
+        {
+            std::cout << "Selected text: " << selectedText->GetName() << std::endl;
+        }
+        if (selectedText != nullptr && selectedText == newSelectedText)
+        {
+            std::cout << "Selected text: " << selectedText->GetName() << std::endl;
+            std::cout << "New Selected Text: " << newSelectedText->GetName() << std::endl;
+            if (selectedText == resetMapText)
+            {
+                ResetMap();
+            }
+            else if (selectedText == exitToMainMenuText)
+            {
+                LoadMenu();
+            }
+        }
+        selectedText = nullptr;
+        break;
+    }
     case SDL_BUTTON_RIGHT:
         break;
     case SDL_BUTTON_MIDDLE:

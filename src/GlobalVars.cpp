@@ -119,3 +119,7 @@ UIElement *die1;
 UIElement *die2;
 
 Text *pausedText;
+
+Text *resetMapText;
+
+Text *exitToMainMenuText;
