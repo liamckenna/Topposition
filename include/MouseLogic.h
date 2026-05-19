@@ -27,4 +27,4 @@ void ClampCameraBoundaries();
 
 void updateHoverState(int x, int y);
 
-void ZoomOutCamera();
+void ZoomOutCamera(bool toPrettyLevel = true);

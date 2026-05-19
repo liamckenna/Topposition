@@ -27,3 +27,5 @@ void SetCameraAtCenter();
 void ClearObjects();
 
 void ResetGlobalVars();
+
+void RefreshShadows();

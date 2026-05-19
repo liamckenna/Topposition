@@ -434,6 +434,8 @@ void loadUI()
     }
     currentRoll = Roll();
     movesLeft = currentRoll;
+
+    RefreshShadows();
 }
 
 void GeneratePixels()
@@ -640,4 +642,13 @@ void ResetGlobalVars()
     currentTurn = nullptr;
     firstPlace = nullptr;
     //loadingText = nullptr;
+}
+
+void RefreshShadows()
+{
+    for (int i = 0; i < uiElements.size(); i++)
+    {
+        uiElements[i]->RefreshShadow(renderer);
+    }
+
 }

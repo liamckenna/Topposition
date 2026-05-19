@@ -188,7 +188,10 @@ public:
         gameStateContext = gsc;
         topLayer = true;
         rotation = 0;
+        RefreshShadow(renderer);
+    }
 
+    void RefreshShadow(SDL_Renderer *renderer) {
         shadowOffsetX = 10;
         shadowOffsetY = 10;
         shadowAlpha = 150;

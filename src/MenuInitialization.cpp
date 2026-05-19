@@ -232,6 +232,7 @@ void UpdateTextElementPositions()
                 std::cout << "Updating GetTieText for Player " << i + 1 << std::endl;
                 players[i]->GetTieText()->SetPosition(x, y - (players[i]->GetTieText()->GetHeight() / 4));
             }
+            RefreshShadows();
             break;
         }
         default:

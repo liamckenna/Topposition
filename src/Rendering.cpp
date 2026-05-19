@@ -35,7 +35,7 @@ void RenderScreen()
             //renderMenuBackground();
             renderOcean();
             renderTerrain();
-            //renderPauseOverlay();
+            renderPauseOverlay();
             renderUI();
             renderText();
             break;

@@ -395,7 +395,7 @@ void moveSelectedObject(GameObject *gameObject, Input *playerInput)
     }
 }
 
-void ZoomOutCamera()
+void ZoomOutCamera(bool toPrettyLevel)
 {
     int i = 0;
     while(zoom(-1, {SCREEN_WIDTH / 2.f, SCREEN_HEIGHT / 2.f}))
@@ -406,5 +406,10 @@ void ZoomOutCamera()
             std::cout << "Zoom out failed to converge after 100 iterations." << std::endl;
             break;
         }
+    }
+    if (toPrettyLevel)
+    {
+        zoom(1, {SCREEN_WIDTH / 2.f, SCREEN_HEIGHT / 2.f});
+        zoom(1, {SCREEN_WIDTH / 2.f, SCREEN_HEIGHT / 2.f});
     }
 }

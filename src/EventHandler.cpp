@@ -337,6 +337,7 @@ void MouseButtonUpMainMenu(Input *playerInput, SDL_MouseButtonEvent &event)
             if (selectedText->GetName() == "playButtonText")
             {
                 std::cout << "hit play button" << std::endl;
+                RefreshShadows();
                 state = GAME;
                 //ResetMap();
             }
