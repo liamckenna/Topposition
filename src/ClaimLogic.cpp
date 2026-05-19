@@ -1,4 +1,5 @@
 #include "ClaimLogic.h"
+#include "MultiPurposeFunctions.h"
 
 namespace
 {
@@ -437,15 +438,40 @@ Piece *PieceBattle(Peak *peak, Piece *attacker, Piece *defender)
 
 void RetreatPiece(Peak *peak, Piece *piece)
 {
-    int x = (rand() % (int)(SCREEN_WIDTH / 1.05)) + SCREEN_WIDTH / 2 - SCREEN_WIDTH / 2.1;
-    int y = (rand() % (int)(SCREEN_HEIGHT / 1.05)) + SCREEN_HEIGHT / 2 - SCREEN_HEIGHT / 2.1;
-    while (selectTerrain(x, y) != NULL)
+    bool foundRetreatLocation = false;
+    int retreatDistance = 100;
+    while (!foundRetreatLocation)
     {
-        x = (rand() % (int)(SCREEN_WIDTH / 1.05)) + SCREEN_WIDTH / 2 - SCREEN_WIDTH / 2.1;
-        y = (rand() % (int)(SCREEN_HEIGHT / 1.05)) + SCREEN_HEIGHT / 2 - SCREEN_HEIGHT / 2.1;
+        float xDir = (rand() % 200 - 100) / 100.0f;
+        float yDir = (rand() % 200 - 100) / 100.0f;
+
+        float length = sqrt(xDir * xDir + yDir * yDir);
+        if (length == 0)
+        {
+            xDir = 0;
+            yDir = -1;
+        }
+        else
+        {
+            xDir /= length;
+            yDir /= length;
+        }
+
+        float globalX = piece->GetGlobalCenter().first + xDir * retreatDistance;
+        float globalY = piece->GetGlobalCenter().second + yDir * retreatDistance;
+        std::pair<float, float> relativePos = GetRelativePosition(globalX, globalY);
+        int x = relativePos.first;
+        int y = relativePos.second;
+        if (selectTerrain(x, y) == nullptr)
+        {
+            foundRetreatLocation = true;
+            piece->SetBottomMiddle(x, y);
+            piece->SetCurrentAnimation(piece->animations["floatIdle"]);
+        }
+        else {
+            retreatDistance += 50;
+        }
     }
-    piece->SetBottomMiddle(x, y);
-    piece->SetCurrentAnimation(piece->animations["floatIdle"]);
     for (int i = 0; i < peak->occupants.size(); i++)
     {
         if (peak->occupants[i] == piece)

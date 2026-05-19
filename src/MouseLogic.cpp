@@ -188,7 +188,7 @@ Text *selectText(int x, int y, bool selecting)
 {
     for (int i = 0; i < text.size(); i++)
     {
-        if (!text[i]->GetSelectable() || !text[i]->GetRendered())
+        if (!text[i]->GetSelectable() || !text[i]->GetRendered() || text[i]->GetGameStateContext() != state)
         {
             continue;
         }

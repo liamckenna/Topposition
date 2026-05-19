@@ -102,3 +102,17 @@ void HueShift(int& r, int& g, int& b, float shiftDegrees)
     b = static_cast<int>((b1 + m) * 255.0f + 0.5f);
 
 }
+
+std::pair<float, float> GetRelativePosition(float globalX, float globalY)
+{
+    float relativeX = (globalX - cameraPosition.first) * cameraZoom;
+    float relativeY = (globalY - cameraPosition.second) * cameraZoom;
+    return {relativeX, relativeY};
+}
+
+std::pair<float, float> GetGlobalPosition(float relativeX, float relativeY)
+{
+    float globalX = (relativeX / cameraZoom) + cameraPosition.first;
+    float globalY = (relativeY / cameraZoom) + cameraPosition.second;
+    return {globalX, globalY};
+}
