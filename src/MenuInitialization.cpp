@@ -50,22 +50,13 @@ void loadMenuBackground()
 
 void updateUIElementPositions()
 {
+    std::cout << "Updating UI element positions" << std::endl;
     for (int i = 0; i < uiElements.size(); i++)
     {
         if (uiElements[i]->GetName() == "logo 1")
         {
             uiElements[i]->SetScale((float)SCREEN_HEIGHT / 1152);
             uiElements[i]->SetGlobalPosition(0, 0);
-        }
-        else if (uiElements[i]->GetName() == "play")
-        {
-            uiElements[i]->SetScale((float)SCREEN_HEIGHT / 1152);
-            uiElements[i]->SetCenter(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 3 * 2);
-        }
-        else if (uiElements[i]->GetName() == "quit")
-        {
-            uiElements[i]->SetScale((float)SCREEN_HEIGHT / 1152);
-            uiElements[i]->SetCenter(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 3 * 2 + ((uiElements[i]->GetDimensions().second * uiElements[i]->GetScale()) * 2));
         }
         else if (uiElements[i]->GetName() == "background")
         {
@@ -95,20 +86,6 @@ void updateUIElementPositions()
         }
         else if (uiElements[i]->GetName() == "endTurnArrow")
         {
-            Text *turnText = nullptr;
-            Text* endText = nullptr;
-            for (int j = 0; j < text.size(); j++)
-            {
-                if (text[j]->GetName() == "turnText")
-                {
-                    turnText = text[j];
-                }
-                else if (text[j]->GetName() == "endText")
-                {
-                    endText = text[j];
-                    break;
-                }
-            }
             int textSize = 75 * (SCREEN_WIDTH / 3840.f);
             turnText->SetSize(textSize, renderer);
             endText->SetSize(textSize, renderer);
@@ -140,7 +117,7 @@ void updateUIElementPositions()
 
 void UpdateTextElementPositions()
 {
-
+    std::cout << "Updating text element positions" << std::endl;
     switch (state)
     {
         case MAIN_MENU:
@@ -245,6 +222,4 @@ void UpdateTextElementPositions()
         default:
             break;
     }
-
-    
 }

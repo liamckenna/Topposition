@@ -227,6 +227,7 @@ void loadGamePieces()
             Piece *flag = new Piece(playerNumber, textures[flagName][0], surfaces[flagName], false);
             flag->SetScale(3);
             flag->SetBottomMiddle(peaks[i]->GetCenter().first, peaks[i]->GetCenter().second);
+            flag->type = FLAG;
 
             pieces.push_back(flag);
             gameObjects[gameObjects.size() - 2].push_back(flag);

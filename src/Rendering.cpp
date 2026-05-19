@@ -40,8 +40,10 @@ void RenderScreen()
         case GAME:
             renderOcean();
             renderTerrain();
-            renderClaimNotifs();
+            renderClaimFlags();
             renderPieces();
+            renderClaimNotifs();
+            renderSelectedObject();
             renderUI();
             renderText();
             //renderInventory();
@@ -49,8 +51,10 @@ void RenderScreen()
         case PAUSED:
             renderOceanFrozen();
             renderTerrain();
-            renderClaimNotifs();
+            renderClaimFlags();
             renderPieces();
+            renderClaimNotifs();
+            renderSelectedObject();
             renderUI();
             renderText();
             break;
@@ -78,7 +82,10 @@ void renderUI()
     {
         if (uiElements[i]->GetAssociatedPeak() == nullptr && uiElements[i]->GetName() != "background")
         {
-            uiElements[i]->RenderGameObject(renderer);
+            if (selectedObject == nullptr || uiElements[i] != selectedObject)
+            {
+                uiElements[i]->RenderGameObject(renderer);
+            }
         }
     }
 }
@@ -89,7 +96,21 @@ void renderClaimNotifs()
     {
         if (uiElements[i]->GetAssociatedPeak() != nullptr)
         {
-            uiElements[i]->RenderGameObject(renderer);
+            if (selectedObject == nullptr || uiElements[i] != selectedObject)
+            {
+                uiElements[i]->RenderGameObject(renderer);
+            }
+        }
+    }
+}
+
+void renderClaimFlags()
+{
+    for (int i = pieces.size() - 1; i >= 0; i--)
+    {
+        if (pieces[i]->type == FLAG)
+        {
+            pieces[i]->RenderGameObject(renderer);
         }
     }
 }
@@ -109,10 +130,21 @@ void renderPieces()
 {
     for (int i = pieces.size() - 1; i >= 0; i--)
     {
-        if (pieces[i]->type != ITEM)
+        if (pieces[i]->type != ITEM && pieces[i]->type != FLAG)
         {
-            pieces[i]->RenderGameObject(renderer);
+            if (selectedObject == nullptr || pieces[i] != selectedObject)
+            {
+                pieces[i]->RenderGameObject(renderer);
+            }
         }
+    }
+}
+
+void renderSelectedObject()
+{
+    if (selectedObject != nullptr)
+    {
+        selectedObject->RenderGameObject(renderer);
     }
 }
 

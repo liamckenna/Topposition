@@ -341,6 +341,11 @@ void updateHoverState(int x, int y)
     Text *hoveredText = selectText(x, y, false);
     for (int i = 0; i < text.size(); i++)
     {
+        if (selectedObject != nullptr)
+        {
+            text[i]->SetHovered(false);
+            continue;
+        }
         if (text[i]->GetSelectable() && text[i]->GetRendered())
         {
             text[i]->SetHovered(text[i] == hoveredText);
@@ -349,6 +354,11 @@ void updateHoverState(int x, int y)
     UIElement *hoveredUI = selectUI(x, y, false, false);
     for (int i = 0; i < uiElements.size(); i++)
     {
+        if (selectedObject != nullptr)
+        {
+            text[i]->SetHovered(false);
+            continue;
+        }
         if (uiElements[i]->GetSelectable() && uiElements[i]->GetRendered())
         {
             uiElements[i]->SetHovered(uiElements[i] == hoveredUI);

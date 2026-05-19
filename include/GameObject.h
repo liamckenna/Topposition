@@ -31,7 +31,8 @@ enum objectType
     ITEM = 4,
     UI_ELEMENT = 5,
     PIXEL = 6,
-    OCEAN_TILE = 7
+    OCEAN_TILE = 7,
+    FLAG = 8
 };
 
 using namespace std;

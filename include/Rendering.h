@@ -11,9 +11,13 @@ void renderUI();
 
 void renderClaimNotifs();
 
+void renderClaimFlags();
+
 void renderTerrain();
 
 void renderPieces();
+
+void renderSelectedObject();
 
 void renderInventory();
 
