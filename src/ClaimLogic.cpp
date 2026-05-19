@@ -297,6 +297,14 @@ void UpdateBattleSequence()
             crown->SetRotation(-45);
             crown->SetRendered(true);
             RetreatPiece(battleSequence.peak, battleSequence.roundDefender);
+            if (battleSequence.attackRoll - battleSequence.defenseRoll >= rules->GetFatalBattleDifference())
+            {
+                battleSequence.roundDefender->SetRendered(false);
+                battleSequence.roundDefender->SetMovable(false);
+                battleSequence.roundDefender->SetSelectable(false);
+                battleSequence.roundDefender->SetCurrentAnimation(nullptr);
+                battleSequence.roundDefender->SetDead(true);
+            }
             battleSequence.defenders.pop_back();
         }
         else
@@ -305,6 +313,14 @@ void UpdateBattleSequence()
             crown->SetRotation(45);
             crown->SetRendered(true);
             RetreatPiece(battleSequence.peak, battleSequence.roundAttacker);
+            if (battleSequence.defenseRoll - battleSequence.attackRoll >= rules->GetFatalBattleDifference())
+            {
+                battleSequence.roundAttacker->SetRendered(false);
+                battleSequence.roundAttacker->SetMovable(false);
+                battleSequence.roundAttacker->SetSelectable(false);
+                battleSequence.roundAttacker->SetCurrentAnimation(nullptr);
+                battleSequence.roundAttacker->SetDead(true);
+            }
             battleSequence.attackers.pop_back();
         }
 
@@ -370,72 +386,6 @@ bool IsBattleSequenceActive()
     return battleSequence.active;
 }
 
-Player *PeakBattle(Peak *peak, Player *attacker, Player *defender)
-{
-    std::vector<Piece *> attackers;
-    std::vector<Piece *> defenders;
-
-    for (int i = 0; i < peak->occupants.size(); i++)
-    {
-        if (peak->occupants[i]->GetPlayer() == attacker)
-        {
-            attackers.push_back(peak->occupants[i]);
-        }
-        else if (peak->occupants[i]->GetPlayer() == defender)
-        {
-            defenders.push_back(peak->occupants[i]);
-        }
-    }
-    Player *loser = nullptr;
-    Player *winner = nullptr;
-    while (attackers.size() > 0 && defenders.size() > 0)
-    {
-        Piece *losing_piece = PieceBattle(peak, attackers[attackers.size() - 1], defenders[defenders.size() - 1]);
-        if (losing_piece->GetPlayer() == attacker)
-        {
-            attackers.pop_back();
-            loser = attacker;
-            winner = defender;
-        }
-        else
-        {
-            defenders.pop_back();
-            loser = defender;
-            winner = attacker;
-        }
-    }
-
-    if (loser == defender)
-    {
-        RetreatPlayer(peak, defender);
-    }
-
-    return winner;
-}
-
-Piece *PieceBattle(Peak *peak, Piece *attacker, Piece *defender)
-{
-    int attackPower = rand() % 6 + 1;
-    int defensePower = rand() % 6 + 1;
-
-    std::cout << std::endl;
-
-    printf("Attack roll: %d vs Defense roll: %d\n", attackPower, defensePower);
-
-    if (attackPower >= defensePower)
-    {
-        printf("%s wins the battle!\n", attacker->GetPlayer()->GetName().c_str());
-        RetreatPiece(peak, defender);
-        return defender;
-    }
-    else
-    {
-        printf("%s wins the battle!\n", defender->GetPlayer()->GetName().c_str());
-        RetreatPiece(peak, attacker);
-        return attacker;
-    }
-}
-
 void RetreatPiece(Peak *peak, Piece *piece)
 {
     bool foundRetreatLocation = false;
@@ -479,15 +429,6 @@ void RetreatPiece(Peak *peak, Piece *piece)
             peak->occupants.erase(peak->occupants.begin() + i);
             break;
         }
-    }
-
-    if (rules->GetFatalBattles())
-    {
-        piece->SetRendered(false);
-        piece->SetMovable(false);
-        piece->SetSelectable(false);
-        piece->SetCurrentAnimation(nullptr);
-        piece->SetDead(true);
     }
 }
 

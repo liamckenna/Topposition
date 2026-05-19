@@ -113,6 +113,10 @@ void EventKeyDown(Input *playerInput, SDL_KeyboardEvent &event)
         {
             state = PAUSED;
         }
+        if (event.key == SDLK_F11)
+        {
+            RefreshShadows();
+        }
         break;
     case PAUSED:
         if (event.key == SDLK_ESCAPE)

@@ -7,10 +7,6 @@ void RefreshClaimNotifs();
 
 void ClaimPeak(UIElement *claimNotif);
 
-Player *PeakBattle(Peak *peak, Player *attacker, Player *defender);
-
-Piece *PieceBattle(Peak *peak, Piece *attacker, Piece *defender);
-
 void RetreatPiece(Peak *peak, Piece *piece);
 
 void RetreatPlayer(Peak *peak, Player *player);

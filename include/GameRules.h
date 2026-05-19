@@ -10,7 +10,7 @@ class GameRules
     int remainingItems = 0;
     int uniqueItemCount = 3;
     int remainingPoints = 100;
-    bool fatalBattles = true;
+    int fatalBattleDifference = 4;
 
 public:
     int GetPlayerCount() { return playerCount; }
@@ -22,7 +22,7 @@ public:
     int GetRemainingItems() { return remainingItems; }
     int GetMaxItems() { return maxItems; }
     int GetUniqueItemCount() { return uniqueItemCount; }
-    bool GetFatalBattles() { return fatalBattles; }
+    int GetFatalBattleDifference() { return fatalBattleDifference; }
     void SetPlayerCount(int pc) { playerCount = pc; }
     void SetMaxPoints(int mp) { maxPoints = mp; }
     void SetPieces(int p) { pieces = p; }
@@ -31,5 +31,5 @@ public:
     void SetRemainingItems(int ri) { remainingItems = ri; }
     void SetMaxHeight(int mh) { maxHeight = mh; }
     void SetPeakCount(int pc) { peakCount = pc; }
-    void SetFatalBattles(bool fb) { fatalBattles = fb; }
+    void SetFatalBattleDifference(int fbd) { fatalBattleDifference = fbd; }
 };
