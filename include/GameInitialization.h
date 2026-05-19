@@ -23,3 +23,7 @@ void ResetMap();
 void loadGame();
 
 void SetCameraAtCenter();
+
+void ClearObjects();
+
+void ResetGlobalVars();

@@ -143,10 +143,12 @@ void UpdateTextElementPositions()
         case GAME:
         case PAUSED:
         {
+            std::cout << "Updating turnTallyText & turnTallyNumText" << std::endl;
             turnTallyText->SetTextContent("Turn 80", renderer);
             turnTallyText->SetSize(125 * (SCREEN_WIDTH / 3840.f), renderer);
             turnTallyText->SetPosition(SCREEN_WIDTH - turnTallyText->GetWidth() - SCREEN_WIDTH / 80, SCREEN_HEIGHT / 40);
 
+            
             turnTallyNumText->SetTextContent("1", renderer);
             turnTallyNumText->SetSize(125 * (SCREEN_WIDTH / 3840.f), renderer);
             turnTallyNumText->SetPosition(turnTallyText->GetPosition().first + turnTallyText->GetWidth() - (turnTallyNumText->GetWidth() * 1.5), SCREEN_HEIGHT / 40);
@@ -163,11 +165,13 @@ void UpdateTextElementPositions()
             }
             turnTallyNumText->SetTextContent(to_string(turnCount).c_str(), renderer);
 
+            std::cout << "Updating peaksLeftText" << std::endl;
             std::string peaksLeftString = "peaks left: " + to_string(unclaimedPeakCount);
             peaksLeftText->SetTextContent(peaksLeftString.c_str(), renderer);
             peaksLeftText->SetSize(65 * (SCREEN_WIDTH / 3840.f), renderer);
             peaksLeftText->SetPosition(x, y);
 
+            std::cout << "Updating movesLeftText" << std::endl;
             movesLeftText->SetTextContent("11", renderer);
             movesLeftText->SetSize(150 * (SCREEN_WIDTH / 3840.f), renderer);
             x = (SCREEN_WIDTH / 2) - (movesLeftText->GetWidth() / 2);
@@ -177,12 +181,15 @@ void UpdateTextElementPositions()
             movesLeftText->SetTextContent(to_string(movesLeft).c_str(), renderer);
             movesLeftText->SetCenter(center.first, center.second);
 
+            std::cout << "Updating pausedText" << std::endl;
             pausedText->SetSize(200 * (SCREEN_WIDTH / 3840.f), renderer);
             pausedText->SetCenter(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 - SCREEN_HEIGHT / 10);
 
+            std::cout << "Updating resetMapText" << std::endl;
             resetMapText->SetSize(150 * (SCREEN_WIDTH / 3840.f), renderer);
             resetMapText->SetCenter(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 + SCREEN_HEIGHT / 8);
 
+            std::cout << "Updating exitToMainMenuText" << std::endl;
             exitToMainMenuText->SetSize(150 * (SCREEN_WIDTH / 3840.f), renderer);
             exitToMainMenuText->SetCenter(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 + SCREEN_HEIGHT / 8 + SCREEN_HEIGHT / 10);
 
@@ -196,25 +203,36 @@ void UpdateTextElementPositions()
                 {
                     y += players[0]->GetTurnText()->GetDimensions().second;
                 }
+                std::cout << "Updating GetTurnText for Player " << i + 1 << std::endl;
                 players[i]->GetTurnText()->SetTextContent(("P" + to_string(i + 1) + ":").c_str(), renderer);
                 players[i]->GetTurnText()->SetSize(textSize, renderer);
+                std::cout << "Updating GetScoreText for Player " << i + 1 << std::endl;
                 players[i]->GetScoreText()->SetTextContent("0", renderer);
                 players[i]->GetScoreText()->SetSize(textSize, renderer);
                 textSize = 75 * (SCREEN_WIDTH / 3840.f);
+                std::cout << "Updating GetFirstText for Player " << i + 1 << std::endl;
                 players[i]->GetFirstText()->SetTextContent("1st!", renderer);
                 players[i]->GetFirstText()->SetSize(textSize, renderer);
+                std::cout << "Updating GetTieText for Player " << i + 1 << std::endl;
                 players[i]->GetTieText()->SetTextContent("Tie!", renderer);
                 players[i]->GetTieText()->SetSize(textSize, renderer);
                 textSize = 125 * (SCREEN_WIDTH / 3840.f);
+                std::cout << "Updating GetCircleText for Player " << i + 1 << std::endl;
                 players[i]->GetCircleText()->SetTextContent(("P" + to_string(i + 1)).c_str(), renderer);
                 players[i]->GetCircleText()->SetSize(textSize, renderer);
+                std::cout << "Updating GetTurnText for Player " << i + 1 << std::endl;
                 players[i]->GetTurnText()->SetPosition(x, y);
                 x += players[i]->GetTurnText()->GetWidth() + (SCREEN_WIDTH / 160);
+                std::cout << "Updating GetScoreText for Player " << i + 1 << std::endl;
                 players[i]->GetScoreText()->SetPosition(x, y);
+                std::cout << "Updating GetCircleText for Player " << i + 1 << std::endl;
                 players[i]->GetCircleText()->SetCenter(currentPlayerCircle->GetCenter().first, currentPlayerCircle->GetCenter().second);
+                std::cout << "Updating GetScoreText for Player " << i + 1 << std::endl;
                 players[i]->GetScoreText()->SetTextContent(to_string(players[i]->GetScore()).c_str(), renderer);
                 x += players[i]->GetScoreText()->GetWidth();
+                std::cout << "Updating GetFirstText for Player " << i + 1 << std::endl;
                 players[i]->GetFirstText()->SetPosition(x, y - (players[i]->GetFirstText()->GetHeight() / 4));
+                std::cout << "Updating GetTieText for Player " << i + 1 << std::endl;
                 players[i]->GetTieText()->SetPosition(x, y - (players[i]->GetTieText()->GetHeight() / 4));
             }
             break;

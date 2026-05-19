@@ -480,6 +480,15 @@ void RetreatPiece(Peak *peak, Piece *piece)
             break;
         }
     }
+
+    if (rules->GetFatalBattles())
+    {
+        piece->SetRendered(false);
+        piece->SetMovable(false);
+        piece->SetSelectable(false);
+        piece->SetCurrentAnimation(nullptr);
+        piece->SetDead(true);
+    }
 }
 
 void RetreatPlayer(Peak *peak, Player *player)
@@ -511,4 +520,17 @@ bool IsOccupyingPeak(Peak *peak, Player *player)
             return true;
     }
     return false;
+}
+
+int SoldierCount(Player *player)
+{
+    int count = 0;
+    for (size_t i = 0; i < player->soldiers.size(); i++)
+    {
+        if (!player->soldiers[i]->IsDead())
+        {
+            count++;
+        }
+    }
+    return count;
 }

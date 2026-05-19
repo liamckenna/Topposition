@@ -250,6 +250,7 @@ private:
     pair<int, int> designatedLocation;
     Terrain *occupyingTerrain;
     Player *player;
+    bool dead = false;
 
 public:
     Piece(string name, SDL_Texture *texture, SDL_Surface *surface, bool r) : GameObject(name, texture, surface, true, r)
@@ -262,13 +263,15 @@ public:
         designatedLocation.first = x;
         designatedLocation.second = y;
     }
-    pair<int, int> GetDesignatedLocation() { return designatedLocation; }
     void SetAltitude(int a) { altitude = a; }
-    int GetAltitude() { return altitude; }
-    Player *GetPlayer() { return player; }
     void SetPlayer(Player *p) { player = p; }
     void SetOccupyingTerrain(Terrain *ot) { occupyingTerrain = ot; }
+    void SetDead(bool d) { dead = d; }
+    pair<int, int> GetDesignatedLocation() { return designatedLocation; }
+    int GetAltitude() { return altitude; }
+    Player *GetPlayer() { return player; }
     Terrain *GetOccupyingTerrain() { return occupyingTerrain; }
+    bool IsDead() { return dead; }
 };
 
 class Item : public Piece

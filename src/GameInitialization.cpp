@@ -2,95 +2,8 @@
 
 void ResetMap()
 {
-    for (int i = 0; i < peaks.size(); i++)
-    {
-        peaks[i] = nullptr;
-    }
-
-    for (int i = 0; i < terrain.size(); i++)
-    {
-        for (int j = 0; j < terrain[i].size(); j++)
-        {
-            terrain[i][j] = nullptr;
-        }
-    }
-
-    for (int i = 0; i < pieces.size(); i++)
-    {
-        pieces[i] = nullptr;
-    }
-
-    for (int i = 0; i < uiElements.size(); i++)
-    {
-        uiElements[i] = nullptr;
-    }
-
-    for (int i = 0; i < players.size(); i++)
-    {
-        for (int j = 0; j < players[i]->soldiers.size(); j++)
-        {
-            players[i]->soldiers[j] = nullptr;
-        }
-        for (int j = 0; j < players[i]->peaks.size(); j++)
-        {
-            players[i]->peaks[j] = nullptr;
-        }
-        for (int j = 0; j < players[i]->inventory.size(); j++)
-        {
-            players[i]->inventory[j] = nullptr;
-        }
-        delete players[i];
-    }
-
-    for (int i = 0; i < pixels.size(); i++)
-    {
-        delete pixels[i];
-    }
-
-    ocean.clear();
-
-    for (int i = 0; i < gameObjects.size(); i++)
-    {
-        for (int j = 0; j < gameObjects[i].size(); j++)
-        {
-            delete gameObjects[i][j];
-        }
-    }
-
-    for (int i = 0; i < text.size(); i++)
-    {
-        delete text[i];
-    }
-
-    for (int i = 0; i < animations.size(); i++)
-    {
-        delete animations[i];
-    }
-
-    std::vector<Piece *> newPieces;
-    std::vector<std::vector<Terrain *>> newTerrain;
-    std::vector<std::vector<GameObject *>> newGameObjects;
-    std::vector<Peak *> newPeaks;
-    std::vector<UIElement *> newUIElements;
-    std::vector<Player *> newPlayers;
-    std::vector<Pixel *> newPixels;
-    std::vector<Text *> newText;
-    std::vector<std::vector<OceanTile *>> newOcean;
-    std::vector<Animation *> newAnimations;
-    animations = newAnimations;
-    players = newPlayers;
-    text = newText;
-    ocean = newOcean;
-    pixels = newPixels;
-    uiElements = newUIElements;
-    pieces = newPieces;
-    terrain = newTerrain;
-    gameObjects = newGameObjects;
-    peaks = newPeaks;
-    cameraZoom = 1.f;
-    cameraPosition = {0, 0};
-    worldResolution = {SCREEN_WIDTH, SCREEN_HEIGHT};
-    turnCount = 1;
+    ClearObjects();
+    ResetGlobalVars();
     if (state == GAME || state == PAUSED)
     {
         state = LOADING;
@@ -604,4 +517,117 @@ void renderPixels()
     {
         pixels[i]->RenderGameObject(renderer, hoveringTerrain);
     }
+}
+
+void ClearObjects()
+{
+    for (int i = 0; i < peaks.size(); i++)
+    {
+        peaks[i] = nullptr;
+    }
+
+    for (int i = 0; i < terrain.size(); i++)
+    {
+        for (int j = 0; j < terrain[i].size(); j++)
+        {
+            terrain[i][j] = nullptr;
+        }
+    }
+
+    for (int i = 0; i < pieces.size(); i++)
+    {
+        pieces[i] = nullptr;
+    }
+
+    for (int i = 0; i < uiElements.size(); i++)
+    {
+        uiElements[i] = nullptr;
+    }
+
+    for (int i = 0; i < players.size(); i++)
+    {
+        for (int j = 0; j < players[i]->soldiers.size(); j++)
+        {
+            players[i]->soldiers[j] = nullptr;
+        }
+        for (int j = 0; j < players[i]->peaks.size(); j++)
+        {
+            players[i]->peaks[j] = nullptr;
+        }
+        for (int j = 0; j < players[i]->inventory.size(); j++)
+        {
+            players[i]->inventory[j] = nullptr;
+        }
+        delete players[i];
+    }
+
+    for (int i = 0; i < pixels.size(); i++)
+    {
+        delete pixels[i];
+    }
+
+    ocean.clear();
+
+    for (int i = 0; i < gameObjects.size(); i++)
+    {
+        for (int j = 0; j < gameObjects[i].size(); j++)
+        {
+            delete gameObjects[i][j];
+        }
+    }
+
+    for (int i = 0; i < text.size(); i++)
+    {
+        delete text[i];
+    }
+
+    for (int i = 0; i < animations.size(); i++)
+    {
+        delete animations[i];
+    }
+}
+
+void ResetGlobalVars()
+{
+    std::vector<Piece *> newPieces;
+    std::vector<std::vector<Terrain *>> newTerrain;
+    std::vector<std::vector<GameObject *>> newGameObjects;
+    std::vector<Peak *> newPeaks;
+    std::vector<UIElement *> newUIElements;
+    std::vector<Player *> newPlayers;
+    std::vector<Pixel *> newPixels;
+    std::vector<Text *> newText;
+    std::vector<std::vector<OceanTile *>> newOcean;
+    std::vector<Animation *> newAnimations;
+    animations = newAnimations;
+    players = newPlayers;
+    text = newText;
+    ocean = newOcean;
+    pixels = newPixels;
+    uiElements = newUIElements;
+    pieces = newPieces;
+    terrain = newTerrain;
+    gameObjects = newGameObjects;
+    peaks = newPeaks;
+    cameraZoom = 1.f;
+    cameraPosition = {0, 0};
+    worldResolution = {SCREEN_WIDTH, SCREEN_HEIGHT};
+    turnCount = 1;
+    turnTallyText = nullptr;
+    turnTallyNumText = nullptr;
+    peaksLeftText = nullptr;
+    movesLeftText = nullptr;
+    pausedText = nullptr;
+    resetMapText = nullptr;
+    exitToMainMenuText = nullptr;
+    turnText = nullptr;
+    endText = nullptr;
+    currentPlayerCircle = nullptr;
+    opposingPlayerCircle = nullptr;
+    endTurnArrow = nullptr;
+    crown = nullptr;
+    die1 = nullptr;
+    die2 = nullptr;
+    currentTurn = nullptr;
+    firstPlace = nullptr;
 }

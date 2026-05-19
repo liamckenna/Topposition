@@ -1,7 +1,7 @@
 #pragma once
 class GameRules
 {
-    int pieces = 6;
+    int pieces = 8;
     int maxHeight = 8;
     int playerCount = 4;
     int peakCount = 20;
@@ -10,6 +10,7 @@ class GameRules
     int remainingItems = 0;
     int uniqueItemCount = 3;
     int remainingPoints = 100;
+    bool fatalBattles = true;
 
 public:
     int GetPlayerCount() { return playerCount; }
@@ -21,6 +22,7 @@ public:
     int GetRemainingItems() { return remainingItems; }
     int GetMaxItems() { return maxItems; }
     int GetUniqueItemCount() { return uniqueItemCount; }
+    bool GetFatalBattles() { return fatalBattles; }
     void SetPlayerCount(int pc) { playerCount = pc; }
     void SetMaxPoints(int mp) { maxPoints = mp; }
     void SetPieces(int p) { pieces = p; }
@@ -29,4 +31,5 @@ public:
     void SetRemainingItems(int ri) { remainingItems = ri; }
     void SetMaxHeight(int mh) { maxHeight = mh; }
     void SetPeakCount(int pc) { peakCount = pc; }
+    void SetFatalBattles(bool fb) { fatalBattles = fb; }
 };

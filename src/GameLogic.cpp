@@ -45,21 +45,26 @@ void RotateTurn()
         currentTurn->soldiers[i]->SetSelectable(false);
     }
 
-    for (int i = 0; i < players.size(); i++)
+    do
     {
-        if (players[i] == currentTurn)
+        for (int i = 0; i < players.size(); i++)
         {
-            if (i == players.size() - 1)
+            if (players[i] == currentTurn)
             {
-                currentTurn = players[0];
+                if (i == players.size() - 1)
+                {
+                    currentTurn = players[0];
+                }
+                else
+                {
+                    currentTurn = players[i + 1];
+                }
+                break;
             }
-            else
-            {
-                currentTurn = players[i + 1];
-            }
-            break;
         }
-    }
+    } while (SoldierCount(currentTurn) <= 0);
+    
+    
 
     for (int i = 0; i < currentTurn->soldiers.size(); i++)
     {

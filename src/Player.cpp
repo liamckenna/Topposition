@@ -8,7 +8,7 @@ Player::Player() {
 void Player::SetScore(int s)
 {
     score = s;
-    if (scoreText != nullptr)
+    if (scoreText != nullptr && firstText != nullptr && tieText != nullptr)
     {
         scoreText->SetTextContent((to_string(score)).c_str(), renderer);
         firstText->SetPosition(scoreText->GetPosition().first + scoreText->GetWidth(), firstText->GetPosition().second);

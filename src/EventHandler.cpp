@@ -110,7 +110,7 @@ void EventKeyDown(Input *playerInput, SDL_KeyboardEvent &event)
     case LOADING:
         break;
     case GAME:
-        if (event.key == SDLK_ESCAPE)
+        if (selectedObject == nullptr && selectedText == nullptr && event.key == SDLK_ESCAPE)
         {
             state = PAUSED;
         }
@@ -267,6 +267,10 @@ void MouseButtonDownGame(Input *playerInput, SDL_MouseButtonEvent &event)
     switch (event.button)
     {
     case SDL_BUTTON_LEFT:
+        if (IsBattleSequenceActive())
+        {
+            break;
+        }
         selectedText = selectText(playerInput->currentMousePosition.first, playerInput->currentMousePosition.second);
         if (selectedText == nullptr)
         {
@@ -367,6 +371,7 @@ void MouseButtonUpGame(Input *playerInput, SDL_MouseButtonEvent &event)
 {
     if (IsBattleSequenceActive())
     {
+        
         if (selectedText != nullptr)
         {
             selectedText->SetSelected(false);
@@ -381,14 +386,17 @@ void MouseButtonUpGame(Input *playerInput, SDL_MouseButtonEvent &event)
                 endTurnArrow->SetSelected(false);
             }
         }
-        if (selectedObject->type == UI_ELEMENT)
+        if (selectedObject != nullptr)
         {
-            UIElement *uiElement = dynamic_cast<UIElement *>(selectedObject);
-            uiElement->SetSelected(false);
-            if (uiElement == endTurnArrow)
+            if (selectedObject->type == UI_ELEMENT)
             {
-                endText->SetSelected(false);
-                turnText->SetSelected(false);
+                UIElement *uiElement = dynamic_cast<UIElement *>(selectedObject);
+                uiElement->SetSelected(false);
+                if (uiElement == endTurnArrow)
+                {
+                    endText->SetSelected(false);
+                    turnText->SetSelected(false);
+                }
             }
         }
         selectedText = nullptr;

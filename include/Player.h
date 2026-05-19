@@ -12,11 +12,11 @@ class Text;
 class Player {
     int score = 0;
     std::string name = "";
-    Text* turnText;
-    Text *scoreText;
-    Text *circleText;
-    Text *firstText;
-    Text *tieText;
+    Text *turnText = nullptr;
+    Text *scoreText = nullptr;
+    Text *circleText = nullptr;
+    Text *firstText = nullptr;
+    Text *tieText = nullptr;
     std::string color;
     SDL_Color sdlColor;
 public:
