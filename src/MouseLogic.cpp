@@ -140,7 +140,7 @@ GameObject *selectObject(int x, int y, bool update)
     return nullptr;
 }
 
-UIElement *selectUI(int x, int y, bool update)
+UIElement *selectUI(int x, int y, bool update, bool selecting)
 {
     for (int i = 0; i < uiElements.size(); i++)
     {
@@ -176,6 +176,15 @@ UIElement *selectUI(int x, int y, bool update)
                 }
                 if (uiElements[i]->GetRendered())
                 {
+                    if (selecting)
+                    {
+                        uiElements[i]->SetSelected(true);
+                        if (uiElements[i] == endTurnArrow)
+                        {   
+                            endText->SetSelected(true);
+                            turnText->SetSelected(true);
+                        }
+                    }
                     return uiElements[i];
                 }
             }
@@ -209,10 +218,18 @@ Text *selectText(int x, int y, bool selecting)
                     if (text[i] == endText)
                     {
                         turnText->SetSelected(true);
+                        if (endTurnArrow != nullptr)
+                        {
+                            endTurnArrow->SetSelected(true);
+                        }
                     }
                     else if (text[i] == turnText)
                     {
                         endText->SetSelected(true);
+                        if (endTurnArrow != nullptr)
+                        {
+                            endTurnArrow->SetSelected(true);
+                        }
                     }
                 }
                 return text[i];
@@ -319,7 +336,7 @@ Item *selectItem(int x, int y, bool update)
     return nullptr;
 }
 
-void updateTextHoverState(int x, int y)
+void updateHoverState(int x, int y)
 {
     Text *hoveredText = selectText(x, y, false);
     for (int i = 0; i < text.size(); i++)
@@ -329,10 +346,19 @@ void updateTextHoverState(int x, int y)
             text[i]->SetHovered(text[i] == hoveredText);
         }
     }
-    if (endText != nullptr && turnText != nullptr)
+    UIElement *hoveredUI = selectUI(x, y, false, false);
+    for (int i = 0; i < uiElements.size(); i++)
     {
-        if (endText->GetHovered() || turnText->GetHovered())
+        if (uiElements[i]->GetSelectable() && uiElements[i]->GetRendered())
         {
+            uiElements[i]->SetHovered(uiElements[i] == hoveredUI);
+        }
+    }
+    if (endText != nullptr && turnText != nullptr && endTurnArrow != nullptr)
+    {
+        if (endText->GetHovered() || turnText->GetHovered() || endTurnArrow->GetHovered())
+        {
+            endTurnArrow->SetHovered(true);
             endText->SetHovered(true);
             turnText->SetHovered(true);
         }

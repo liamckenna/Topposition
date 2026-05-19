@@ -86,6 +86,15 @@ void GameObject::RenderGameObject(SDL_Renderer *renderer)
                         SDL_RenderTexture(renderer, uiElement->GetShadowTexture(), NULL, shadowRect);
                     }
                 }
+                
+                if (uiElement->GetSelected())
+                {
+                    SDL_SetTextureColorMod(texture, 255 / 2, 255 / 2, 255 / 2);
+                }
+                else if (uiElement->GetHovered())
+                {
+                    SDL_SetTextureColorMod(texture, 255 / 1.5, 255 / 1.5, 255 / 1.5);
+                }
                 if (uiElement->GetName() == "crown")
                 {
                     SDL_RenderTextureRotated(renderer, texture, NULL, renderRect, uiElement->GetRotation(), NULL, SDL_FLIP_NONE);
@@ -93,6 +102,10 @@ void GameObject::RenderGameObject(SDL_Renderer *renderer)
                 else
                 {
                     SDL_RenderTexture(renderer, texture, NULL, renderRect);
+                }
+                if (uiElement->GetSelected() || uiElement->GetHovered())
+                {
+                    SDL_SetTextureColorMod(texture, 255, 255, 255);
                 }
             }
             else

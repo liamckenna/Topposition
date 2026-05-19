@@ -22,22 +22,21 @@ enum gameState
     PAUSED = 4
 };
 
+enum objectType
+{
+    GENERIC = 0,
+    TERRAIN = 1,
+    PEAK = 2,
+    PIECE = 3,
+    ITEM = 4,
+    UI_ELEMENT = 5,
+    PIXEL = 6,
+    OCEAN_TILE = 7
+};
+
 using namespace std;
 class GameObject
 {
-public:
-    enum objectType
-    {
-        GENERIC = 0,
-        TERRAIN = 1,
-        PEAK = 2,
-        PIECE = 3,
-        ITEM = 4,
-        UI_ELEMENT = 5,
-        PIXEL = 6,
-        OCEAN_TILE = 7
-    };
-
 protected:
     string name;
     SDL_Texture *texture;
@@ -174,6 +173,8 @@ class UIElement : public GameObject
     int shadowOffsetY;
     Uint8 shadowAlpha;
     int rotation;
+    bool selected = false;
+    bool hovered = false;
 
 public:
     UIElement(string name, SDL_Texture *texture, SDL_Surface *surface, bool r, bool s, SDL_Renderer *renderer, Peak *ap = nullptr) : GameObject(name, texture, surface, false, r)
@@ -202,6 +203,10 @@ public:
     void SetAssociatedPeak(Peak *ap) { associatedPeak = ap; }
     void SetRenderShadow(bool rs) { renderShadow = rs; }
     void SetRotation(int r) { rotation = r; }
+    void SetSelected(bool s) { selected = s; }
+    void SetHovered(bool h) { hovered = h; }
+    bool GetHovered() { return hovered; }
+    bool GetSelected() { return selected; }
     int GetRotation() { return rotation; }
     bool GetRenderShadow() { return renderShadow; }
     SDL_FRect *GetShadowRect() { return shadowRect; }

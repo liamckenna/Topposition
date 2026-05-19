@@ -11,7 +11,7 @@ void scroll(Input *playerInput);
 
 GameObject *selectObject(int x, int y, bool update = true);
 
-UIElement *selectUI(int x, int y, bool update = true);
+UIElement *selectUI(int x, int y, bool update = true, bool selecting = true);
 
 Text *selectText(int x, int y, bool selecting = true);
 
@@ -25,4 +25,4 @@ void moveSelectedObject(GameObject *gameObject, Input *playerInput);
 
 void ClampCameraBoundaries();
 
-void updateTextHoverState(int x, int y);
+void updateHoverState(int x, int y);

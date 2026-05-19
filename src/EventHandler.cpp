@@ -35,7 +35,7 @@ void HandleEvents(Input *playerInput)
 
     MouseMovement(playerInput);
 
-    updateTextHoverState(playerInput->currentMousePosition.first, playerInput->currentMousePosition.second);
+    updateHoverState(playerInput->currentMousePosition.first, playerInput->currentMousePosition.second);
 
     SDL_GetMouseState(&playerInput->prevMousePosition.first, &playerInput->prevMousePosition.second);
 }
@@ -279,7 +279,7 @@ void MouseButtonDownGame(Input *playerInput, SDL_MouseButtonEvent &event)
                 {
                     selectedObject = selectPiece(playerInput->currentMousePosition.first,
                                                  playerInput->currentMousePosition.second);
-                    if (selectedObject != nullptr && selectedObject->type == GameObject::PIECE)
+                    if (selectedObject != nullptr && selectedObject->type == PIECE)
                     {
                         Piece *piece = dynamic_cast<Piece *>(selectedObject);
 
@@ -345,26 +345,10 @@ void MouseButtonUpMainMenu(Input *playerInput, SDL_MouseButtonEvent &event)
         if (selectedText != nullptr)
         {
             selectedText->SetSelected(false);
-            if (selectedText == endText)
-            {
-                turnText->SetSelected(false);
-            }
-            else if (selectedText == turnText)
-            {
-                endText->SetSelected(false);
-            }
         }
         if (newSelectedText != nullptr)
         {
             newSelectedText->SetSelected(false);
-            if (newSelectedText == endText)
-            {
-                turnText->SetSelected(false);
-            }
-            else if (newSelectedText == turnText)
-            {
-                endText->SetSelected(false);
-            }
         }
         newSelectedText = nullptr;
         selectedText = nullptr;
@@ -389,10 +373,22 @@ void MouseButtonUpGame(Input *playerInput, SDL_MouseButtonEvent &event)
             if (selectedText == endText)
             {
                 turnText->SetSelected(false);
+                endTurnArrow->SetSelected(false);
             }
             else if (selectedText == turnText)
             {
                 endText->SetSelected(false);
+                endTurnArrow->SetSelected(false);
+            }
+        }
+        if (selectedObject->type == UI_ELEMENT)
+        {
+            UIElement *uiElement = dynamic_cast<UIElement *>(selectedObject);
+            uiElement->SetSelected(false);
+            if (uiElement == endTurnArrow)
+            {
+                endText->SetSelected(false);
+                turnText->SetSelected(false);
             }
         }
         selectedText = nullptr;
@@ -433,7 +429,7 @@ void MouseButtonUpGame(Input *playerInput, SDL_MouseButtonEvent &event)
             {
                 ClaimPeak(dynamic_cast<UIElement *>(selectedObject));
             }
-            else if (selectedObject->type == GameObject::PIECE)
+            else if (selectedObject->type == PIECE)
             {
                 Piece *piece = dynamic_cast<Piece *>(selectedObject);
                 pair<float, float> bottom_middle = piece->GetBottomMiddle();
@@ -449,7 +445,7 @@ void MouseButtonUpGame(Input *playerInput, SDL_MouseButtonEvent &event)
                 seaHover = false;
                 validMove = true;
             }
-            else if (selectedObject->type == GameObject::ITEM)
+            else if (selectedObject->type == ITEM)
             {
             }
         }
@@ -459,10 +455,12 @@ void MouseButtonUpGame(Input *playerInput, SDL_MouseButtonEvent &event)
             if (selectedText == endText)
             {
                 turnText->SetSelected(false);
+                endTurnArrow->SetSelected(false);
             }
             else if (selectedText == turnText)
             {
                 endText->SetSelected(false);
+                endTurnArrow->SetSelected(false);
             }
         }
         if (newSelectedText != nullptr)
@@ -471,10 +469,22 @@ void MouseButtonUpGame(Input *playerInput, SDL_MouseButtonEvent &event)
             if (newSelectedText == endText)
             {
                 turnText->SetSelected(false);
+                endTurnArrow->SetSelected(false);
             }
             else if (newSelectedText == turnText)
             {
                 endText->SetSelected(false);
+                endTurnArrow->SetSelected(false);
+            }
+        }
+        if (selectedObject != nullptr && selectedObject->type == UI_ELEMENT)
+        {
+            UIElement *uiElement = dynamic_cast<UIElement *>(selectedObject);
+            uiElement->SetSelected(false);
+            if (uiElement == endTurnArrow)
+            {
+                endText->SetSelected(false);
+                turnText->SetSelected(false);
             }
         }
         selectedText = nullptr;
@@ -516,10 +526,12 @@ void MouseButtonUpPaused(Input *playerInput, SDL_MouseButtonEvent &event)
             if (selectedText == endText)
             {
                 turnText->SetSelected(false);
+                endTurnArrow->SetSelected(false);
             }
             else if (selectedText == turnText)
             {
                 endText->SetSelected(false);
+                endTurnArrow->SetSelected(false);
             }
         }
         if (newSelectedText != nullptr)
@@ -528,10 +540,12 @@ void MouseButtonUpPaused(Input *playerInput, SDL_MouseButtonEvent &event)
             if (newSelectedText == endText)
             {
                 turnText->SetSelected(false);
+                endTurnArrow->SetSelected(false);
             }
             else if (newSelectedText == turnText)
             {
                 endText->SetSelected(false);
+                endTurnArrow->SetSelected(false);
             }
         }
         newSelectedText = nullptr;

@@ -297,7 +297,7 @@ void loadGamePieces()
                     }
                     break;
                 }
-            } while (selectTerrain(x, y, false) != NULL || selectUI(x, y, false) != NULL);
+            } while (selectTerrain(x, y, false) != NULL || selectUI(x, y, false, false) != NULL);
 
             Piece *piece = new Piece(pieceName + " " + std::to_string(i), textures[pieceName][0], surfaces[pieceName], true);
             piece->SetScale(3);

@@ -109,7 +109,7 @@ void renderPieces()
 {
     for (int i = pieces.size() - 1; i >= 0; i--)
     {
-        if (pieces[i]->type != GameObject::ITEM)
+        if (pieces[i]->type != ITEM)
         {
             pieces[i]->RenderGameObject(renderer);
         }
