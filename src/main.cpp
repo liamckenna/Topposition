@@ -32,6 +32,8 @@ int main(int argc, char *args[])
         return 1;
     }
 
+    RenderLoadingScreen();
+
     LoadMenu();
 
     Input *playerInput = new Input();

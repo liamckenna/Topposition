@@ -176,14 +176,16 @@ class UIElement : public GameObject
     int rotation;
     bool selected = false;
     bool hovered = false;
+    gameState gameStateContext;
 
 public:
-    UIElement(string name, SDL_Texture *texture, SDL_Surface *surface, bool r, bool s, SDL_Renderer *renderer, Peak *ap = nullptr) : GameObject(name, texture, surface, false, r)
+    UIElement(string name, SDL_Texture *texture, SDL_Surface *surface, bool r, bool s, SDL_Renderer *renderer, gameState gsc, Peak *ap = nullptr) : GameObject(name, texture, surface, false, r)
     {
         type = UI_ELEMENT;
         associatedPeak = ap;
         resizable = false;
         selectable = s;
+        gameStateContext = gsc;
         topLayer = true;
         rotation = 0;
 
@@ -194,18 +196,22 @@ public:
 
         SDL_Surface *shadowSurface = SDL_DuplicateSurface(surface);
         shadowTexture = SDL_CreateTextureFromSurface(renderer, shadowSurface);
+        SDL_SetTextureScaleMode(shadowTexture, SDL_SCALEMODE_NEAREST);
         SDL_DestroySurface(shadowSurface);
 
         SDL_SetTextureColorMod(shadowTexture, 0, 0, 0);
         SDL_SetTextureAlphaMod(shadowTexture, shadowAlpha / 2);
         SDL_SetTextureBlendMode(shadowTexture, SDL_BLENDMODE_BLEND);
     }
-    Peak *GetAssociatedPeak() { return associatedPeak; }
+    
     void SetAssociatedPeak(Peak *ap) { associatedPeak = ap; }
     void SetRenderShadow(bool rs) { renderShadow = rs; }
     void SetRotation(int r) { rotation = r; }
     void SetSelected(bool s) { selected = s; }
     void SetHovered(bool h) { hovered = h; }
+    void SetGameStateContext(gameState gsc) { gameStateContext = gsc; }
+    gameState GetGameStateContext() { return gameStateContext; }
+    Peak *GetAssociatedPeak() { return associatedPeak; }
     bool GetHovered() { return hovered; }
     bool GetSelected() { return selected; }
     int GetRotation() { return rotation; }

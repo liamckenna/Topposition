@@ -32,8 +32,10 @@ void RenderScreen()
     switch (state)
     {   
         case MAIN_MENU:
-            renderMenuBackground();
-            renderPauseOverlay();
+            //renderMenuBackground();
+            renderOcean();
+            renderTerrain();
+            //renderPauseOverlay();
             renderUI();
             renderText();
             break;
@@ -46,7 +48,7 @@ void RenderScreen()
             renderSelectedObject();
             renderUI();
             renderText();
-            //renderInventory();
+            renderInventory();
             break;
         case PAUSED:
             renderOceanFrozen();
@@ -82,10 +84,14 @@ void renderUI()
     {
         if (uiElements[i]->GetAssociatedPeak() == nullptr && uiElements[i]->GetName() != "background")
         {
-            if (selectedObject == nullptr || uiElements[i] != selectedObject)
+            if ((selectedObject == nullptr || uiElements[i] != selectedObject))
             {
-                uiElements[i]->RenderGameObject(renderer);
+                if (uiElements[i]->GetGameStateContext() == state || (uiElements[i]->GetGameStateContext() == GAME && state == PAUSED))
+                {
+                    uiElements[i]->RenderGameObject(renderer);
+                }
             }
+
         }
     }
 }
@@ -276,4 +282,22 @@ void ReflectOceanTile(OceanTile *tile)
     float newY = 4000 - x;
 
     tile->SetGlobalPosition(newX, newY);
+}
+
+void RenderLoadingScreen()
+{
+    SDL_Color White = {255, 255, 255};
+
+    int textSize = 250 * (SCREEN_WIDTH / 3840.f);
+    Text *loadingText = new Text("loadingText", "fonts/yoster.ttf", White, 0, 0, textSize, renderer, "Loading...");
+    loadingText->SetCenter(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2);
+    loadingText->SetRenderShadow(false);
+    loadingText->SetGameStateContext(LOADING);
+    loadingText->SetRenderShadow(true);
+
+    SDL_SetRenderDrawColor(renderer, 2, 120, 150, 100);
+    SDL_RenderClear(renderer);
+    loadingText->RenderText(renderer);
+    SDL_RenderPresent(renderer);
+    free(loadingText);
 }

@@ -13,34 +13,33 @@ void loadMenuUI()
 {
     SDL_Color White = {255, 255, 255};
 
-    UIElement *logo = new UIElement("logo 1", textures["logo 1"][0], surfaces["logo 1"], true, false, renderer);
+    UIElement *logo = new UIElement("Logo", textures["Logo2"][0], surfaces["Logo2"], true, false, renderer, MAIN_MENU);
     uiElements.push_back(logo);
     gameObjects[0].push_back(logo);
-    logo->SetScale((float)SCREEN_HEIGHT / 1152);
-    logo->SetGlobalPosition(0, 0);
+    logo->SetScale(20 * (SCREEN_WIDTH / 3840.f));
+    logo->SetGlobalCenter(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 3);
+    logo->SetRenderShadow(true);
 
     int textSize = 250 * (SCREEN_WIDTH / 3840.f);
     Text *playButtonText = new Text("playButtonText", "fonts/yoster.ttf", White, 0, 0, textSize, renderer, "Play");
-    playButtonText->SetCenter(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 + SCREEN_HEIGHT / 8);
-    playButtonText->SetRenderShadow(false);
+    playButtonText->SetCenter(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 + SCREEN_HEIGHT / 6);
+    playButtonText->SetRenderShadow(true);
     playButtonText->SetSelectable(true);
     playButtonText->SetGameStateContext(MAIN_MENU);
     text.push_back(playButtonText);
-    playButtonText->SetRendered(true);
 
     textSize = 175 * (SCREEN_WIDTH / 3840.f);
     Text *quitButtonText = new Text("quitButtonText", "fonts/yoster.ttf", White, 0, 0, textSize, renderer, "Quit");
     quitButtonText->SetCenter(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 + SCREEN_HEIGHT / 8 + SCREEN_HEIGHT / 4);
-    quitButtonText->SetRenderShadow(false);
+    quitButtonText->SetRenderShadow(true);
     quitButtonText->SetSelectable(true);
     quitButtonText->SetGameStateContext(MAIN_MENU);
     text.push_back(quitButtonText);
-    playButtonText->SetRendered(true);
 };
 
 void loadMenuBackground()
 {
-    UIElement *background = new UIElement("background", textures["background"][0], surfaces["background"], true, false, renderer);
+    UIElement *background = new UIElement("background", textures["background"][0], surfaces["background"], true, false, renderer, MAIN_MENU);
     uiElements.push_back(background);
     gameObjects[0].push_back(background);
     background->SetScale((float)SCREEN_HEIGHT / 1152);
@@ -53,10 +52,10 @@ void updateUIElementPositions()
     std::cout << "Updating UI element positions" << std::endl;
     for (int i = 0; i < uiElements.size(); i++)
     {
-        if (uiElements[i]->GetName() == "logo 1")
+        if (uiElements[i]->GetName() == "Logo")
         {
-            uiElements[i]->SetScale((float)SCREEN_HEIGHT / 1152);
-            uiElements[i]->SetGlobalPosition(0, 0);
+            uiElements[i]->SetScale(20 * (SCREEN_WIDTH / 3840.f));
+            uiElements[i]->SetGlobalCenter(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 3);
         }
         else if (uiElements[i]->GetName() == "background")
         {
@@ -80,7 +79,6 @@ void updateUIElementPositions()
         }
         else if (uiElements[i]->GetName() == "dieTwo")
         {
-
             uiElements[i]->SetScale(0.15 * (SCREEN_WIDTH / 3840.f));
             uiElements[i]->SetGlobalCenter((SCREEN_WIDTH / 2) + (uiElements[i]->GetDimensions().first * uiElements[i]->GetScale() / 1.25f), SCREEN_HEIGHT - (uiElements[i]->GetDimensions().second * uiElements[i]->GetScale() / 2) - (SCREEN_HEIGHT / 40));
         }
@@ -126,7 +124,7 @@ void UpdateTextElementPositions()
                 if (text[i]->GetName() == "playButtonText")
                 {
                     text[i]->SetSize(250 * (SCREEN_WIDTH / 3840.f), renderer);
-                    text[i]->SetCenter(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 + SCREEN_HEIGHT / 8);
+                    text[i]->SetCenter(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 + SCREEN_HEIGHT / 6);
                 }
                 else if (text[i]->GetName() == "settings")
                 {
@@ -139,7 +137,6 @@ void UpdateTextElementPositions()
                     text[i]->SetCenter(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 + SCREEN_HEIGHT / 8 + SCREEN_HEIGHT / 4);
                 }
             }
-            break;
         case GAME:
         case PAUSED:
         {

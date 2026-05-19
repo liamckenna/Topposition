@@ -1,15 +1,25 @@
 #include "GameInitialization.h"
+#include "Rendering.h"
+#include "MouseLogic.h"
 
 void ResetMap()
 {
+    gameState prevState = state;
+    state = LOADING;
+    RenderLoadingScreen();
     ClearObjects();
     ResetGlobalVars();
-    if (state == GAME || state == PAUSED)
+    loadGame();
+    if (prevState == PAUSED)
     {
-        state = LOADING;
-        loadGame();
         state = GAME;
     }
+    else
+    {
+        state = prevState;
+    }
+    SetCameraAtCenter();
+    ZoomOutCamera();
 }
 
 void loadGame()
@@ -55,7 +65,6 @@ void loadGame()
     std::cout << "Total Load Time: " << (gameStartTime - mapStartTime) / 1000.f << " seconds!" << std::endl;
 
     std::cout << "World Resolution: " << worldResolution.first << ", " << worldResolution.second << std::endl;
-    SetCameraAtCenter();
 }
 
 void SetCameraAtCenter()
@@ -272,14 +281,14 @@ void loadText()
     peaksLeftText = new Text("peaksLeftText", "fonts/yoster.ttf", White, x, y, textSize, renderer, peaksLeftString.c_str());
     text.push_back(peaksLeftText);
 
-    currentPlayerCircle = new UIElement("currentPlayerCircle", textures["player circle"][0], surfaces["player circle"], true, false, renderer);
+    currentPlayerCircle = new UIElement("currentPlayerCircle", textures["player circle"][0], surfaces["player circle"], true, false, renderer, GAME);
     currentPlayerCircle->SetScale(1.f * (SCREEN_WIDTH / 3840.f));
     uiElements.push_back(currentPlayerCircle);
     gameObjects[gameObjects.size() - 1].push_back(currentPlayerCircle);
     currentPlayerCircle->SetGlobalCenter((SCREEN_WIDTH / 2) - (SCREEN_WIDTH / 7.50f), SCREEN_HEIGHT - (currentPlayerCircle->GetDimensions().second * currentPlayerCircle->GetScale() / 2) - (SCREEN_HEIGHT / 40));
     currentPlayerCircle->SetRenderShadow(true);
 
-    opposingPlayerCircle = new UIElement("opposingPlayerCircle", textures["opposing player circle"][0], surfaces["opposing player circle"], true, false, renderer);
+    opposingPlayerCircle = new UIElement("opposingPlayerCircle", textures["opposing player circle"][0], surfaces["opposing player circle"], true, false, renderer, GAME);
     opposingPlayerCircle->SetScale(1.f * (SCREEN_WIDTH / 3840.f));
     uiElements.push_back(opposingPlayerCircle);
     gameObjects[gameObjects.size() - 1].push_back(opposingPlayerCircle);
@@ -356,7 +365,7 @@ void loadText()
     endText->SetSelectable(true);
     text.push_back(endText);
 
-    endTurnArrow = new UIElement("endTurnArrow", textures["end turn arrow"][0], surfaces["end turn arrow"], true, true, renderer);
+    endTurnArrow = new UIElement("endTurnArrow", textures["end turn arrow"][0], surfaces["end turn arrow"], true, true, renderer, GAME);
     uiElements.push_back(endTurnArrow);
     endTurnArrow->SetScale(0.8f * (SCREEN_WIDTH / 3840.f));
     gameObjects[gameObjects.size() - 1].push_back(endTurnArrow);
@@ -388,7 +397,7 @@ void loadText()
 
 void loadUI()
 {
-    die1 = new UIElement("dieOne", textures["die 1"][0], surfaces["die 1"], true, true, renderer);
+    die1 = new UIElement("dieOne", textures["die 1"][0], surfaces["die 1"], true, true, renderer, GAME);
     die1->SetScale(0.15 * (SCREEN_WIDTH / 3840.f));
     uiElements.push_back(die1);
     gameObjects[gameObjects.size() - 1].push_back(die1);
@@ -396,14 +405,14 @@ void loadUI()
     die1->SetRenderShadow(true);
 
 
-    die2 = new UIElement("dieTwo", textures["die 2"][0], surfaces["die 2"], true, true, renderer);
+    die2 = new UIElement("dieTwo", textures["die 2"][0], surfaces["die 2"], true, true, renderer, GAME);
     die2->SetScale(0.15 * (SCREEN_WIDTH / 3840.f));
     uiElements.push_back(die2);
     gameObjects[gameObjects.size() - 1].push_back(die2);
     die2->SetGlobalCenter((SCREEN_WIDTH / 2) + (die2->GetDimensions().first * die2->GetScale() / 1.25f), SCREEN_HEIGHT - (die2->GetDimensions().second * die2->GetScale() / 2) - (SCREEN_HEIGHT / 40));
     die2->SetRenderShadow(true);
 
-    crown = new UIElement("crown", textures["crown"][0], surfaces["crown"], true, false, renderer);
+    crown = new UIElement("crown", textures["crown"][0], surfaces["crown"], true, false, renderer, GAME);
     uiElements.push_back(crown);
     gameObjects[gameObjects.size() - 1].push_back(crown);
     crown->SetScale(8 * (SCREEN_WIDTH / 3840.f));
@@ -414,7 +423,7 @@ void loadUI()
 
     for (int i = 0; i < peaks.size(); i++)
     {
-        UIElement *claimPeakButton = new UIElement("claim peak button", textures["claim peak"][0], surfaces["claim peak"], false, true, renderer, peaks[i]);
+        UIElement *claimPeakButton = new UIElement("claim peak button", textures["claim peak"][0], surfaces["claim peak"], false, true, renderer, GAME, peaks[i]);
         claimPeakButton->SetScale(0.1);
         claimPeakButton->SetCenter(peaks[i]->GetCenter().first + 50, peaks[i]->GetCenter().second - 50);
         claimPeakButton->SetResizable(true);
@@ -630,4 +639,5 @@ void ResetGlobalVars()
     die2 = nullptr;
     currentTurn = nullptr;
     firstPlace = nullptr;
+    //loadingText = nullptr;
 }

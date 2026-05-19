@@ -182,7 +182,7 @@ void GameFinished(Player *winner)
         winnerColor = "winnerYellow";
     }
 
-    UIElement *winnerMessage = new UIElement("winner message", textures[winnerColor][0], surfaces[winnerColor], true, false, renderer);
+    UIElement *winnerMessage = new UIElement("winner message", textures[winnerColor][0], surfaces[winnerColor], true, false, renderer, GAME);
     winnerMessage->SetCenter(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2);
     uiElements.push_back(winnerMessage);
     gameObjects[gameObjects.size() - 1].push_back(winnerMessage);

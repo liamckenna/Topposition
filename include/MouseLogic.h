@@ -5,7 +5,7 @@
 #include "GameInitialization.h"
 #include "PlayerMovement.h"
 
-void zoom(SDL_MouseWheelEvent &event, Input *playerInput);
+bool zoom(int direction, std::pair<float, float> mousePos);
 
 void scroll(Input *playerInput);
 
@@ -26,3 +26,5 @@ void moveSelectedObject(GameObject *gameObject, Input *playerInput);
 void ClampCameraBoundaries();
 
 void updateHoverState(int x, int y);
+
+void ZoomOutCamera();

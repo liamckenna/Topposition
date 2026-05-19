@@ -32,3 +32,5 @@ void CheckOceanTilePositioning();
 void ReflectOceanTile(OceanTile *tile);
 
 void renderPauseOverlay();
+
+void RenderLoadingScreen();

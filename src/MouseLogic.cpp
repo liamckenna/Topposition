@@ -1,19 +1,19 @@
 #include "MouseLogic.h"
 #include <cmath>
 
-void zoom(SDL_MouseWheelEvent &event, Input *playerInput)
+bool zoom(int direction, std::pair<float, float> mousePos)
 {
+
     float prevCameraZoom = cameraZoom;
     std::pair<float, float> relativePositionB4;
     std::pair<float, float> newRelativePosition;
-    SDL_GetMouseState(&playerInput->currentMousePosition.first, &playerInput->currentMousePosition.second);
-    float mouseX = playerInput->currentMousePosition.first;
-    float mouseY = playerInput->currentMousePosition.second;
+    float mouseX = mousePos.first;
+    float mouseY = mousePos.second;
     if (worldResolution.first > 9599.95f && worldResolution.first < 9600.05f)
     {
-        if (event.y < 0)
+        if (direction < 0)
         {
-            return;
+            return false;
         }
         else
         {
@@ -26,9 +26,9 @@ void zoom(SDL_MouseWheelEvent &event, Input *playerInput)
     }
     else if (worldResolution.first > 1919.95f && worldResolution.first < 1920.05f)
     {
-        if (event.y > 0)
+        if (direction > 0)
         {
-            return;
+            return false;
         }
         else
         {
@@ -41,7 +41,7 @@ void zoom(SDL_MouseWheelEvent &event, Input *playerInput)
     }
     else
     {
-        cameraZoom += (event.y / abs(event.y) * .1);
+        cameraZoom += (direction * 0.1);
         if (cameraZoom <= 0.f)
         {
             cameraZoom = SCREEN_WIDTH / 9600.f;
@@ -66,6 +66,8 @@ void zoom(SDL_MouseWheelEvent &event, Input *playerInput)
     //std::cout << "World Resolution: " << worldResolution.first << ", " << worldResolution.second << std::endl;
 
     ClampCameraBoundaries();
+
+    return true;
 }
 
 void scroll(Input *playerInput)
@@ -389,6 +391,20 @@ void moveSelectedObject(GameObject *gameObject, Input *playerInput)
         {
             hoveringTerrain = terrain_under;
             validMove = CheckMovementPossibility(dynamic_cast<Piece *>(gameObject), hoveringTerrain);
+        }
+    }
+}
+
+void ZoomOutCamera()
+{
+    int i = 0;
+    while(zoom(-1, {SCREEN_WIDTH / 2.f, SCREEN_HEIGHT / 2.f}))
+    {
+        i++;
+        if (i > 100) 
+        {
+            std::cout << "Zoom out failed to converge after 100 iterations." << std::endl;
+            break;
         }
     }
 }

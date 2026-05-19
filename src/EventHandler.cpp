@@ -55,12 +55,11 @@ void EventWindowResized(Input *playerInput, SDL_WindowEvent &event)
 
     switch (state)
     {
-    case MAIN_MENU:
-        break;
     case SETTINGS:
         break;
     case LOADING:
         break;
+    case MAIN_MENU:
     case GAME:
         if (SCREEN_WIDTH / cameraZoom > 9600.f)
         {
@@ -141,7 +140,10 @@ void EventMouseWheel(Input *playerInput, SDL_MouseWheelEvent &event)
         {
             if (selectedObject == nullptr)
             {
-                zoom(event, playerInput);
+                int direction = event.y > 0 ? 1 : -1;
+                SDL_GetMouseState(&playerInput->currentMousePosition.first, &playerInput->currentMousePosition.second);
+                std::pair<float, float> mousePos = playerInput->currentMousePosition;
+                zoom(direction, mousePos);
             }
         }
         break;
@@ -336,7 +338,7 @@ void MouseButtonUpMainMenu(Input *playerInput, SDL_MouseButtonEvent &event)
             {
                 std::cout << "hit play button" << std::endl;
                 state = GAME;
-                ResetMap();
+                //ResetMap();
             }
             else if (selectedText->GetName() == "settings")
             {
@@ -418,11 +420,7 @@ void MouseButtonUpGame(Input *playerInput, SDL_MouseButtonEvent &event)
         }
         else if (selectedObject != nullptr)
         {
-            if (selectedObject->GetName() == "reset button")
-            {
-                ResetMap();
-            }
-            else if ((selectedObject->GetName() == "dieOne" ||
+            if ((selectedObject->GetName() == "dieOne" ||
                       selectedObject->GetName() == "dieTwo") &&
                      movesLeft < 1)
             {
