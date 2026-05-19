@@ -294,7 +294,7 @@ void RenderLoadingScreen()
     loadingText->SetRenderShadow(false);
     loadingText->SetGameStateContext(LOADING);
     loadingText->SetRenderShadow(true);
-
+    loadingText->SetShadowOffset(30, 30);
     SDL_SetRenderDrawColor(renderer, 2, 120, 150, 100);
     SDL_RenderClear(renderer);
     loadingText->RenderText(renderer);

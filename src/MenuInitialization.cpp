@@ -19,6 +19,7 @@ void loadMenuUI()
     logo->SetScale(20 * (SCREEN_WIDTH / 3840.f));
     logo->SetGlobalCenter(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 3);
     logo->SetRenderShadow(true);
+    logo->SetShadowOffset(30, 30);
 
     int textSize = 250 * (SCREEN_WIDTH / 3840.f);
     Text *playButtonText = new Text("playButtonText", "fonts/yoster.ttf", White, 0, 0, textSize, renderer, "Play");
@@ -26,7 +27,9 @@ void loadMenuUI()
     playButtonText->SetRenderShadow(true);
     playButtonText->SetSelectable(true);
     playButtonText->SetGameStateContext(MAIN_MENU);
+    playButtonText->SetShadowOffset(30, 30);
     text.push_back(playButtonText);
+    
 
     textSize = 175 * (SCREEN_WIDTH / 3840.f);
     Text *quitButtonText = new Text("quitButtonText", "fonts/yoster.ttf", White, 0, 0, textSize, renderer, "Quit");
@@ -34,6 +37,7 @@ void loadMenuUI()
     quitButtonText->SetRenderShadow(true);
     quitButtonText->SetSelectable(true);
     quitButtonText->SetGameStateContext(MAIN_MENU);
+    quitButtonText->SetShadowOffset(30, 30);
     text.push_back(quitButtonText);
 };
 

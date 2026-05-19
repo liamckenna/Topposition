@@ -188,15 +188,15 @@ public:
         gameStateContext = gsc;
         topLayer = true;
         rotation = 0;
+        shadowOffsetX = 10;
+        shadowOffsetY = 10;
+        shadowAlpha = 150;
         RefreshShadow(renderer);
     }
 
     void RefreshShadow(SDL_Renderer *renderer) {
-        shadowOffsetX = 10;
-        shadowOffsetY = 10;
-        shadowAlpha = 150;
+        
         shadowRect = new SDL_FRect();
-
         SDL_Surface *shadowSurface = SDL_DuplicateSurface(surface);
         shadowTexture = SDL_CreateTextureFromSurface(renderer, shadowSurface);
         SDL_SetTextureScaleMode(shadowTexture, SDL_SCALEMODE_NEAREST);
@@ -213,6 +213,7 @@ public:
     void SetSelected(bool s) { selected = s; }
     void SetHovered(bool h) { hovered = h; }
     void SetGameStateContext(gameState gsc) { gameStateContext = gsc; }
+    void SetShadowOffset(int x, int y) { shadowOffsetX = x; shadowOffsetY = y; }
     gameState GetGameStateContext() { return gameStateContext; }
     Peak *GetAssociatedPeak() { return associatedPeak; }
     bool GetHovered() { return hovered; }
@@ -433,6 +434,9 @@ public:
         font = TTF_OpenFont(fontPath, size);
         SetTextContent(text, renderer);
     }
+    void SetHovered(bool h) { hovered = h; }
+    void SetSelected(bool s) { selected = s; }
+    void SetShadowOffset(int x, int y) { shadowOffsetX = x; shadowOffsetY = y; }
     int GetSize() { return size; }
     int GetWidth() { return dimensions.first; }
     int GetHeight() { return dimensions.second; }
@@ -440,8 +444,6 @@ public:
     bool GetRendered() { return rendered; }
     bool GetHovered() { return hovered; }
     bool GetSelected() { return selected; }
-    void SetHovered(bool h) { hovered = h; }
-    void SetSelected(bool s) { selected = s; }
     std::pair<int, int> GetPosition() { return position; }
     std::pair<int, int> GetDimensions() { return dimensions; }
     string GetName() { return name; }

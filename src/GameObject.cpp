@@ -73,8 +73,8 @@ void GameObject::RenderGameObject(SDL_Renderer *renderer)
                 if (uiElement->GetRenderShadow())
                 {
                     SDL_FRect *shadowRect = uiElement->GetShadowRect();
-                    shadowRect->x = position.first + (uiElement->GetShadowOffsetX() * SCREEN_WIDTH / 3840.f);
-                    shadowRect->y = position.second + (uiElement->GetShadowOffsetY() * SCREEN_HEIGHT / 2160.f);
+                    shadowRect->x = globalPosition.first + (uiElement->GetShadowOffsetX() * SCREEN_WIDTH / 3840.f);
+                    shadowRect->y = globalPosition.second + (uiElement->GetShadowOffsetY() * SCREEN_HEIGHT / 2160.f);
                     shadowRect->w = dimensions.first * scale;
                     shadowRect->h = dimensions.second * scale;
                     if (uiElement->GetName() == "crown")

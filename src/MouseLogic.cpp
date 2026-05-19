@@ -3,7 +3,10 @@
 
 bool zoom(int direction, std::pair<float, float> mousePos)
 {
-
+    if (IsBattleSequenceActive())
+    {
+        return false;
+    }
     float prevCameraZoom = cameraZoom;
     std::pair<float, float> relativePositionB4;
     std::pair<float, float> newRelativePosition;
