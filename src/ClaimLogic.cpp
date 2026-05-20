@@ -200,7 +200,7 @@ void RefreshClaimNotifs()
     {
         for (int j = 0; j < peaks[i]->occupants.size(); j++)
         {
-            if (peaks[i]->occupants[j]->GetPlayer() == currentTurn && peaks[i]->GetClaimedBy() != currentTurn)
+            if (peaks[i]->occupants[j]->GetPlayer() == currentTurn && peaks[i]->GetClaimedBy() != currentTurn && !peaks[i]->occupants[j]->IsHeld())
             {
                 peaks[i]->occupants[j]->UpdateRelativePositions();
                 peaks[i]->GetClaimNotif()->SetGlobalPosition((peaks[i]->occupants[j]->GetCenter().first / cameraZoom) + cameraPosition.first,

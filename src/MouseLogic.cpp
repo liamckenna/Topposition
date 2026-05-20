@@ -179,19 +179,16 @@ UIElement *selectUI(int x, int y, bool update, bool selecting)
                 {
                     continue;
                 }
-                if (uiElements[i]->GetRendered())
+                if (selecting)
                 {
-                    if (selecting)
+                    uiElements[i]->SetSelected(true);
+                    if (uiElements[i] == endTurnArrow)
                     {
-                        uiElements[i]->SetSelected(true);
-                        if (uiElements[i] == endTurnArrow)
-                        {   
-                            endText->SetSelected(true);
-                            turnText->SetSelected(true);
-                        }
+                        endText->SetSelected(true);
+                        turnText->SetSelected(true);
                     }
-                    return uiElements[i];
                 }
+                return uiElements[i];
             }
         }
     }

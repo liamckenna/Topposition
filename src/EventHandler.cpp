@@ -223,18 +223,23 @@ void MouseMovement(Input *playerInput)
         }
         if ((playerInput->GetMouseButtonDown("Middle") || playerInput->GetMouseButtonDown("Right")) && !playerInput->GetMouseButtonDown("Left"))
         {
-            if (selectedObject == nullptr)
+            if (selectedObject == nullptr && selectedText == nullptr)
             {
                 scroll(playerInput);
             }
         }
-        if (playerInput->GetMouseButtonDown("Left"))
+        else if (playerInput->GetMouseButtonDown("Left"))
         {
             if (selectedObject != nullptr)
             {
                 moveSelectedObject(selectedObject, playerInput);
             }
+            else if (selectedText == nullptr)
+            {
+                scroll(playerInput);
+            }
         }
+
         break;
     case PAUSED:
         break;
@@ -295,10 +300,12 @@ void MouseButtonDownGame(Input *playerInput, SDL_MouseButtonEvent &event)
 
                         piece->SetDesignatedLocation(piece->GetBottomMiddle().first, piece->GetBottomMiddle().second);
                         piece->SetScale(piece->GetScale() * 2);
+                        piece->SetHeld(true);
                         piece->SetBottomMiddle(piece->GetDesignatedLocation().first, piece->GetDesignatedLocation().second);
                         startingTerrain = selectTerrain(piece->GetDesignatedLocation().first, piece->GetDesignatedLocation().second);
                         if (piece->GetCurrentAnimation() != NULL)
                             piece->GetCurrentAnimation()->Pause();
+                        RefreshClaimNotifs();
                     }
                 }
             }
@@ -425,20 +432,27 @@ void MouseButtonUpGame(Input *playerInput, SDL_MouseButtonEvent &event)
         }
         else if (selectedObject != nullptr)
         {
-            if ((selectedObject->GetName() == "dieOne" ||
-                      selectedObject->GetName() == "dieTwo") &&
-                     movesLeft < 1)
+            GameObject *newSelectedObject = selectUI(playerInput->currentMousePosition.first, playerInput->currentMousePosition.second, false);
+            if (selectedObject == newSelectedObject)
             {
-                currentRoll = Roll();
-                movesLeft = currentRoll;
-            }
-            else if (selectedObject->GetName() == "finish turn button" || selectedObject->GetName() == "endTurnArrow")
-            {
-                FinishTurn();
-            }
-            else if (selectedObject->GetName() == "claim peak button")
-            {
-                ClaimPeak(dynamic_cast<UIElement *>(selectedObject));
+                if ((selectedObject->GetName() == "dieOne" ||
+                     selectedObject->GetName() == "dieTwo") &&
+                    movesLeft < 1)
+                {
+                    currentRoll = Roll();
+                    movesLeft = currentRoll;
+                }
+                else if (selectedObject->GetName() == "endTurnArrow")
+                {
+                    FinishTurn();
+                }
+                else if (selectedObject->GetName() == "claim peak button")
+                {
+                    ClaimPeak(dynamic_cast<UIElement *>(selectedObject));
+                }
+                else if (selectedObject->type == ITEM)
+                {
+                }
             }
             else if (selectedObject->type == PIECE)
             {
@@ -446,19 +460,19 @@ void MouseButtonUpGame(Input *playerInput, SDL_MouseButtonEvent &event)
                 pair<float, float> bottom_middle = piece->GetBottomMiddle();
                 piece->SetScale(piece->GetScale() / 2.f);
                 piece->SetBottomMiddle(bottom_middle.first, bottom_middle.second);
+                piece->SetHeld(false);
                 // Terrain *startingTerrain = selectTerrain(piece->GetDesignatedLocation().first, piece->GetDesignatedLocation().second);
                 Terrain *targetTerrain = selectTerrain(piece->GetBottomMiddle().first, piece->GetBottomMiddle().second);
                 if (piece->GetCurrentAnimation() != NULL)
                     piece->GetCurrentAnimation()->Unpause();
                 bool successful_move = Move(piece, startingTerrain, targetTerrain, movesLeft);
+                RefreshClaimNotifs();
                 startingTerrain = nullptr;
                 hoveringTerrain = nullptr;
                 seaHover = false;
                 validMove = true;
             }
-            else if (selectedObject->type == ITEM)
-            {
-            }
+            newSelectedObject = nullptr;
         }
         if (selectedText != nullptr)
         {

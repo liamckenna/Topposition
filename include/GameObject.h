@@ -261,6 +261,7 @@ private:
     Terrain *occupyingTerrain;
     Player *player;
     bool dead = false;
+    bool held = false;
 
 public:
     Piece(string name, SDL_Texture *texture, SDL_Surface *surface, bool r) : GameObject(name, texture, surface, true, r)
@@ -277,11 +278,13 @@ public:
     void SetPlayer(Player *p) { player = p; }
     void SetOccupyingTerrain(Terrain *ot) { occupyingTerrain = ot; }
     void SetDead(bool d) { dead = d; }
+    void SetHeld(bool h) { held = h; }
     pair<int, int> GetDesignatedLocation() { return designatedLocation; }
     int GetAltitude() { return altitude; }
     Player *GetPlayer() { return player; }
     Terrain *GetOccupyingTerrain() { return occupyingTerrain; }
     bool IsDead() { return dead; }
+    bool IsHeld() { return held; }
 };
 
 class Item : public Piece
