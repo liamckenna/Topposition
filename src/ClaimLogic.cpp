@@ -228,12 +228,16 @@ void ClaimPeak(UIElement *peakNotif)
     Peak *peak = peakNotif->GetAssociatedPeak();
     if (!IsOccupyingPeak(peak, currentTurn))
     {
+        if (rules->GetClaimEndsTurn())
+            FinishTurn();
         return;
     }
 
     if (LastPlayerStanding(peak, currentTurn))
     {
         FinalizePeakClaim(peak);
+        if (rules->GetClaimEndsTurn())
+            FinishTurn();
         return;
     }
 
@@ -431,6 +435,8 @@ void UpdateBattleSequence()
         }
         EndBattleSequence();
         RefreshClaimNotifs();
+        if (rules->GetClaimEndsTurn())
+            FinishTurn();
         break;
     default:
         break;
