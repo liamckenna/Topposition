@@ -122,6 +122,7 @@ namespace
                 RefreshBattleParticipants();
                 opposingPlayerCircle->SetRendered(true);
                 SDL_SetTextureColorMod(opposingPlayerCircle->GetTexture(), battleSequence.defender->GetSDLColor().r / 1.5f, battleSequence.defender->GetSDLColor().g / 1.5f, battleSequence.defender->GetSDLColor().b / 1.5f);
+                battleSequence.defender->GetCircleText()->SetTextContent(std::to_string(battleSequence.defenders.size()).c_str(), renderer);
                 battleSequence.defender->GetCircleText()->SetCenter(opposingPlayerCircle->GetCenter().first, opposingPlayerCircle->GetCenter().second);
                 battleSequence.defender->GetCircleText()->SetRendered(true);
                 endTurnArrow->SetRendered(false);
@@ -129,6 +130,9 @@ namespace
                 turnText->SetRendered(false);
                 battleSequence.peak->GetClaimNotif()->SetRendered(false);
                 crown->SetRendered(false);
+                battleSequence.attacker->GetCircleText()->SetTextContent(std::to_string(battleSequence.attackers.size()).c_str(), renderer);
+                battleSequence.attacker->GetCircleText()->SetCenter(currentPlayerCircle->GetCenter().first, currentPlayerCircle->GetCenter().second);
+
                 return true;
             }
         }
@@ -137,6 +141,10 @@ namespace
 
     void EndBattleSequence()
     {
+        battleSequence.attacker->GetCircleText()->SetTextContent(battleSequence.attacker->GetCircleTextString().c_str(), renderer);
+        battleSequence.defender->GetCircleText()->SetTextContent(battleSequence.defender->GetCircleTextString().c_str(), renderer);
+        battleSequence.attacker->GetCircleText()->SetCenter(currentPlayerCircle->GetCenter().first, currentPlayerCircle->GetCenter().second);
+        battleSequence.defender->GetCircleText()->SetCenter(opposingPlayerCircle->GetCenter().first, opposingPlayerCircle->GetCenter().second);
         battleSequence.defender->GetCircleText()->SetRendered(false);
         battleSequence.defender->GetCircleText()->SetCenter(currentPlayerCircle->GetCenter().first, currentPlayerCircle->GetCenter().second);
         opposingPlayerCircle->SetRendered(false);
@@ -306,6 +314,8 @@ void UpdateBattleSequence()
                 battleSequence.roundDefender->SetDead(true);
             }
             battleSequence.defenders.pop_back();
+            battleSequence.defender->GetCircleText()->SetTextContent(std::to_string(battleSequence.defenders.size()).c_str(), renderer);
+            battleSequence.defender->GetCircleText()->SetCenter(opposingPlayerCircle->GetCenter().first, opposingPlayerCircle->GetCenter().second);
         }
         else
         {
@@ -322,6 +332,8 @@ void UpdateBattleSequence()
                 battleSequence.roundAttacker->SetDead(true);
             }
             battleSequence.attackers.pop_back();
+            battleSequence.attacker->GetCircleText()->SetTextContent(std::to_string(battleSequence.attackers.size()).c_str(), renderer);
+            battleSequence.attacker->GetCircleText()->SetCenter(currentPlayerCircle->GetCenter().first, currentPlayerCircle->GetCenter().second);
         }
 
         battleSequence.roundAttacker = nullptr;

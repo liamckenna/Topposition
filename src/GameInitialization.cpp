@@ -112,6 +112,7 @@ void loadGamePieces()
         SDL_Color sdlColor;
         bool selectable;
         Player *player = new Player();
+
         players.push_back(player);
         switch (j)
         {
@@ -143,6 +144,7 @@ void loadGamePieces()
         player->SetName(playerNumber);
         player->SetColor(color);
         player->SetSDLColor(sdlColor);
+        player->SetCircleTextString("P" + std::to_string(j + 1));
         string flagName = playerNumber + " flag";
         for (int i = 0; i < peaks.size(); i++)
         {

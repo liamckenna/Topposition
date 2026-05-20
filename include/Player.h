@@ -12,6 +12,7 @@ class Text;
 class Player {
     int score = 0;
     std::string name = "";
+    std::string circleTextString = "";
     Text *turnText = nullptr;
     Text *scoreText = nullptr;
     Text *circleText = nullptr;
@@ -42,5 +43,7 @@ public:
     void SetCircleText(Text* ct) {circleText = ct;}
     SDL_Color GetSDLColor() {return sdlColor;}
     void SetSDLColor(SDL_Color c) {sdlColor = c;}
+    std::string GetCircleTextString() {return circleTextString;}
+    void SetCircleTextString(std::string cts) {circleTextString = cts;}
 
 };
