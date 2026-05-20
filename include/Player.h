@@ -6,6 +6,7 @@
 class Peak;
 class Piece;
 class Item;
+class UIElement;
 class Text;
 
 
@@ -24,6 +25,8 @@ public:
     std::vector<Peak*> peaks;
     std::vector<Piece*> soldiers;
     std::vector<Item*> inventory;
+    std::vector<UIElement*> soldierHeads;
+    std::vector<UIElement*> soldierHeadCrosses;
     Player();
     std::string GetName() {return name;}
     void SetName(std::string n) {name = n;}
@@ -45,5 +48,6 @@ public:
     void SetSDLColor(SDL_Color c) {sdlColor = c;}
     std::string GetCircleTextString() {return circleTextString;}
     void SetCircleTextString(std::string cts) {circleTextString = cts;}
+    int GetSoldierIndex(Piece* soldier);
 
 };

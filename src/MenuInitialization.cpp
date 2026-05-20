@@ -96,7 +96,7 @@ void updateUIElementPositions()
             endText->SetPosition((SCREEN_WIDTH / 2) + (SCREEN_WIDTH / 8) + ((turnText->GetWidth() - endText->GetWidth()) / 2), SCREEN_HEIGHT - turnText->GetHeight() - endText->GetHeight() - (SCREEN_HEIGHT / 40));
             endText->SetCenter((SCREEN_WIDTH / 2) + (SCREEN_WIDTH / 7.50f), endText->GetCenter().second);
             uiElements[i]->SetScale(0.8f * (SCREEN_WIDTH / 3840.f));
-            uiElements[i]->SetGlobalCenter((SCREEN_WIDTH / 2) + (SCREEN_WIDTH / 7.50f), endText->GetPosition().second - (SCREEN_HEIGHT / 200) - (uiElements[i]->GetDimensions().second * uiElements[i]->GetScale() / 2));
+            uiElements[i]->SetGlobalCenter((SCREEN_WIDTH / 2) + (SCREEN_WIDTH / 7.50f), endText->GetPosition().second - (SCREEN_HEIGHT / 200) - (uiElements[i]->GetDimensions().second * uiElements[i]->GetScale() / 3));
         }
     }
     if (crown)
@@ -235,6 +235,13 @@ void UpdateTextElementPositions()
                 players[i]->GetFirstText()->SetPosition(x, y - (players[i]->GetFirstText()->GetHeight() / 4));
                 std::cout << "Updating GetTieText for Player " << i + 1 << std::endl;
                 players[i]->GetTieText()->SetPosition(x, y - (players[i]->GetTieText()->GetHeight() / 4));
+                for (int j = 0; j < players[i]->soldiers.size(); j++)
+                {
+                    players[i]->soldierHeads[j]->SetScale(2.f * (SCREEN_WIDTH / 3840.f));
+                    players[i]->soldierHeadCrosses[j]->SetScale(2.f * (SCREEN_WIDTH / 3840.f));
+                    players[i]->soldierHeads[j]->SetPosition(peaksLeftText->GetPosition().first + (j * (players[i]->soldierHeads[j]->GetDimensions().first * players[i]->soldierHeads[j]->GetScale() + SCREEN_WIDTH / 600)) - SCREEN_WIDTH / 350, peaksLeftText->GetPosition().second + peaksLeftText->GetHeight() + SCREEN_HEIGHT / 100);
+                    players[i]->soldierHeadCrosses[j]->SetPosition(peaksLeftText->GetPosition().first + (j * (players[i]->soldierHeadCrosses[j]->GetDimensions().first * players[i]->soldierHeadCrosses[j]->GetScale() + SCREEN_WIDTH / 600)) - SCREEN_WIDTH / 350, peaksLeftText->GetPosition().second + peaksLeftText->GetHeight() + SCREEN_HEIGHT / 100);
+                }
             }
             RefreshShadows();
             break;

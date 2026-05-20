@@ -371,7 +371,7 @@ void loadText()
     uiElements.push_back(endTurnArrow);
     endTurnArrow->SetScale(0.8f * (SCREEN_WIDTH / 3840.f));
     gameObjects[gameObjects.size() - 1].push_back(endTurnArrow);
-    endTurnArrow->SetGlobalCenter((SCREEN_WIDTH / 2) + (SCREEN_WIDTH / 7.50f), endText->GetPosition().second - (SCREEN_HEIGHT / 200) - (endTurnArrow->GetDimensions().second * endTurnArrow->GetScale() / 2));
+    endTurnArrow->SetGlobalCenter((SCREEN_WIDTH / 2) + (SCREEN_WIDTH / 7.50f), endText->GetPosition().second - (SCREEN_HEIGHT / 200) - (endTurnArrow->GetDimensions().second * endTurnArrow->GetScale() / 3));
     endTurnArrow->SetRenderShadow(true);
 
     textSize = 200 * (SCREEN_WIDTH / 3840.f);
@@ -436,7 +436,29 @@ void loadUI()
     }
     currentRoll = Roll();
     movesLeft = currentRoll;
+    
+    for (int i = 0; i < players.size(); i++)
+    {
+        for(int j = 0; j < players[i]->soldiers.size(); j++)
+        {
+            UIElement *soldierHead = new UIElement(players[i]->GetName() + " soldier " + std::to_string(j) + " head", textures[players[i]->GetName() + " soldier head"][0], surfaces[players[i]->GetName() + " soldier head"], true, false, renderer, GAME);
+            UIElement *soldierHeadCross = new UIElement(players[i]->GetName() + " soldier " + std::to_string(j) + " head cross", textures["soldier head cross"][0], surfaces["soldier head cross"], true, false, renderer, GAME);
 
+            soldierHead->SetScale(2.f * (SCREEN_WIDTH / 3840.f));
+            soldierHeadCross->SetScale(2.f * (SCREEN_WIDTH / 3840.f));
+            soldierHead->SetPosition(peaksLeftText->GetPosition().first + (j * (soldierHead->GetDimensions().first * soldierHead->GetScale() + SCREEN_WIDTH / 600)) - SCREEN_WIDTH / 350, peaksLeftText->GetPosition().second + peaksLeftText->GetHeight() + SCREEN_HEIGHT / 100);
+            soldierHeadCross->SetPosition(peaksLeftText->GetPosition().first + (j * (soldierHeadCross->GetDimensions().first * soldierHeadCross->GetScale() + SCREEN_WIDTH / 600)) - SCREEN_WIDTH / 350, peaksLeftText->GetPosition().second + peaksLeftText->GetHeight() + SCREEN_HEIGHT / 100);
+            if (i > 0)
+            {
+                soldierHead->SetRendered(false);
+            } 
+            soldierHeadCross->SetRendered(false);
+            players[i]->soldierHeads.push_back(soldierHead);
+            players[i]->soldierHeadCrosses.push_back(soldierHeadCross);
+            uiElements.push_back(soldierHead);
+            uiElements.push_back(soldierHeadCross);
+        }
+    }
     RefreshShadows();
 }
 

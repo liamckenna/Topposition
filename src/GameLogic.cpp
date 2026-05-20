@@ -43,6 +43,8 @@ void RotateTurn()
     for (int i = 0; i < currentTurn->soldiers.size(); i++)
     {
         currentTurn->soldiers[i]->SetSelectable(false);
+        currentTurn->soldierHeads[currentTurn->GetSoldierIndex(currentTurn->soldiers[i])]->SetRendered(false);
+        currentTurn->soldierHeadCrosses[currentTurn->GetSoldierIndex(currentTurn->soldiers[i])]->SetRendered(false);
     }
 
     do
@@ -63,12 +65,20 @@ void RotateTurn()
             }
         }
     } while (SoldierCount(currentTurn) <= 0);
-    
-    
 
     for (int i = 0; i < currentTurn->soldiers.size(); i++)
     {
         currentTurn->soldiers[i]->SetSelectable(true);
+
+        currentTurn->soldierHeads[currentTurn->GetSoldierIndex(currentTurn->soldiers[i])]->SetRendered(true);
+        if (currentTurn->soldiers[i]->IsDead())
+        {
+            currentTurn->soldierHeadCrosses[currentTurn->GetSoldierIndex(currentTurn->soldiers[i])]->SetRendered(true);
+        }
+        else
+        {
+            currentTurn->soldierHeadCrosses[currentTurn->GetSoldierIndex(currentTurn->soldiers[i])]->SetRendered(false);
+        }
     }
 
     currentTurn->GetCircleText()->SetRendered(true);

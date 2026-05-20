@@ -307,11 +307,7 @@ void UpdateBattleSequence()
             RetreatPiece(battleSequence.peak, battleSequence.roundDefender);
             if (battleSequence.attackRoll - battleSequence.defenseRoll >= rules->GetFatalBattleDifference())
             {
-                battleSequence.roundDefender->SetRendered(false);
-                battleSequence.roundDefender->SetMovable(false);
-                battleSequence.roundDefender->SetSelectable(false);
-                battleSequence.roundDefender->SetCurrentAnimation(nullptr);
-                battleSequence.roundDefender->SetDead(true);
+                KillSoldier(battleSequence.roundDefender);
             }
             battleSequence.defenders.pop_back();
             battleSequence.defender->GetCircleText()->SetTextContent(std::to_string(battleSequence.defenders.size()).c_str(), renderer);
@@ -325,11 +321,7 @@ void UpdateBattleSequence()
             RetreatPiece(battleSequence.peak, battleSequence.roundAttacker);
             if (battleSequence.defenseRoll - battleSequence.attackRoll >= rules->GetFatalBattleDifference())
             {
-                battleSequence.roundAttacker->SetRendered(false);
-                battleSequence.roundAttacker->SetMovable(false);
-                battleSequence.roundAttacker->SetSelectable(false);
-                battleSequence.roundAttacker->SetCurrentAnimation(nullptr);
-                battleSequence.roundAttacker->SetDead(true);
+                KillSoldier(battleSequence.roundAttacker);
             }
             battleSequence.attackers.pop_back();
             battleSequence.attacker->GetCircleText()->SetTextContent(std::to_string(battleSequence.attackers.size()).c_str(), renderer);
@@ -486,4 +478,18 @@ int SoldierCount(Player *player)
         }
     }
     return count;
+}
+
+void KillSoldier(Piece *soldier)
+{
+    soldier->SetRendered(false);
+    soldier->SetMovable(false);
+    soldier->SetSelectable(false);
+    soldier->SetCurrentAnimation(nullptr);
+    soldier->SetDead(true);
+    if (soldier->GetPlayer() == currentTurn)
+    {
+        soldier->GetPlayer()->soldierHeadCrosses[soldier->GetPlayer()->GetSoldierIndex(soldier)]->SetRendered(true);
+    }
+    
 }

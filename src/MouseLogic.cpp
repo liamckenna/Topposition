@@ -361,7 +361,7 @@ void updateHoverState(int x, int y)
     {
         if (selectedObject != nullptr)
         {
-            text[i]->SetHovered(false);
+            uiElements[i]->SetHovered(false);
             continue;
         }
         if (uiElements[i]->GetSelectable() && uiElements[i]->GetRendered())

@@ -15,3 +15,15 @@ void Player::SetScore(int s)
         tieText->SetPosition(scoreText->GetPosition().first + scoreText->GetWidth(), tieText->GetPosition().second);
     }
 }
+
+int Player::GetSoldierIndex(Piece* soldier)
+{
+    for (size_t i = 0; i < soldiers.size(); i++)
+    {
+        if (soldiers[i] == soldier)
+        {
+            return i;
+        }
+    }
+    return -1;
+}

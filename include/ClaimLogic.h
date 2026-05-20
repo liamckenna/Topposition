@@ -18,3 +18,5 @@ bool IsOccupyingPeak(Peak *peak, Player *player);
 void UpdateBattleSequence();
 
 bool IsBattleSequenceActive();
+
+void KillSoldier(Piece *soldier);
