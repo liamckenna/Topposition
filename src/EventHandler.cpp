@@ -55,8 +55,6 @@ void EventWindowResized(Input *playerInput, SDL_WindowEvent &event)
 
     switch (state)
     {
-    case SETTINGS:
-        break;
     case LOADING:
         break;
     case MAIN_MENU:
@@ -104,8 +102,6 @@ void EventKeyDown(Input *playerInput, SDL_KeyboardEvent &event)
     {
     case MAIN_MENU:
         break;
-    case SETTINGS:
-        break;
     case LOADING:
         break;
     case GAME:
@@ -115,13 +111,23 @@ void EventKeyDown(Input *playerInput, SDL_KeyboardEvent &event)
         }
         if (event.key == SDLK_F11)
         {
-            RefreshShadows();
+            GameFinished(currentTurn);
         }
         break;
     case PAUSED:
         if (event.key == SDLK_ESCAPE)
         {
-            state = GAME;
+            switch(pState)
+            {
+                case MAIN:
+                    state = GAME;
+                    break;
+                case WINNER:
+                    LoadMenu();
+                    break;
+                default:
+                    break;
+            }
         }
         break;
     default:
@@ -134,8 +140,6 @@ void EventMouseWheel(Input *playerInput, SDL_MouseWheelEvent &event)
     switch (state)
     {
     case MAIN_MENU:
-        break;
-    case SETTINGS:
         break;
     case LOADING:
         break;
@@ -167,8 +171,6 @@ void EventMouseButtonDown(Input *playerInput, SDL_MouseButtonEvent &event)
     case MAIN_MENU:
         MouseButtonDownMainMenu(playerInput, event);
         break;
-    case SETTINGS:
-        break;
     case LOADING:
         break;
     case GAME:
@@ -190,8 +192,6 @@ void EventMouseButtonUp(Input *playerInput, SDL_MouseButtonEvent &event)
     case MAIN_MENU:
         MouseButtonUpMainMenu(playerInput, event);
         break;
-    case SETTINGS:
-        break;
     case LOADING:
         break;
     case GAME:
@@ -211,8 +211,6 @@ void MouseMovement(Input *playerInput)
     switch (state)
     {
     case MAIN_MENU:
-        break;
-    case SETTINGS:
         break;
     case LOADING:
         break;
@@ -536,11 +534,11 @@ void MouseButtonUpPaused(Input *playerInput, SDL_MouseButtonEvent &event)
         Text *newSelectedText = selectText(playerInput->currentMousePosition.first, playerInput->currentMousePosition.second);
         if (selectedText != nullptr && selectedText == newSelectedText)
         {
-            if (selectedText == resetMapText)
+            if (selectedText == resetMapText || selectedText == playAgainText)
             {
                 ResetMap();
             }
-            else if (selectedText == exitToMainMenuText)
+            else if (selectedText == mainExitToMainMenuText || selectedText == winnerExitToMainMenuText)
             {
                 LoadMenu();
             }

@@ -49,5 +49,5 @@ public:
     std::string GetCircleTextString() {return circleTextString;}
     void SetCircleTextString(std::string cts) {circleTextString = cts;}
     int GetSoldierIndex(Piece* soldier);
-
+    int GetPlayerIndex();
 };

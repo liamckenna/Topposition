@@ -27,3 +27,17 @@ int Player::GetSoldierIndex(Piece* soldier)
     }
     return -1;
 }
+
+int Player::GetPlayerIndex()
+{
+    for (size_t i = 0; i < players.size(); i++)
+    {
+        if (this == players[i])
+        {
+            std::cout << "returning " << i << std::endl;
+            return i;
+        }
+    }
+    std::cout << "returning -1" << std::endl;
+    return -1;
+}

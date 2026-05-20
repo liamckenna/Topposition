@@ -50,6 +50,8 @@ extern GameObject *selectedObject;
 
 extern gameState state;
 
+extern pauseState pState;
+
 extern GameRules *rules;
 
 extern Player *currentTurn;
@@ -138,4 +140,10 @@ extern Text *pausedText;
 
 extern Text *resetMapText;
 
-extern Text *exitToMainMenuText;
+extern Text *mainExitToMainMenuText;
+
+extern Text *playerWinsText;
+
+extern Text *playAgainText;
+
+extern Text *winnerExitToMainMenuText;

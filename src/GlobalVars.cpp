@@ -24,6 +24,8 @@ int movesLeft = 3;
 
 gameState state = MAIN_MENU;
 
+pauseState pState = MAIN;
+
 std::map<std::string, std::map<int, SDL_Texture *>> textures;
 
 std::map<std::string, SDL_Surface *> surfaces;
@@ -126,4 +128,10 @@ Text *pausedText;
 
 Text *resetMapText;
 
-Text *exitToMainMenuText;
+Text *mainExitToMainMenuText;
+
+Text *playerWinsText;
+
+Text *playAgainText;
+
+Text *winnerExitToMainMenuText;

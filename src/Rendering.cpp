@@ -174,12 +174,6 @@ void renderText()
                     text[i]->RenderText(renderer);
                 }
                 break;
-            case SETTINGS:
-                if (text[i]->GetGameStateContext() == SETTINGS)
-                {
-                    text[i]->RenderText(renderer);
-                }
-                break;
             case LOADING:
                 if (text[i]->GetGameStateContext() == LOADING)
                 {
@@ -207,9 +201,16 @@ void renderText()
     if (state == PAUSED)
     {
         renderPauseOverlay();
-        pausedText->RenderText(renderer);
-        resetMapText->RenderText(renderer);
-        exitToMainMenuText->RenderText(renderer);
+        for (int i = 0; i < text.size(); i++)
+        {
+            if (text[i]->GetGameStateContext() == PAUSED)
+            {
+                if (text[i]->GetPauseStateContext() == pState)
+                {
+                    text[i]->RenderText(renderer);
+                }
+            }
+        }
     }
 }
 
@@ -294,7 +295,7 @@ void RenderLoadingScreen()
     loadingText->SetRenderShadow(false);
     loadingText->SetGameStateContext(LOADING);
     loadingText->SetRenderShadow(true);
-    loadingText->SetShadowOffset(30, 30);
+    loadingText->SetShadowOffset(20, 20);
     SDL_SetRenderDrawColor(renderer, 2, 120, 150, 100);
     SDL_RenderClear(renderer);
     loadingText->RenderText(renderer);

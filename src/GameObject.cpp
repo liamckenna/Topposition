@@ -563,6 +563,13 @@ Text::Text(string n, const char *fp, SDL_Color c, int x, int y, int s, SDL_Rende
     dimensions.second = surface->h;
 }
 
+void Text::SetColor(SDL_Color c, SDL_Renderer *r)
+{
+    color = c;
+    surface = TTF_RenderText_Solid(font, text, 0, color);
+    texture = SDL_CreateTextureFromSurface(r, surface);
+}
+
 void Text::RenderText(SDL_Renderer *renderer)
 {
     if (rendered)

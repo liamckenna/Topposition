@@ -379,6 +379,7 @@ void loadText()
     pausedText->SetCenter(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 - SCREEN_HEIGHT / 10);
     pausedText->SetRenderShadow(false);
     pausedText->SetGameStateContext(PAUSED);
+    pausedText->SetPauseStateContext(MAIN);
     text.push_back(pausedText);
 
     textSize = 150 * (SCREEN_WIDTH / 3840.f);
@@ -386,15 +387,42 @@ void loadText()
     resetMapText->SetCenter(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 + SCREEN_HEIGHT / 8);
     resetMapText->SetRenderShadow(false);
     resetMapText->SetGameStateContext(PAUSED);
+    resetMapText->SetPauseStateContext(MAIN);
     resetMapText->SetSelectable(true);
     text.push_back(resetMapText);
 
-    exitToMainMenuText = new Text("exitToMainMenuText", "fonts/yoster.ttf", White, 0, 0, textSize, renderer, "Main Menu");
-    exitToMainMenuText->SetCenter(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 + SCREEN_HEIGHT / 8 + SCREEN_HEIGHT / 10);
-    exitToMainMenuText->SetRenderShadow(false);
-    exitToMainMenuText->SetGameStateContext(PAUSED);
-    exitToMainMenuText->SetSelectable(true);
-    text.push_back(exitToMainMenuText);
+    mainExitToMainMenuText = new Text("mainExitToMainMenuText", "fonts/yoster.ttf", White, 0, 0, textSize, renderer, "Main Menu");
+    mainExitToMainMenuText->SetCenter(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 + SCREEN_HEIGHT / 8 + SCREEN_HEIGHT / 10);
+    mainExitToMainMenuText->SetRenderShadow(false);
+    mainExitToMainMenuText->SetGameStateContext(PAUSED);
+    mainExitToMainMenuText->SetPauseStateContext(MAIN);
+    mainExitToMainMenuText->SetSelectable(true);
+    text.push_back(mainExitToMainMenuText);
+
+    textSize = 200 * (SCREEN_WIDTH / 3840.f);
+    playerWinsText = new Text("playerWinsText", "fonts/yoster.ttf", White, 0, 0, textSize, renderer, "Player 1 Wins!");
+    playerWinsText->SetCenter(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 - SCREEN_HEIGHT / 10);
+    playerWinsText->SetRenderShadow(false);
+    playerWinsText->SetGameStateContext(PAUSED);
+    playerWinsText->SetPauseStateContext(WINNER);
+    text.push_back(playerWinsText);
+
+    textSize = 150 * (SCREEN_WIDTH / 3840.f);
+    playAgainText = new Text("playAgainText", "fonts/yoster.ttf", White, 0, 0, textSize, renderer, "Play Again");
+    playAgainText->SetCenter(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 + SCREEN_HEIGHT / 8);
+    playAgainText->SetRenderShadow(false);
+    playAgainText->SetGameStateContext(PAUSED);
+    playAgainText->SetPauseStateContext(WINNER);
+    playAgainText->SetSelectable(true);
+    text.push_back(playAgainText);
+
+    winnerExitToMainMenuText = new Text("winnerExitToMainMenuText", "fonts/yoster.ttf", White, 0, 0, textSize, renderer, "Main Menu");
+    winnerExitToMainMenuText->SetCenter(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 + SCREEN_HEIGHT / 8 + SCREEN_HEIGHT / 10);
+    winnerExitToMainMenuText->SetRenderShadow(false);
+    winnerExitToMainMenuText->SetGameStateContext(PAUSED);
+    winnerExitToMainMenuText->SetPauseStateContext(WINNER);
+    winnerExitToMainMenuText->SetSelectable(true);
+    text.push_back(winnerExitToMainMenuText);
 }
 
 void loadUI()
@@ -669,7 +697,7 @@ void ResetGlobalVars()
     movesLeftText = nullptr;
     pausedText = nullptr;
     resetMapText = nullptr;
-    exitToMainMenuText = nullptr;
+    mainExitToMainMenuText = nullptr;
     turnText = nullptr;
     endText = nullptr;
     currentPlayerCircle = nullptr;
@@ -682,6 +710,7 @@ void ResetGlobalVars()
     firstPlace = nullptr;
     fatalAttackExclamation = nullptr;
     fatalDefenseExclamation = nullptr;
+    pState = MAIN;
 }
 
 void RefreshShadows()

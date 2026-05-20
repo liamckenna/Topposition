@@ -16,10 +16,17 @@ class Player;
 enum gameState
 {
     MAIN_MENU = 0,
+    LOADING = 1,
+    GAME = 2,
+    PAUSED = 3
+};
+
+enum pauseState
+{
+    MAIN = 0,
     SETTINGS = 1,
-    LOADING = 2,
-    GAME = 3,
-    PAUSED = 4
+    RULES = 2,
+    WINNER = 3
 };
 
 enum objectType
@@ -177,6 +184,7 @@ class UIElement : public GameObject
     bool selected = false;
     bool hovered = false;
     gameState gameStateContext;
+    pauseState pauseStateContext = MAIN;
 
 public:
     UIElement(string name, SDL_Texture *texture, SDL_Surface *surface, bool r, bool s, SDL_Renderer *renderer, gameState gsc, Peak *ap = nullptr) : GameObject(name, texture, surface, false, r)
@@ -214,7 +222,9 @@ public:
     void SetHovered(bool h) { hovered = h; }
     void SetGameStateContext(gameState gsc) { gameStateContext = gsc; }
     void SetShadowOffset(int x, int y) { shadowOffsetX = x; shadowOffsetY = y; }
+    void SetPauseStateContextP(pauseState psc) { pauseStateContext = psc; }
     gameState GetGameStateContext() { return gameStateContext; }
+    pauseState GetPauseStateContext() { return pauseStateContext; }
     Peak *GetAssociatedPeak() { return associatedPeak; }
     bool GetHovered() { return hovered; }
     bool GetSelected() { return selected; }
@@ -379,6 +389,7 @@ class Text
     int shadowOffsetY;
     Uint8 shadowAlpha;
     gameState gameStateContext = GAME;
+    pauseState pauseStateContext = MAIN;
 
 public:
     Text(string n, const char *fp, SDL_Color c, int x, int y, int s, SDL_Renderer *r, const char *t);
@@ -386,7 +397,8 @@ public:
     void SetRendered(bool r) { rendered = r; }
     void SetRenderShadow(bool rs) { renderShadow = rs; }
     void SetSelectable(bool s) { selectable = s; }
-    void SetGameStateContext(gameState gs) { gameStateContext = gs; }
+    void SetGameStateContext(gameState gsc) { gameStateContext = gsc; }
+    void SetPauseStateContext(pauseState psc) { pauseStateContext = psc; }
     void SetPosition(int x, int y)
     {
         position.first = x;
@@ -437,6 +449,7 @@ public:
         font = TTF_OpenFont(fontPath, size);
         SetTextContent(text, renderer);
     }
+    void SetColor(SDL_Color c, SDL_Renderer *r);
     void SetHovered(bool h) { hovered = h; }
     void SetSelected(bool s) { selected = s; }
     void SetShadowOffset(int x, int y) { shadowOffsetX = x; shadowOffsetY = y; }
@@ -454,7 +467,7 @@ public:
     SDL_Texture* GetTexture() { return texture; }
     std::pair<int, int> GetBottomRight() { return {position.first + dimensions.first, position.second + dimensions.second}; }
     gameState GetGameStateContext() { return gameStateContext; }
-
+    pauseState GetPauseStateContext() { return pauseStateContext; }
 };
 
 class Animation

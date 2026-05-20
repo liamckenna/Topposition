@@ -174,28 +174,18 @@ void UpdateScore()
 
 void GameFinished(Player *winner)
 {
-    string winnerColor;
-    if (winner->GetName() == "playerOne")
-    {
-        winnerColor = "winnerRed";
-    }
-    else if (winner->GetName() == "playerTwo")
-    {
-        winnerColor = "winnerGreen";
-    }
-    else if (winner->GetName() == "playerThree")
-    {
-        winnerColor = "winnerBlue";
-    }
-    else if (winner->GetName() == "playerFour")
-    {
-        winnerColor = "winnerYellow";
-    }
+    state = PAUSED;
+    pState = WINNER;
 
-    UIElement *winnerMessage = new UIElement("winner message", textures[winnerColor][0], surfaces[winnerColor], true, false, renderer, GAME);
-    winnerMessage->SetCenter(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2);
-    uiElements.push_back(winnerMessage);
-    gameObjects[gameObjects.size() - 1].push_back(winnerMessage);
+    string textContent = "Player " + to_string(winner->GetPlayerIndex() + 1);
+    textContent = textContent + " Wins!";
+
+    std::cout << textContent << std::endl;
+
+    playerWinsText->SetColor(winner->GetSDLColor(), renderer);
+    playerWinsText->SetSize(playerWinsText->GetSize(), renderer);
+    playerWinsText->SetTextContent(textContent.c_str(), renderer);
+    playerWinsText->SetSize(playerWinsText->GetSize(), renderer);
 }
 
 void Tiebreaker()

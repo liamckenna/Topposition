@@ -13,18 +13,18 @@ void loadMenuUI()
 {
     SDL_Color White = {255, 255, 255};
 
-    UIElement *logo = new UIElement("Logo", textures["Logo2"][0], surfaces["Logo2"], true, false, renderer, MAIN_MENU);
+    UIElement *logo = new UIElement("Logo", textures["Logo"][0], surfaces["Logo"], true, false, renderer, MAIN_MENU);
     uiElements.push_back(logo);
     gameObjects[0].push_back(logo);
     logo->SetScale(20 * (SCREEN_WIDTH / 3840.f));
     logo->SetGlobalCenter(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 3);
-    logo->SetRenderShadow(true);
+    logo->SetRenderShadow(false);
     logo->SetShadowOffset(30, 30);
 
     int textSize = 250 * (SCREEN_WIDTH / 3840.f);
     Text *playButtonText = new Text("playButtonText", "fonts/yoster.ttf", White, 0, 0, textSize, renderer, "Play");
     playButtonText->SetCenter(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 + SCREEN_HEIGHT / 6);
-    playButtonText->SetRenderShadow(true);
+    playButtonText->SetRenderShadow(false);
     playButtonText->SetSelectable(true);
     playButtonText->SetGameStateContext(MAIN_MENU);
     playButtonText->SetShadowOffset(30, 30);
@@ -34,7 +34,7 @@ void loadMenuUI()
     textSize = 175 * (SCREEN_WIDTH / 3840.f);
     Text *quitButtonText = new Text("quitButtonText", "fonts/yoster.ttf", White, 0, 0, textSize, renderer, "Quit");
     quitButtonText->SetCenter(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 + SCREEN_HEIGHT / 8 + SCREEN_HEIGHT / 4);
-    quitButtonText->SetRenderShadow(true);
+    quitButtonText->SetRenderShadow(false);
     quitButtonText->SetSelectable(true);
     quitButtonText->SetGameStateContext(MAIN_MENU);
     quitButtonText->SetShadowOffset(30, 30);
@@ -200,9 +200,18 @@ void UpdateTextElementPositions()
             resetMapText->SetSize(150 * (SCREEN_WIDTH / 3840.f), renderer);
             resetMapText->SetCenter(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 + SCREEN_HEIGHT / 8);
 
-            std::cout << "Updating exitToMainMenuText" << std::endl;
-            exitToMainMenuText->SetSize(150 * (SCREEN_WIDTH / 3840.f), renderer);
-            exitToMainMenuText->SetCenter(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 + SCREEN_HEIGHT / 8 + SCREEN_HEIGHT / 10);
+            std::cout << "Updating mainExitToMainMenuText" << std::endl;
+            mainExitToMainMenuText->SetSize(150 * (SCREEN_WIDTH / 3840.f), renderer);
+            mainExitToMainMenuText->SetCenter(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 + SCREEN_HEIGHT / 8 + SCREEN_HEIGHT / 10);
+            
+            playerWinsText->SetSize(200 * (SCREEN_WIDTH / 3840.f), renderer);
+            playerWinsText->SetCenter(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 - SCREEN_HEIGHT / 10);
+
+            playAgainText->SetSize(150 * (SCREEN_WIDTH / 3840.f), renderer);
+            playAgainText->SetCenter(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 + SCREEN_HEIGHT / 8);
+
+            winnerExitToMainMenuText->SetSize(150 * (SCREEN_WIDTH / 3840.f), renderer);
+            winnerExitToMainMenuText->SetCenter(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 + SCREEN_HEIGHT / 8 + SCREEN_HEIGHT / 10);
 
             int textSize = 125 * (SCREEN_WIDTH / 3840.f);
             y = SCREEN_HEIGHT / 40;
