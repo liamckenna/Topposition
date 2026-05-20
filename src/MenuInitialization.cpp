@@ -98,6 +98,16 @@ void updateUIElementPositions()
             uiElements[i]->SetScale(0.8f * (SCREEN_WIDTH / 3840.f));
             uiElements[i]->SetGlobalCenter((SCREEN_WIDTH / 2) + (SCREEN_WIDTH / 7.50f), endText->GetPosition().second - (SCREEN_HEIGHT / 200) - (uiElements[i]->GetDimensions().second * uiElements[i]->GetScale() / 3));
         }
+        else if (uiElements[i]->GetName() == "fatalAttackExclamation")
+        {
+            uiElements[i]->SetScale(8 * (SCREEN_WIDTH / 3840.f));
+            uiElements[i]->SetGlobalPosition(die2->GetGlobalCenter().first + (die2->GetDimensions().first * die2->GetScale() / 2) + (uiElements[i]->GetDimensions().first * uiElements[i]->GetScale()), die2->GetGlobalCenter().second - (die2->GetDimensions().second * die2->GetScale() / 2) - (uiElements[i]->GetDimensions().second * uiElements[i]->GetScale() / 2));
+}
+        else if (uiElements[i]->GetName() == "fatalDefenseExclamation")
+        {
+            uiElements[i]->SetScale(8 * (SCREEN_WIDTH / 3840.f));
+            uiElements[i]->SetGlobalPosition(die1->GetGlobalCenter().first - (die1->GetDimensions().first * die1->GetScale() / 2) - (uiElements[i]->GetDimensions().first * uiElements[i]->GetScale()) - (uiElements[i]->GetDimensions().first * uiElements[i]->GetScale()), die1->GetGlobalCenter().second - (die1->GetDimensions().second * die1->GetScale() / 2) - (uiElements[i]->GetDimensions().second * uiElements[i]->GetScale() / 2));
+        }
     }
     if (crown)
     {

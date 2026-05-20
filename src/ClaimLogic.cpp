@@ -5,6 +5,7 @@ namespace
 {
     constexpr int BATTLE_ROUND_DELAY_MS = 1000;
     constexpr int BATTLE_ADVANCE_DELAY_MS = 1000;
+    constexpr int BATTLE_FATAL_SIGNAL_DELAY_MS = 1800;
 
     enum BattlePhase
     {
@@ -14,6 +15,8 @@ namespace
         BATTLE_REVEAL_ATTACK,
         BATTLE_WAIT_DEFENSE_ROLL,
         BATTLE_RESOLVE_ROUND,
+        BATTLE_FATAL_ATTACK,
+        BATTLE_FATAL_DEFENSE,
         BATTLE_ADVANCE,
         BATTLE_END
     };
@@ -305,10 +308,6 @@ void UpdateBattleSequence()
             crown->SetRotation(-45);
             crown->SetRendered(true);
             RetreatPiece(battleSequence.peak, battleSequence.roundDefender);
-            if (battleSequence.attackRoll - battleSequence.defenseRoll >= rules->GetFatalBattleDifference())
-            {
-                KillSoldier(battleSequence.roundDefender);
-            }
             battleSequence.defenders.pop_back();
             battleSequence.defender->GetCircleText()->SetTextContent(std::to_string(battleSequence.defenders.size()).c_str(), renderer);
             battleSequence.defender->GetCircleText()->SetCenter(opposingPlayerCircle->GetCenter().first, opposingPlayerCircle->GetCenter().second);
@@ -319,19 +318,72 @@ void UpdateBattleSequence()
             crown->SetRotation(45);
             crown->SetRendered(true);
             RetreatPiece(battleSequence.peak, battleSequence.roundAttacker);
-            if (battleSequence.defenseRoll - battleSequence.attackRoll >= rules->GetFatalBattleDifference())
-            {
-                KillSoldier(battleSequence.roundAttacker);
-            }
             battleSequence.attackers.pop_back();
             battleSequence.attacker->GetCircleText()->SetTextContent(std::to_string(battleSequence.attackers.size()).c_str(), renderer);
             battleSequence.attacker->GetCircleText()->SetCenter(currentPlayerCircle->GetCenter().first, currentPlayerCircle->GetCenter().second);
         }
 
+        if (battleSequence.attackRoll - battleSequence.defenseRoll >= rules->GetFatalBattleDifference())
+        {
+            KillSoldier(battleSequence.roundDefender);
+            battleSequence.phase = BATTLE_FATAL_ATTACK;
+        }
+        else if (battleSequence.defenseRoll - battleSequence.attackRoll >= rules->GetFatalBattleDifference())
+        {
+            KillSoldier(battleSequence.roundAttacker);
+            battleSequence.phase = BATTLE_FATAL_DEFENSE;
+        }
+        else
+        {
+            battleSequence.phase = BATTLE_ADVANCE;
+        }
         battleSequence.roundAttacker = nullptr;
         battleSequence.roundDefender = nullptr;
         battleSequence.phaseStart = SDL_GetTicks();
-        battleSequence.phase = BATTLE_ADVANCE;
+
+        break;
+    }
+    case BATTLE_FATAL_ATTACK:
+    {
+        if (SDL_GetTicks() - battleSequence.phaseStart > BATTLE_FATAL_SIGNAL_DELAY_MS)
+        {
+            fatalAttackExclamation->SetRendered(false);
+            battleSequence.phaseStart = SDL_GetTicks();
+            battleSequence.phase = BATTLE_ADVANCE;
+            break;
+        }
+
+        switch ((int(SDL_GetTicks() - battleSequence.phaseStart) / (BATTLE_FATAL_SIGNAL_DELAY_MS / 6)) % 2)
+        {
+            case 0:
+                fatalAttackExclamation->SetRendered(true);
+                break;
+            case 1:
+                fatalAttackExclamation->SetRendered(false);
+                break;
+        }
+        break;
+    }
+        
+    case BATTLE_FATAL_DEFENSE:
+    {
+        if (SDL_GetTicks() - battleSequence.phaseStart > BATTLE_FATAL_SIGNAL_DELAY_MS)
+        {
+            fatalDefenseExclamation->SetRendered(false);
+            battleSequence.phaseStart = SDL_GetTicks();
+            battleSequence.phase = BATTLE_ADVANCE;
+            break;
+        }
+
+        switch ((int(SDL_GetTicks() - battleSequence.phaseStart) / (BATTLE_FATAL_SIGNAL_DELAY_MS / 6)) % 2)
+        {
+        case 0:
+            fatalDefenseExclamation->SetRendered(true);
+            break;
+        case 1:
+            fatalDefenseExclamation->SetRendered(false);
+            break;
+        }
         break;
     }
     case BATTLE_ADVANCE:

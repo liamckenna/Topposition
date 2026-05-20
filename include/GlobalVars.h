@@ -116,6 +116,10 @@ extern UIElement *die1;
 
 extern UIElement *die2;
 
+extern UIElement *fatalAttackExclamation;
+
+extern UIElement *fatalDefenseExclamation;
+
 extern Text *turnText;
 
 extern Text *endText;

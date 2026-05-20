@@ -74,6 +74,10 @@ UIElement *currentPlayerCircle;
 
 UIElement *opposingPlayerCircle;
 
+UIElement *fatalAttackExclamation;
+
+UIElement *fatalDefenseExclamation;
+
 Terrain *startingTerrain;
 
 Terrain *hoveringTerrain;

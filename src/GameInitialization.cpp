@@ -419,9 +419,24 @@ void loadUI()
     gameObjects[gameObjects.size() - 1].push_back(crown);
     crown->SetScale(8 * (SCREEN_WIDTH / 3840.f));
     crown->SetGlobalPosition(die1->GetGlobalCenter().first - (die1->GetDimensions().first * die1->GetScale() / 2) - (crown->GetDimensions().first * crown->GetScale()), die1->GetGlobalCenter().second - (die1->GetDimensions().second * die1->GetScale() / 2) - (crown->GetDimensions().second * crown->GetScale()));
-    
     crown->SetRenderShadow(true);
     crown->SetRendered(false);
+
+    fatalAttackExclamation = new UIElement("fatalAttackExclamation", textures["exclamation point"][0], surfaces["exclamation point"], true, false, renderer, GAME);
+    fatalAttackExclamation->SetScale(8 * (SCREEN_WIDTH / 3840.f));
+    fatalAttackExclamation->SetGlobalPosition(die2->GetGlobalCenter().first + (die2->GetDimensions().first * die2->GetScale() / 2) + (fatalAttackExclamation->GetDimensions().first * fatalAttackExclamation->GetScale()), die2->GetGlobalCenter().second - (die2->GetDimensions().second * die2->GetScale() / 2) - (fatalAttackExclamation->GetDimensions().second * fatalAttackExclamation->GetScale() / 2));
+    fatalAttackExclamation->SetRenderShadow(true);
+    fatalAttackExclamation->SetRendered(false);
+    uiElements.push_back(fatalAttackExclamation);
+    gameObjects[gameObjects.size() - 1].push_back(fatalAttackExclamation);
+
+    fatalDefenseExclamation = new UIElement("fatalDefenseExclamation", textures["exclamation point"][0], surfaces["exclamation point"], true, false, renderer, GAME);
+    fatalDefenseExclamation->SetScale(8 * (SCREEN_WIDTH / 3840.f));
+    fatalDefenseExclamation->SetGlobalPosition(die1->GetGlobalCenter().first - (die1->GetDimensions().first * die1->GetScale() / 2) - (fatalDefenseExclamation->GetDimensions().first * fatalDefenseExclamation->GetScale()) - (fatalDefenseExclamation->GetDimensions().first * fatalDefenseExclamation->GetScale()), die1->GetGlobalCenter().second - (die1->GetDimensions().second * die1->GetScale() / 2) - (fatalDefenseExclamation->GetDimensions().second * fatalDefenseExclamation->GetScale() / 2));
+    fatalDefenseExclamation->SetRenderShadow(true);
+    fatalDefenseExclamation->SetRendered(false);
+    uiElements.push_back(fatalDefenseExclamation);
+    gameObjects[gameObjects.size() - 1].push_back(fatalDefenseExclamation);
 
     for (int i = 0; i < peaks.size(); i++)
     {
@@ -665,7 +680,8 @@ void ResetGlobalVars()
     die2 = nullptr;
     currentTurn = nullptr;
     firstPlace = nullptr;
-    //loadingText = nullptr;
+    fatalAttackExclamation = nullptr;
+    fatalDefenseExclamation = nullptr;
 }
 
 void RefreshShadows()
