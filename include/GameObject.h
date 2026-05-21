@@ -419,7 +419,6 @@ public:
     }
     void SetTextContent(const char *t, SDL_Renderer *renderer)
     {
-        std::cout << "Changing text (" << text << ") to " << t << std::endl;
         text = t;
         SDL_DestroyTexture(texture);
         SDL_DestroyTexture(shadowTexture);
@@ -433,18 +432,7 @@ public:
 
 
         surface = TTF_RenderText_Solid(font, text.c_str(), text.length(), color);
-        if (surface == nullptr)
-        {
-            std::cout << SDL_GetError() << std::endl;
-        }
-            
         texture = SDL_CreateTextureFromSurface(renderer, surface);
-
-
-        while(surface == nullptr)
-        {
-            _sleep(1);
-        }
 
         dimensions.first = surface->w;
         dimensions.second = surface->h;

@@ -24,43 +24,35 @@ void ResetMap()
 
 void loadGame()
 {
-    //std::cout << "Loading Map..." << std::endl;
     Uint64 mapStartTime = SDL_GetTicks();
     loadMap();
     Uint64 mapEndTime = SDL_GetTicks();
     std::cout << "Map Loaded in " << (mapEndTime - mapStartTime) / 1000.f << " seconds!" << std::endl;
-    //std::cout << "Loading Game Pieces..." << std::endl;
     Uint64 gamePiecesStartTime = SDL_GetTicks();
     loadGamePieces();
     Uint64 gamePiecesEndTime = SDL_GetTicks();
     std::cout << "Game Pieces Loaded in " << (gamePiecesEndTime - gamePiecesStartTime) / 1000.f << " seconds!" << std::endl;
-    //std::cout << "Loading Text..." << std::endl;
     Uint64 textStartTime = SDL_GetTicks();
     loadText();
     Uint64 textEndTime = SDL_GetTicks();
     std::cout << "Text Loaded in " << (textEndTime - textStartTime) / 1000.f << " seconds!" << std::endl;
-    //std::cout << "Loading UI..." << std::endl;
     Uint64 uiStartTime = SDL_GetTicks();
     loadUI();
     Uint64 uiEndTime = SDL_GetTicks();
     std::cout << "UI Loaded in " << (uiEndTime - uiStartTime) / 1000.f << " seconds!" << std::endl;
-    //std::cout << "Generating Pixels..." << std::endl;
     Uint64 pixelsStartTime = SDL_GetTicks();
     GeneratePixels();
     Uint64 pixelsEndTime = SDL_GetTicks();
     std::cout << "Pixels Generated in " << (pixelsEndTime - pixelsStartTime) / 1000.f << " seconds!" << std::endl;
-    //std::cout << "Generating Ocean..." << std::endl;
     Uint64 oceanStartTime = SDL_GetTicks();
     GenerateOcean();
     Uint64 oceanEndTime = SDL_GetTicks();
     std::cout << "Ocean Generated in " << (oceanEndTime - oceanStartTime) / 1000.f << " seconds!" << std::endl;
-    //std::cout << "Rendering Pixels..." << std::endl;
     Uint64 renderPixelsStartTime = SDL_GetTicks();
     renderPixels();
     SDL_SetRenderTarget(renderer, NULL);
     Uint64 renderPixelsEndTime = SDL_GetTicks();
     std::cout << "Pixels Rendered in " << (renderPixelsEndTime - renderPixelsStartTime) / 1000.f << " seconds!" << std::endl;
-    //std::cout << "Game Loaded!" << std::endl;
     gameStartTime = SDL_GetTicks();
     std::cout << "Total Load Time: " << (gameStartTime - mapStartTime) / 1000.f << " seconds!" << std::endl;
 
@@ -174,25 +166,19 @@ void loadGamePieces()
                 switch (j % 4)
                 {
                 case 0:
-                    //x += MAP_WIDTH;
-                    //y += MAP_HEIGHT;
                     break;
                 case 1:
                     x += MAP_WIDTH;
-                    //y += MAP_HEIGHT;
                     break;
                 case 2:
                     x += MAP_WIDTH;
                     y += MAP_HEIGHT;
                     break;
                 case 3:
-                    //x += MAP_WIDTH;
                     y += MAP_HEIGHT;
                     break;
                 default:
                     break;
-                    //x = (rand() % (int)(MAP_WIDTH * 3)) - MAP_WIDTH / 4;
-                    //y = (rand() % (int)(MAP_HEIGHT * 3)) - MAP_HEIGHT / 4;
                 }
                 tries++;
                 if (tries > maxTries)

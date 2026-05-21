@@ -428,7 +428,6 @@ void ZoomOutCamera(bool toPrettyLevel)
         i++;
         if (i > 100) 
         {
-            std::cout << "Zoom out failed to converge after 100 iterations." << std::endl;
             break;
         }
     }

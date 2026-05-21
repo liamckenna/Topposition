@@ -34,10 +34,8 @@ int Player::GetPlayerIndex()
     {
         if (this == players[i])
         {
-            std::cout << "returning " << i << std::endl;
             return i;
         }
     }
-    std::cout << "returning -1" << std::endl;
     return -1;
 }

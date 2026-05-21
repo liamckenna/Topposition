@@ -89,14 +89,9 @@ void RotateTurn()
 
 void UpdateMovesLeft()
 {
-    std::cout << "getting center" << std::endl;
     std::pair<float, float> center = movesLeftText->GetCenter();
-    std::cout << "setting size" << std::endl;
-    std::cout << "current text content: " << movesLeftText->GetTextContent() << std::endl;
     movesLeftText->SetSize(150 * (SCREEN_WIDTH / 3840.f), renderer);
-    std::cout << "setting text content" << std::endl;
     movesLeftText->SetTextContent(to_string(movesLeft).c_str(), renderer);
-    std::cout << "setting center" << std::endl;
     movesLeftText->SetCenter(center.first, center.second);
 }
 
@@ -204,9 +199,6 @@ void GameFinished(Player *winner)
 
     string textContent = "Player " + to_string(winner->GetPlayerIndex() + 1);
     textContent = textContent + " Wins!";
-
-    std::cout << textContent << std::endl;
-
     playerWinsText->SetColor(winner->GetSDLColor(), renderer);
     playerWinsText->SetSize(playerWinsText->GetSize(), renderer);
     playerWinsText->SetTextContent(textContent.c_str(), renderer);

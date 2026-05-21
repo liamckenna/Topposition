@@ -345,10 +345,8 @@ void MouseButtonUpMainMenu(Input *playerInput, SDL_MouseButtonEvent &event)
         {
             if (selectedText->GetName() == "playButtonText")
             {
-                std::cout << "hit play button" << std::endl;
                 RefreshShadows();
                 state = GAME;
-                //ResetMap();
             }
             else if (selectedText->GetName() == "settings")
             {
@@ -546,7 +544,6 @@ void MouseButtonUpPaused(Input *playerInput, SDL_MouseButtonEvent &event)
     {
     case SDL_BUTTON_LEFT:
     {
-        std::cout << "Mouse button up in paused state" << std::endl;
         Text *newSelectedText = selectText(playerInput->currentMousePosition.first, playerInput->currentMousePosition.second);
         if (selectedText != nullptr && selectedText == newSelectedText)
         {
