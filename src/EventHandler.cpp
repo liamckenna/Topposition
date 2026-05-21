@@ -270,13 +270,19 @@ void MouseButtonDownGame(Input *playerInput, SDL_MouseButtonEvent &event)
 {
     if (IsBattleSequenceActive())
     {
+        if (!rules->GetAutoRollMoves() && event.button == SDL_BUTTON_LEFT && IsBattleWaitingForDieClick())
+        {
+            selectedObject = selectUI(playerInput->currentMousePosition.first, playerInput->currentMousePosition.second, false);
+            if (selectedObject != nullptr && selectedObject != die1 && selectedObject != die2)
+                selectedObject = nullptr;
+        }
         return;
     }
 
     switch (event.button)
     {
     case SDL_BUTTON_LEFT:
-        if (IsBattleSequenceActive())
+        if (IsBattleSequenceActive() && rules->GetAutoRollMoves())
         {
             break;
         }
@@ -401,6 +407,17 @@ void MouseButtonUpGame(Input *playerInput, SDL_MouseButtonEvent &event)
             if (selectedObject->type == UI_ELEMENT)
             {
                 UIElement *uiElement = dynamic_cast<UIElement *>(selectedObject);
+                if (event.button == SDL_BUTTON_LEFT && !rules->GetAutoRollMoves())
+                {
+                    GameObject *newSelectedObject = selectUI(playerInput->currentMousePosition.first, playerInput->currentMousePosition.second, false);
+                    if (selectedObject == newSelectedObject)
+                    {
+                        if (uiElement == die1)
+                            OnBattleDieClicked("dieOne");
+                        else if (uiElement == die2)
+                            OnBattleDieClicked("dieTwo");
+                    }
+                }
                 uiElement->SetSelected(false);
                 if (uiElement == endTurnArrow)
                 {

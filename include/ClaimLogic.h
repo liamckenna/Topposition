@@ -19,4 +19,8 @@ void UpdateBattleSequence();
 
 bool IsBattleSequenceActive();
 
+bool IsBattleWaitingForDieClick(UIElement* die = nullptr);
+
+void OnBattleDieClicked(const std::string &dieName);
+
 void KillSoldier(Piece *soldier);

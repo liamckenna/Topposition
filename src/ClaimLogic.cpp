@@ -1,5 +1,6 @@
 #include "ClaimLogic.h"
 #include "MultiPurposeFunctions.h"
+#include <algorithm>
 
 namespace
 {
@@ -14,6 +15,7 @@ namespace
         BATTLE_WAIT_ATTACK_ROLL,
         BATTLE_REVEAL_ATTACK,
         BATTLE_WAIT_DEFENSE_ROLL,
+        BATTLE_WAIT_DIE_CLICKS,
         BATTLE_RESOLVE_ROUND,
         BATTLE_FATAL_ATTACK,
         BATTLE_FATAL_DEFENSE,
@@ -33,6 +35,8 @@ namespace
         Piece *roundDefender = nullptr;
         int attackRoll = 0;
         int defenseRoll = 0;
+        bool attackRollStarted = false;
+        bool defenseRollStarted = false;
         Uint64 phaseStart = SDL_GetTicks();
         BattlePhase phase = BATTLE_IDLE;
     };
@@ -84,7 +88,17 @@ namespace
 
         std::string finalFaceName = "die " + std::to_string(roll);
         Uint64 now = SDL_GetTicks();
-        diceAnimations.clear();
+        if (rules->GetAutoRollMoves())
+        {
+            diceAnimations.erase(std::remove_if(diceAnimations.begin(), diceAnimations.end(),
+                                                [die](const DiceAnimation &a)
+                                                { return a.die == die; }),
+                                 diceAnimations.end());
+        }
+        else
+        {
+            diceAnimations.clear();
+        }
         diceAnimations.emplace_back(die, dieFaces, textures[finalFaceName][0], now, 125, 8, false);
     }
 
@@ -135,7 +149,14 @@ namespace
                 crown->SetRendered(false);
                 battleSequence.attacker->GetCircleText()->SetTextContent(std::to_string(battleSequence.attackers.size()).c_str(), renderer);
                 battleSequence.attacker->GetCircleText()->SetCenter(currentPlayerCircle->GetCenter().first, currentPlayerCircle->GetCenter().second);
-
+                if (rules->GetClaimEndsTurn())
+                {
+                    ClearRoll();
+                }
+                else
+                {
+                    movesLeftText->SetRendered(false);
+                }
                 return true;
             }
         }
@@ -155,6 +176,8 @@ namespace
         endText->SetRendered(true);
         turnText->SetRendered(true);
         crown->SetRendered(false);
+        movesLeftText->SetRendered(true);
+
         battleSequence = BattleSequenceState();
     }
 
@@ -270,9 +293,26 @@ void UpdateBattleSequence()
 
         battleSequence.roundAttacker = battleSequence.attackers[battleSequence.attackers.size() - 1];
         battleSequence.roundDefender = battleSequence.defenders[battleSequence.defenders.size() - 1];
-        battleSequence.attackRoll = RollDie();
-        StartSingleDieRoll("dieOne", battleSequence.attackRoll);
-        battleSequence.phase = BATTLE_WAIT_ATTACK_ROLL;
+        if (rules->GetAutoRollMoves())
+        {
+            battleSequence.attackRoll = RollDie();
+            StartSingleDieRoll("dieOne", battleSequence.attackRoll);
+            battleSequence.phase = BATTLE_WAIT_ATTACK_ROLL;
+            break;
+        }
+        else
+        {
+            battleSequence.attackRollStarted = false;
+            battleSequence.defenseRollStarted = false;
+            die1->SetTexture(textures["die 0"][0]);
+            die2->SetTexture(textures["die 0"][0]);
+            diceAnimations.clear();
+            battleSequence.phase = BATTLE_WAIT_DIE_CLICKS;
+            break;
+        }
+    case BATTLE_WAIT_DIE_CLICKS:
+        if (battleSequence.attackRollStarted && battleSequence.defenseRollStarted && !HasActiveDiceAnimation())
+            battleSequence.phase = BATTLE_RESOLVE_ROUND;
         break;
     case BATTLE_WAIT_ATTACK_ROLL:
         if (HasActiveDiceAnimation())
@@ -446,6 +486,42 @@ void UpdateBattleSequence()
 bool IsBattleSequenceActive()
 {
     return battleSequence.active;
+}
+
+bool IsBattleWaitingForDieClick(UIElement* die)
+{
+    if (die == nullptr)
+    {
+        return battleSequence.active && battleSequence.phase == BATTLE_WAIT_DIE_CLICKS;
+    }
+    else if (die == die1)
+    {
+        return battleSequence.active && battleSequence.phase == BATTLE_WAIT_DIE_CLICKS && !battleSequence.attackRollStarted;
+    }
+    else if (die == die2)
+    {
+        return battleSequence.active && battleSequence.phase == BATTLE_WAIT_DIE_CLICKS && !battleSequence.defenseRollStarted;
+    }
+    return false;
+}
+
+void OnBattleDieClicked(const std::string &dieName)
+{
+    if (battleSequence.phase != BATTLE_WAIT_DIE_CLICKS)
+        return;
+
+    if (dieName == "dieOne" && !battleSequence.attackRollStarted)
+    {
+        battleSequence.attackRoll = RollDie();
+        StartSingleDieRoll("dieOne", battleSequence.attackRoll);
+        battleSequence.attackRollStarted = true;
+    }
+    else if (dieName == "dieTwo" && !battleSequence.defenseRollStarted)
+    {
+        battleSequence.defenseRoll = RollDie();
+        StartSingleDieRoll("dieTwo", battleSequence.defenseRoll);
+        battleSequence.defenseRollStarted = true;
+    }
 }
 
 void RetreatPiece(Peak *peak, Piece *piece)

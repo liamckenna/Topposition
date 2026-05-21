@@ -1,4 +1,5 @@
 #include "MouseLogic.h"
+#include "ClaimLogic.h"
 #include <cmath>
 
 bool zoom(int direction, std::pair<float, float> mousePos)
@@ -179,27 +180,59 @@ UIElement *selectUI(int x, int y, bool update, bool selecting)
                 {
                     continue;
                 }
-                if ((uiElements[i] == die1 || uiElements[i] == die2) && hasRolled)
+                if (!rules->GetAutoRollMoves())
+                {
+                    if (IsBattleSequenceActive())
+                    {
+                        if (uiElements[i] == die1 && !IsBattleWaitingForDieClick(die1))
+                        {
+                            continue;
+                        }
+                        else if (uiElements[i] == die2 && !IsBattleWaitingForDieClick(die2))
+                        {
+                            continue;
+                        }
+                    }
+                    else if ((uiElements[i] == die1 || uiElements[i] == die2) && hasRolled)
+                    {
+                        continue;
+                    }
+                }
+                else if ((uiElements[i] == die1 || uiElements[i] == die2) && hasRolled)
                 {
                     continue;
                 }
-                if (selecting)
-                {
-                    uiElements[i]->SetSelected(true);
-                    if (uiElements[i] == endTurnArrow)
+                    if (selecting)
                     {
-                        endText->SetSelected(true);
-                        turnText->SetSelected(true);
+                        uiElements[i]->SetSelected(true);
+                        if (uiElements[i] == endTurnArrow)
+                        {
+                            endText->SetSelected(true);
+                            turnText->SetSelected(true);
+                        }
+                        if (!rules->GetAutoRollMoves() && !IsBattleWaitingForDieClick())
+                        {
+                            if (uiElements[i] == die1)
+                            {
+                                die2->SetSelected(true);
+                            }
+                            else if (uiElements[i] == die2)
+                            {
+                                die1->SetSelected(true);
+                            }
+                        }
+                        else if (rules->GetAutoRollMoves())
+                        {
+                            if (uiElements[i] == die1)
+                            {
+                                die2->SetSelected(true);
+                            }
+                            else if (uiElements[i] == die2)
+                            {
+                                die1->SetSelected(true);
+                            }
+                        }
                     }
-                    else if (uiElements[i] == die1)
-                    {
-                        die2->SetSelected(true);
-                    }
-                    else if (uiElements[i] == die2)
-                    {
-                        die1->SetSelected(true);
-                    }
-                }
                 return uiElements[i];
             }
         }
@@ -389,7 +422,7 @@ void updateHoverState(int x, int y)
             turnText->SetHovered(true);
         }
     }
-    if (die1 != nullptr && die2 != nullptr)
+    if (die1 != nullptr && die2 != nullptr && (rules->GetAutoRollMoves() || !IsBattleWaitingForDieClick()))
     {
         if (die1->GetHovered())
         {
