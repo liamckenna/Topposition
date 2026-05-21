@@ -32,6 +32,8 @@ int Roll()
 
     UpdateMovesLeft();
 
+    hasRolled = true;
+
     return movesLeft;
 }
 
@@ -87,16 +89,15 @@ void RotateTurn()
 
 void UpdateMovesLeft()
 {
-    for (int i = 0; i < text.size(); i++)
-    {
-        if (text[i]->GetName() == "movesLeftText")
-        {
-            std::pair<float, float> center = text[i]->GetCenter();
-            text[i]->SetTextContent(to_string(movesLeft).c_str(), renderer);
-            text[i]->SetCenter(center.first, center.second);
-            break;
-        }
-    }
+    std::cout << "getting center" << std::endl;
+    std::pair<float, float> center = movesLeftText->GetCenter();
+    std::cout << "setting size" << std::endl;
+    std::cout << "current text content: " << movesLeftText->GetTextContent() << std::endl;
+    movesLeftText->SetSize(150 * (SCREEN_WIDTH / 3840.f), renderer);
+    std::cout << "setting text content" << std::endl;
+    movesLeftText->SetTextContent(to_string(movesLeft).c_str(), renderer);
+    std::cout << "setting center" << std::endl;
+    movesLeftText->SetCenter(center.first, center.second);
 }
 
 void FinishTurn()
@@ -116,8 +117,32 @@ void FinishTurn()
         }
         turnTallyNumText->SetTextContent(to_string(turnCount).c_str(), renderer);
     }
-    currentRoll = Roll();
-    movesLeft = currentRoll;
+
+    hasRolled = false;
+
+    if (rules->GetAutoRollMoves())
+    {
+        currentRoll = Roll();
+        movesLeft = currentRoll;
+    }
+    else
+    {
+        ClearRoll();
+    }
+}
+
+void ClearRoll()
+{
+    currentRoll = 0;
+    movesLeft = 0;
+    string rollText = "Roll!";
+    
+    die1->SetTexture(textures["die 0"][0]);
+    die2->SetTexture(textures["die 0"][0]);
+    std::pair<float, float> center = movesLeftText->GetCenter();
+    movesLeftText->SetSize(100 * (SCREEN_WIDTH / 3840.f), renderer);
+    movesLeftText->SetTextContent(rollText.c_str(), renderer);
+    movesLeftText->SetCenter(center.first, center.second);
 }
 
 void UpdateScore()

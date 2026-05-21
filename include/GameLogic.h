@@ -17,3 +17,5 @@ void GameFinished(Player* winner);
 void Tiebreaker();
 
 int SoldierCount(Player* player);
+
+void ClearRoll();

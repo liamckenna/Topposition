@@ -183,13 +183,23 @@ void UpdateTextElementPositions()
             peaksLeftText->SetPosition(x, y);
 
             std::cout << "Updating movesLeftText" << std::endl;
-            movesLeftText->SetTextContent("11", renderer);
+            const char *eleven = "11";
+            movesLeftText->SetTextContent(eleven, renderer);
             movesLeftText->SetSize(150 * (SCREEN_WIDTH / 3840.f), renderer);
             x = (SCREEN_WIDTH / 2) - (movesLeftText->GetWidth() / 2);
             y = SCREEN_HEIGHT - movesLeftText->GetHeight() - (SCREEN_HEIGHT / 9);
             movesLeftText->SetPosition(x, y);
             std::pair<float, float> center = movesLeftText->GetCenter();
-            movesLeftText->SetTextContent(to_string(movesLeft).c_str(), renderer);
+            if (hasRolled)
+            {
+                movesLeftText->SetTextContent(to_string(movesLeft).c_str(), renderer);
+            }
+            else
+            {
+                string rollText = "Roll!";
+                movesLeftText->SetSize(100 * (SCREEN_WIDTH / 3840.f), renderer);
+                movesLeftText->SetTextContent(rollText.c_str(), renderer);
+            }
             movesLeftText->SetCenter(center.first, center.second);
 
             std::cout << "Updating pausedText" << std::endl;

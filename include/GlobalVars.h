@@ -70,6 +70,8 @@ extern bool hovering;
 
 extern bool validMove;
 
+extern bool hasRolled;
+
 extern float cameraZoom;
 
 extern int SCREEN_WIDTH;

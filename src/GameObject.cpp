@@ -551,12 +551,12 @@ Text::Text(string n, const char *fp, SDL_Color c, int x, int y, int s, SDL_Rende
     font = TTF_OpenFont(fontPath, size);
 
     SDL_Color shadowColor = {0, 0, 0, shadowAlpha};
-    SDL_Surface *shadowSurface = TTF_RenderText_Solid(font, text, 0, shadowColor);
+    SDL_Surface *shadowSurface = TTF_RenderText_Solid(font, text.c_str(), text.length(), shadowColor);
     shadowTexture = SDL_CreateTextureFromSurface(r, shadowSurface);
     SDL_SetTextureAlphaMod(shadowTexture, shadowAlpha);
     SDL_DestroySurface(shadowSurface);
 
-    surface = TTF_RenderText_Solid(font, text, 0, color);
+    surface = TTF_RenderText_Solid(font, text.c_str(), text.length(), color);
     texture = SDL_CreateTextureFromSurface(r, surface);
 
     dimensions.first = surface->w;
@@ -566,7 +566,7 @@ Text::Text(string n, const char *fp, SDL_Color c, int x, int y, int s, SDL_Rende
 void Text::SetColor(SDL_Color c, SDL_Renderer *r)
 {
     color = c;
-    surface = TTF_RenderText_Solid(font, text, 0, color);
+    surface = TTF_RenderText_Solid(font, text.c_str(), 0, color);
     texture = SDL_CreateTextureFromSurface(r, surface);
 }
 

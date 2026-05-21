@@ -409,6 +409,14 @@ void MouseButtonUpGame(Input *playerInput, SDL_MouseButtonEvent &event)
                     endText->SetSelected(false);
                     turnText->SetSelected(false);
                 }
+                else if (uiElement == die1)
+                {
+                    die2->SetSelected(false);
+                }
+                else if (uiElement == die2)
+                {
+                    die1->SetSelected(false);
+                }
             }
         }
         selectedText = nullptr;
@@ -435,7 +443,7 @@ void MouseButtonUpGame(Input *playerInput, SDL_MouseButtonEvent &event)
             {
                 if ((selectedObject->GetName() == "dieOne" ||
                      selectedObject->GetName() == "dieTwo") &&
-                    movesLeft < 1)
+                    movesLeft < 1 && !hasRolled)
                 {
                     currentRoll = Roll();
                     movesLeft = currentRoll;
@@ -508,6 +516,14 @@ void MouseButtonUpGame(Input *playerInput, SDL_MouseButtonEvent &event)
             {
                 endText->SetSelected(false);
                 turnText->SetSelected(false);
+            }
+            else if (uiElement == die1)
+            {
+                die2->SetSelected(false);
+            }
+            else if (uiElement == die2)
+            {
+                die1->SetSelected(false);
             }
         }
         selectedText = nullptr;

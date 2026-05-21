@@ -135,3 +135,5 @@ Text *playerWinsText;
 Text *playAgainText;
 
 Text *winnerExitToMainMenuText;
+
+bool hasRolled = false;

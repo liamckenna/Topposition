@@ -374,7 +374,7 @@ class Text
     const char *fontPath;
     TTF_Font *font;
     SDL_Color color;
-    const char *text;
+    std::string text;
     std::pair<int, int> position;
     std::pair<int, int> dimensions;
     SDL_FRect *rect = new SDL_FRect();
@@ -419,21 +419,36 @@ public:
     }
     void SetTextContent(const char *t, SDL_Renderer *renderer)
     {
+        std::cout << "Changing text (" << text << ") to " << t << std::endl;
         text = t;
         SDL_DestroyTexture(texture);
         SDL_DestroyTexture(shadowTexture);
 
+
         SDL_Color shadowColor = {0, 0, 0, shadowAlpha};
-        SDL_Surface *shadowSurface = TTF_RenderText_Solid(font, text, 0, shadowColor);
+        SDL_Surface *shadowSurface = TTF_RenderText_Solid(font, text.c_str(), text.length(), shadowColor);
         shadowTexture = SDL_CreateTextureFromSurface(renderer, shadowSurface);
         SDL_SetTextureAlphaMod(shadowTexture, shadowAlpha);
         SDL_DestroySurface(shadowSurface);
 
-        surface = TTF_RenderText_Solid(font, text, 0, color);
+
+        surface = TTF_RenderText_Solid(font, text.c_str(), text.length(), color);
+        if (surface == nullptr)
+        {
+            std::cout << SDL_GetError() << std::endl;
+        }
+            
         texture = SDL_CreateTextureFromSurface(renderer, surface);
+
+
+        while(surface == nullptr)
+        {
+            _sleep(1);
+        }
 
         dimensions.first = surface->w;
         dimensions.second = surface->h;
+
     }
     void SetDimensions(int w, int h)
     {
@@ -445,9 +460,8 @@ public:
     void SetSize(int s, SDL_Renderer *renderer)
     {
         size = s;
-        TTF_CloseFont(font);
         font = TTF_OpenFont(fontPath, size);
-        SetTextContent(text, renderer);
+        SetTextContent(text.c_str(), renderer);
     }
     void SetColor(SDL_Color c, SDL_Renderer *r);
     void SetHovered(bool h) { hovered = h; }
@@ -468,6 +482,7 @@ public:
     std::pair<int, int> GetBottomRight() { return {position.first + dimensions.first, position.second + dimensions.second}; }
     gameState GetGameStateContext() { return gameStateContext; }
     pauseState GetPauseStateContext() { return pauseStateContext; }
+    string GetTextContent() { return text; }
 };
 
 class Animation

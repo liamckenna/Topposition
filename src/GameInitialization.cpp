@@ -477,9 +477,15 @@ void loadUI()
         gameObjects[gameObjects.size() - 1].push_back(claimPeakButton);
         peaks[i]->SetClaimNotif(claimPeakButton);
     }
-    currentRoll = Roll();
-    movesLeft = currentRoll;
-    
+    if (rules->GetAutoRollMoves())
+    {
+        currentRoll = Roll();
+        movesLeft = currentRoll;
+    }
+    else
+    {
+        ClearRoll();
+    }
     for (int i = 0; i < players.size(); i++)
     {
         for(int j = 0; j < players[i]->soldiers.size(); j++)
@@ -711,6 +717,7 @@ void ResetGlobalVars()
     fatalAttackExclamation = nullptr;
     fatalDefenseExclamation = nullptr;
     pState = MAIN;
+    hasRolled = false;
 }
 
 void RefreshShadows()

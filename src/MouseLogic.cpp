@@ -179,6 +179,10 @@ UIElement *selectUI(int x, int y, bool update, bool selecting)
                 {
                     continue;
                 }
+                if ((uiElements[i] == die1 || uiElements[i] == die2) && hasRolled)
+                {
+                    continue;
+                }
                 if (selecting)
                 {
                     uiElements[i]->SetSelected(true);
@@ -186,6 +190,14 @@ UIElement *selectUI(int x, int y, bool update, bool selecting)
                     {
                         endText->SetSelected(true);
                         turnText->SetSelected(true);
+                    }
+                    else if (uiElements[i] == die1)
+                    {
+                        die2->SetSelected(true);
+                    }
+                    else if (uiElements[i] == die2)
+                    {
+                        die1->SetSelected(true);
                     }
                 }
                 return uiElements[i];
@@ -243,6 +255,8 @@ Text *selectText(int x, int y, bool selecting)
 
 Piece *selectPiece(int x, int y, bool update)
 {
+    if (!hasRolled)
+        return nullptr;
     for (int i = pieces.size() - 1; i >= 0; i--)
     {
         if (!pieces[i]->GetSelectable() || !pieces[i]->GetRendered())
@@ -373,6 +387,17 @@ void updateHoverState(int x, int y)
             endTurnArrow->SetHovered(true);
             endText->SetHovered(true);
             turnText->SetHovered(true);
+        }
+    }
+    if (die1 != nullptr && die2 != nullptr)
+    {
+        if (die1->GetHovered())
+        {
+            die2->SetHovered(true);
+        }
+        else if (die2->GetHovered())
+        {
+            die1->SetHovered(true);
         }
     }
 }
