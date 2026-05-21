@@ -102,6 +102,8 @@ Uint64 frameCountTime = 0;
 
 int frameCounter = 0;
 
+int moveCost = 0;
+
 float cameraZoom = 1.f;
 
 std::pair<float, float> cameraPosition = {0.f, 0.f};
@@ -141,6 +143,8 @@ Text *winnerExitToMainMenuText;
 Text *suddenDeathText;
 
 Text *lastTurnText;
+
+Text *moveCostText;
 
 bool hasRolled = false;
 

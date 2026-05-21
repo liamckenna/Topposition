@@ -367,7 +367,24 @@ void Terrain::RenderGameObject(SDL_Renderer *renderer, Terrain *hoveringTerrain,
         {
             if (!isStartingTerrain)
             {
-                SDL_SetTextureColorMod(pixels, 255 / 2, 255 / 2, 255 / 2);
+                if (startingTerrain != nullptr)
+                {
+                    bool isConnected = false;
+                    for (int i = 0; i < startingTerrain->connectedTerrain.size(); i++)
+                    {
+                        if (this == startingTerrain->connectedTerrain[i])
+                        {
+                            isConnected = true;
+                            break;
+                        }
+                    }
+                    if (!isConnected)
+                        SDL_SetTextureColorMod(pixels, 255 / 2, 255 / 2, 255 / 2);
+                }
+                else
+                {
+                    SDL_SetTextureColorMod(pixels, 255 / 2, 255 / 2, 255 / 2);
+                }                
             }
         }
         else

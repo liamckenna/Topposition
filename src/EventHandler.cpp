@@ -301,7 +301,6 @@ void MouseButtonDownGame(Input *playerInput, SDL_MouseButtonEvent &event)
                     if (selectedObject != nullptr && selectedObject->type == PIECE)
                     {
                         Piece *piece = dynamic_cast<Piece *>(selectedObject);
-
                         piece->SetDesignatedLocation(piece->GetBottomMiddle().first, piece->GetBottomMiddle().second);
                         piece->SetScale(piece->GetScale() * 2);
                         piece->SetHeld(true);
@@ -310,6 +309,7 @@ void MouseButtonDownGame(Input *playerInput, SDL_MouseButtonEvent &event)
                         if (piece->GetCurrentAnimation() != NULL)
                             piece->GetCurrentAnimation()->Pause();
                         RefreshClaimNotifs();
+                        CheckMovementPossibility(piece, startingTerrain);
                     }
                 }
             }

@@ -440,6 +440,12 @@ void loadText()
     winnerExitToMainMenuText->SetPauseStateContext(WINNER);
     winnerExitToMainMenuText->SetSelectable(true);
     text.push_back(winnerExitToMainMenuText);
+
+    moveCostText = new Text("moveCostText", "fonts/yoster.ttf", White, 0, 0, textSize, renderer, "-0");
+    moveCostText->SetSize(65 * (SCREEN_WIDTH / 3840.f), renderer);
+    moveCostText->SetCenter(movesLeftText->GetBottomRight().first + (SCREEN_WIDTH / 200), movesLeftText->GetPosition().second + (moveCostText->GetHeight() / 2));
+    moveCostText->SetGameStateContext(GAME);
+    text.push_back(moveCostText);
 }
 
 void loadUI()
@@ -733,6 +739,7 @@ void ResetGlobalVars()
     endText = nullptr;
     suddenDeathText = nullptr;
     lastTurnText = nullptr;
+    moveCostText = nullptr;
     currentPlayerCircle = nullptr;
     opposingPlayerCircle = nullptr;
     endTurnArrow = nullptr;

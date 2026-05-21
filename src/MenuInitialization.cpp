@@ -202,6 +202,10 @@ void UpdateTextElementPositions()
             x = (SCREEN_WIDTH / 2) - (movesLeftText->GetWidth() / 2);
             y = SCREEN_HEIGHT - movesLeftText->GetHeight() - (SCREEN_HEIGHT / 9);
             movesLeftText->SetPosition(x, y);
+
+            moveCostText->SetSize(65 * (SCREEN_WIDTH / 3840.f), renderer);
+            moveCostText->SetCenter(movesLeftText->GetBottomRight().first + (SCREEN_WIDTH / 200), movesLeftText->GetPosition().second + (moveCostText->GetHeight() / 2));
+            
             center = movesLeftText->GetCenter();
             if (hasRolled)
             {
@@ -232,6 +236,8 @@ void UpdateTextElementPositions()
 
             winnerExitToMainMenuText->SetSize(150 * (SCREEN_WIDTH / 3840.f), renderer);
             winnerExitToMainMenuText->SetCenter(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 + SCREEN_HEIGHT / 8 + SCREEN_HEIGHT / 10);
+
+            
 
             int textSize = 125 * (SCREEN_WIDTH / 3840.f);
             y = SCREEN_HEIGHT / 40;

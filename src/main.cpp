@@ -21,6 +21,7 @@
 
 float last_fps_time = 0.f;
 int frame_count = 0;
+constexpr int FRAMETIME_CALC_MS = 1000;
 
 void CalculateFrameRate();
 
@@ -70,9 +71,9 @@ void CalculateFrameRate()
 
     frameCounter++;
     frameCountTime += deltaTime;
-    if (frameCountTime >= 1000)
+    if (frameCountTime >= FRAMETIME_CALC_MS)
     {
-        std::cout << "FPS: " << frameCounter << std::endl;
+        std::cout << "FPS: " << (frameCounter / (FRAMETIME_CALC_MS / 1000)) << std::endl;
         frameCounter = 0;
         frameCountTime = 0;
     }

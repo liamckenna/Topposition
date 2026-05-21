@@ -213,7 +213,7 @@ void UpdateScore()
             else if (!suddenDeath)
                 BeginSuddenDeath();
         }
-        else if (!lastTurn)
+        else if (!lastTurn && !suddenDeath)
         {
             BeginLastTurn();
         }

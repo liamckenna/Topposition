@@ -4,11 +4,13 @@ bool Move(Piece* piece, Terrain* startingPoint, Terrain* targetTerrain, int& mov
 
     int moveCount = 0;
     int heightDifference;
+    int bestCost = -1;
     std::vector<Terrain*> currentPath;
 
-    bool moveSuccess = MovementAttempt(heightDifference, moveCount, startingPoint, targetTerrain, currentPath, false);
+    bool moveSuccess = MovementAttempt(heightDifference, moveCount, startingPoint, targetTerrain, currentPath, false, bestCost);
 
     if (!moveSuccess) {
+        if (bestCost != -1) moveCount = bestCost;
         std::pair<float, float> originalPosition = piece->GetPosition();
         piece->SetCenter(piece->GetDesignatedLocation().first, piece->GetCenter().second);
         piece->SetBottomRight(piece->GetBottomRight().first, piece->GetDesignatedLocation().second);
@@ -46,7 +48,7 @@ bool Move(Piece* piece, Terrain* startingPoint, Terrain* targetTerrain, int& mov
 
 }
 
-bool MovementAttempt(int& heightDifference, int& attemptedMoves, Terrain* currentTerrain, Terrain*& targetTerrain, std::vector<Terrain*>& currentPath, bool fromAdjacent) {
+bool MovementAttempt(int& heightDifference, int& attemptedMoves, Terrain* currentTerrain, Terrain*& targetTerrain, std::vector<Terrain*>& currentPath, bool fromAdjacent, int& bestCost) {
 
     int targetTerrainLayer;
     int currentTerrainLayer;
@@ -58,60 +60,106 @@ bool MovementAttempt(int& heightDifference, int& attemptedMoves, Terrain* curren
     heightDifference = targetTerrainLayer - currentTerrainLayer;
 
     if (heightDifference == 0) {
-        if (currentTerrain == targetTerrain && attemptedMoves <= movesLeft) return true;
+        if (currentTerrain == targetTerrain) {
+            if (attemptedMoves <= movesLeft) return true;
+            if (bestCost == -1 || attemptedMoves < bestCost) bestCost = attemptedMoves;
+        }
     }
 
     if (currentTerrainLayer == 0) {
-        currentPath.push_back(GetTargetTerrainBase(targetTerrain));
-        return MovementAttempt(heightDifference, ++attemptedMoves, GetTargetTerrainBase(targetTerrain), targetTerrain, currentPath, false);
+        Terrain* targetBase = GetTargetTerrainBase(targetTerrain);
+        if (targetBase != currentTerrain) {
+            currentPath.push_back(targetBase);
+            return MovementAttempt(heightDifference, ++attemptedMoves, targetBase, targetTerrain, currentPath, false, bestCost);
+        }
     }
 
     if (heightDifference > 0) {
-        if (DirectMovementUp(heightDifference, attemptedMoves, currentTerrain, targetTerrain, currentPath) && attemptedMoves <= movesLeft) return true;
+        int savedMoves = attemptedMoves;
+        int savedPathSize = (int)currentPath.size();
+        if (DirectMovementUp(heightDifference, attemptedMoves, currentTerrain, targetTerrain, currentPath)) {
+            if (attemptedMoves <= movesLeft) return true;
+            if (bestCost == -1 || attemptedMoves < bestCost) bestCost = attemptedMoves;
+            currentPath.resize(savedPathSize);
+            attemptedMoves = savedMoves;
+        }
     }
 
     if (heightDifference < 0) {
-        if (DirectMovementDown(heightDifference, attemptedMoves, currentTerrain, targetTerrain, currentPath) && attemptedMoves <= movesLeft) return true;
+        int savedMoves = attemptedMoves;
+        int savedPathSize = (int)currentPath.size();
+        if (DirectMovementDown(heightDifference, attemptedMoves, currentTerrain, targetTerrain, currentPath)) {
+            if (attemptedMoves <= movesLeft) return true;
+            if (bestCost == -1 || attemptedMoves < bestCost) bestCost = attemptedMoves;
+            currentPath.resize(savedPathSize);
+            attemptedMoves = savedMoves;
+        }
     }
+
     if (!fromAdjacent) {
-        if (AdjacentMovement(heightDifference, attemptedMoves, currentTerrain, targetTerrain, currentPath) && attemptedMoves <= movesLeft) return true;
+        if (AdjacentMovement(heightDifference, attemptedMoves, currentTerrain, targetTerrain, currentPath, bestCost) && attemptedMoves <= movesLeft) return true;
     }
 
-    if (currentTerrain->GetLowerTerrain() != NULL && !fromAdjacent) {
-
+    if (currentTerrain->GetLowerTerrain() != NULL && !fromAdjacent)
+    {
+        int savedMoves = attemptedMoves;
+        int savedPathSize = (int)currentPath.size();
         currentPath.push_back(currentTerrain->GetLowerTerrain());
-
         attemptedMoves++;
-        if (MovementAttempt(heightDifference, attemptedMoves, currentTerrain->GetLowerTerrain(), targetTerrain, currentPath, false) && attemptedMoves <= movesLeft) return true;
-
-
-    } else if (!fromAdjacent) {
-
+        if (MovementAttempt(heightDifference, attemptedMoves, currentTerrain->GetLowerTerrain(), targetTerrain, currentPath, false, bestCost) && attemptedMoves <= movesLeft) return true;
+        currentPath.resize(savedPathSize);
+        attemptedMoves = savedMoves;
+    }
+    else if (!fromAdjacent)
+    {
+        int savedMoves = attemptedMoves;
         attemptedMoves = attemptedMoves + 2;
-        if (attemptedMoves > movesLeft) return false;
+        if (attemptedMoves > movesLeft) { attemptedMoves = savedMoves; return false; }
         currentPath.push_back(nullptr);
         currentPath.push_back(GetTargetTerrainBase(targetTerrain));
         Terrain* terrainBase = GetTargetTerrainBase(targetTerrain);
-        if (MovementAttempt(heightDifference, attemptedMoves, terrainBase, targetTerrain, currentPath, false) && attemptedMoves <= movesLeft) return true;
+        if (MovementAttempt(heightDifference, attemptedMoves, terrainBase, targetTerrain, currentPath, true, bestCost) && attemptedMoves <= movesLeft) return true;
+        currentPath.pop_back();
+        currentPath.pop_back();
+        attemptedMoves = savedMoves;
     }
 
     return false;
 
 }
 
-bool CheckMovementPossibility(Piece* piece, Terrain* targetTerrain) {
-
+bool CheckMovementPossibility(Piece* piece, Terrain* targetTerrain)
+{
+    SDL_Color White = {255, 255, 255};
+    SDL_Color Red = {255, 0, 0};
     int moveCount = 0;
     int heightDifference;
+    int bestCost = -1;
     std::vector<Terrain*> currentPath;
     Terrain* currentTerrain = selectTerrain(piece->GetDesignatedLocation().first, piece->GetDesignatedLocation().second);
+    string moveCostString = "-";
+    bool moveIsPossible = MovementAttempt(heightDifference, moveCount, currentTerrain, targetTerrain, currentPath, false, bestCost);
+    if (bestCost != -1)
+        moveCount = bestCost;
 
-    if (MovementAttempt(heightDifference, moveCount, currentTerrain, targetTerrain, currentPath, false)) {
-        return true;
-    } else {
-        return false;
+    if (bestCost == -1 && !moveIsPossible && currentTerrain != nullptr && targetTerrain != nullptr) {
+        Terrain* currentBase = GetTargetTerrainBase(currentTerrain);
+        Terrain* targetBase = GetTargetTerrainBase(targetTerrain);
+        if (currentBase != nullptr && targetBase != nullptr) {
+            moveCount = (currentTerrain->GetLayer() - currentBase->GetLayer()) + (targetTerrain->GetLayer() - targetBase->GetLayer());
+            if (currentBase != targetBase) moveCount += 2;
+        }
     }
 
+    moveCostString = moveCostString + to_string(moveCount);
+    if (moveIsPossible)
+        moveCostText->SetColor(White, renderer);
+    else
+        moveCostText->SetColor(Red, renderer);
+
+    moveCostText->SetTextContent(moveCostString.c_str(), renderer);
+
+    return moveIsPossible;
 }
 
 bool DirectMovementUp(int& heightDifference, int& attemptedMoves, Terrain* currentTerrain, Terrain*& targetTerrain ,std::vector<Terrain*>& currentPath) {
@@ -165,7 +213,7 @@ Terrain* GetTargetTerrainBase(Terrain* targetTerrain) {
     return targetTerrainBase;
 }
 
-bool AdjacentMovement(int& heightDifference, int& attemptedMoves, Terrain* currentTerrain, Terrain*& targetTerrain ,std::vector<Terrain*>& currentPath) {
+bool AdjacentMovement(int& heightDifference, int& attemptedMoves, Terrain* currentTerrain, Terrain*& targetTerrain, std::vector<Terrain*>& currentPath, int& bestCost) {
     for (int i = 0; i < currentTerrain->connectedTerrain.size(); i++) {
 
         bool alreadyCovered = false;
@@ -177,10 +225,13 @@ bool AdjacentMovement(int& heightDifference, int& attemptedMoves, Terrain* curre
         }
         if (alreadyCovered) continue;
 
+        int savedMoves = attemptedMoves;
+        int savedPathSize = (int)currentPath.size();
         currentPath.push_back(currentTerrain->connectedTerrain[i]);
 
-        if (MovementAttempt(heightDifference, attemptedMoves, currentTerrain->connectedTerrain[i], targetTerrain, currentPath, true) && attemptedMoves <= movesLeft) return true;
-        else currentPath.pop_back();
+        if (MovementAttempt(heightDifference, attemptedMoves, currentTerrain->connectedTerrain[i], targetTerrain, currentPath, true, bestCost) && attemptedMoves <= movesLeft) return true;
+        currentPath.resize(savedPathSize);
+        attemptedMoves = savedMoves;
     }
 
     return false;

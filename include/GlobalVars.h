@@ -102,6 +102,8 @@ extern int unclaimedPeakCount;
 
 extern int frameCounter;
 
+extern int moveCost;
+
 extern Uint64 currentTime;
 
 extern Uint64 prevTime;
@@ -163,3 +165,5 @@ extern Text *winnerExitToMainMenuText;
 extern Text *suddenDeathText;
 
 extern Text *lastTurnText;
+
+extern Text *moveCostText;

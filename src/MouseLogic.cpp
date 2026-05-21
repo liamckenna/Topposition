@@ -439,6 +439,15 @@ void updateHoverState(int x, int y)
             die1->SetHovered(true);
         }
     }
+
+    if (selectedObject != nullptr && selectedObject->type == PIECE)
+    {
+        moveCostText->SetRendered(true);
+    }
+    else
+    {
+        moveCostText->SetRendered(false);
+    }
 }
 
 void moveSelectedObject(GameObject *gameObject, Input *playerInput)

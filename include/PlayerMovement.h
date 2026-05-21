@@ -4,7 +4,7 @@
 
 bool Move(Piece* piece, Terrain* startingPoint, Terrain* targetTerrain, int& movesLeft);
 
-bool MovementAttempt(int& heightDifference, int& attemptedMoves, Terrain* currentTerrain, Terrain*& targetTerrain, std::vector<Terrain*>& currentPath, bool fromAdjacent);
+bool MovementAttempt(int& heightDifference, int& attemptedMoves, Terrain* currentTerrain, Terrain*& targetTerrain, std::vector<Terrain*>& currentPath, bool fromAdjacent, int& bestCost);
 
 bool CheckMovementPossibility(Piece* piece, Terrain* targetTerrain);
 
@@ -14,4 +14,4 @@ bool DirectMovementDown(int& heightDifference, int& attemptedMoves, Terrain* cur
 
 Terrain* GetTargetTerrainBase(Terrain* targetTerrain);
 
-bool AdjacentMovement(int& heightDifference, int& attemptedMoves, Terrain* currentTerrain, Terrain*& targetTerrain ,std::vector<Terrain*>& currentPath);
+bool AdjacentMovement(int& heightDifference, int& attemptedMoves, Terrain* currentTerrain, Terrain*& targetTerrain, std::vector<Terrain*>& currentPath, int& bestCost);
