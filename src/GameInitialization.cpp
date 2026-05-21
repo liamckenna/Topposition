@@ -266,17 +266,36 @@ void loadText()
     x = turnTallyText->GetPosition().first + (SCREEN_WIDTH / 160);
     y = turnTallyText->GetPosition().second + turnTallyText->GetHeight() + (SCREEN_HEIGHT / 200);
 
+    lastTurnText = new Text("lastTurnText", "fonts/yoster.ttf", Yellow, x, y, 90 * (SCREEN_WIDTH / 3840.f), renderer, "Last Turn!");
+    lastTurnText->SetCenter(turnTallyText->GetCenter().first, turnTallyText->GetCenter().second);
+    lastTurnText->SetPosition(lastTurnText->GetPosition().first + (SCREEN_WIDTH / 400), turnTallyText->GetBottomRight().second - lastTurnText->GetHeight());
+    lastTurnText->SetGameStateContext(GAME);
+    lastTurnText->SetRendered(false);
+    text.push_back(lastTurnText);
+
+    suddenDeathText = new Text("suddenDeathText", "fonts/yoster.ttf", Red, x, y, textSize, renderer, "Sudden Death!");
+    suddenDeathText->SetSize(70 * (SCREEN_WIDTH / 3840.f), renderer);
+    suddenDeathText->SetCenter(turnTallyText->GetCenter().first, turnTallyText->GetCenter().second);
+    suddenDeathText->SetPosition(suddenDeathText->GetPosition().first, turnTallyText->GetBottomRight().second - suddenDeathText->GetHeight() - (SCREEN_HEIGHT / 200));
+    suddenDeathText->SetGameStateContext(GAME);
+    suddenDeathText->SetRendered(false);
+    text.push_back(suddenDeathText);
+
     turnTallyText->SetPosition(turnTallyText->GetPosition().first + (turnTallyNumText->GetWidth() / 2), turnTallyText->GetPosition().second);
     turnTallyText->SetTextContent("Turn", renderer);
 
-    std::string peaksLeftString = "peaks left: " + to_string(11);
+
+
+    std::string peaksLeftString = "peaks left: 22";
     peaksLeftText = new Text("peaksLeftText", "fonts/yoster.ttf", White, x, y, textSize, renderer, peaksLeftString.c_str());
     text.push_back(peaksLeftText);
 
-    std::string peaksLeftNumString = to_string(11);
+    std::string peaksLeftNumString = to_string(22);
     peaksLeftNumText = new Text("peaksLeftNumText", "fonts/yoster.ttf", White, x, y, textSize, renderer, peaksLeftNumString.c_str());
     peaksLeftNumText->SetPosition(peaksLeftText->GetBottomRight().first - peaksLeftNumText->GetWidth(), peaksLeftText->GetPosition().second);
+    std::pair<float, float> peaksLeftNumCenter = peaksLeftNumText->GetCenter();
     peaksLeftNumText->SetTextContent(to_string(unclaimedPeakCount).c_str(), renderer);
+    peaksLeftNumText->SetCenter(peaksLeftNumCenter.first, peaksLeftNumCenter.second);
     text.push_back(peaksLeftNumText);
 
     peaksLeftText->SetTextContent("peaks left: ", renderer);
@@ -712,6 +731,8 @@ void ResetGlobalVars()
     mainExitToMainMenuText = nullptr;
     turnText = nullptr;
     endText = nullptr;
+    suddenDeathText = nullptr;
+    lastTurnText = nullptr;
     currentPlayerCircle = nullptr;
     opposingPlayerCircle = nullptr;
     endTurnArrow = nullptr;

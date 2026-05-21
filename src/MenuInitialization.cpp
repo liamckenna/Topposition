@@ -164,6 +164,14 @@ void UpdateTextElementPositions()
             int x = turnTallyText->GetPosition().first + (SCREEN_WIDTH / 160);
             int y = turnTallyText->GetPosition().second + turnTallyText->GetHeight() + (SCREEN_HEIGHT / 200);
 
+            lastTurnText->SetSize(90 * (SCREEN_WIDTH / 3840.f), renderer);
+            lastTurnText->SetCenter(turnTallyText->GetCenter().first, turnTallyText->GetCenter().second);
+            lastTurnText->SetPosition(lastTurnText->GetPosition().first + (SCREEN_WIDTH / 400), turnTallyText->GetBottomRight().second - lastTurnText->GetHeight());
+
+            suddenDeathText->SetSize(70 * (SCREEN_WIDTH / 3840.f), renderer);
+            suddenDeathText->SetCenter(turnTallyText->GetCenter().first, turnTallyText->GetCenter().second);
+            suddenDeathText->SetPosition(suddenDeathText->GetPosition().first, turnTallyText->GetBottomRight().second - suddenDeathText->GetHeight() - (SCREEN_HEIGHT / 200));
+
             turnTallyText->SetPosition(turnTallyText->GetPosition().first + (turnTallyNumText->GetWidth() / 2), turnTallyText->GetPosition().second);
             turnTallyText->SetTextContent("Turn", renderer);
             if (turnCount >= 10)
@@ -173,15 +181,6 @@ void UpdateTextElementPositions()
             }
             turnTallyNumText->SetTextContent(to_string(turnCount).c_str(), renderer);
 
-            if (lastTurn)
-            {
-                BeginLastTurn();
-            }
-            if (suddenDeath)
-            {
-                BeginSuddenDeath();
-            }
-            
             std::string peaksLeftString = "peaks left: " + to_string(11);
             peaksLeftText->SetTextContent(peaksLeftString.c_str(), renderer);
             peaksLeftText->SetSize(65 * (SCREEN_WIDTH / 3840.f), renderer);

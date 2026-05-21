@@ -138,6 +138,10 @@ Text *playAgainText;
 
 Text *winnerExitToMainMenuText;
 
+Text *suddenDeathText;
+
+Text *lastTurnText;
+
 bool hasRolled = false;
 
 bool allPeaksClaimed = false;

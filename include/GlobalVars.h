@@ -58,6 +58,8 @@ extern Player *currentTurn;
 
 extern Player *firstPlace;
 
+extern BattleSequenceState* battleSequence;
+
 extern std::pair<float, float> worldResolution;
 
 extern std::pair<float, float> cameraPosition;
@@ -158,4 +160,6 @@ extern Text *playAgainText;
 
 extern Text *winnerExitToMainMenuText;
 
-extern BattleSequenceState* battleSequence;
+extern Text *suddenDeathText;
+
+extern Text *lastTurnText;

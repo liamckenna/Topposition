@@ -144,25 +144,6 @@ void FinishTurn()
     }
 }
 
-void BeginSuddenDeath()
-{
-    lastTurn = false;
-    SDL_Color Red = {255, 0, 0};
-    
-    std::pair<float, float> center = {turnTallyText->GetPosition().first + ((turnTallyText->GetWidth() + turnTallyNumText->GetWidth()) / 2), turnTallyText->GetCenter().second};
-    if (lastTurn || suddenDeath)
-    {
-        center = {turnTallyText->GetCenter().first, turnTallyText->GetCenter().second};
-    }
-    turnTallyNumText->SetRendered(false);
-    turnTallyText->SetColor(Red, renderer);
-    string suddenDeathText = "Sudden Death!";
-    turnTallyText->SetTextContent(suddenDeathText.c_str(), renderer);
-    turnTallyText->SetSize(85 * (SCREEN_WIDTH / 3840.f), renderer);
-    turnTallyText->SetCenter(center.first, center.second);
-
-    suddenDeath = true;
-}
 
 void ClearRoll()
 {
@@ -246,22 +227,24 @@ void UpdateScore()
     }
 }
 
-void BeginLastTurn()
+void BeginSuddenDeath()
 {
-    SDL_Color Yellow = {255, 255, 0};
+    lastTurn = false;
 
-    std::pair<float, float> center = {turnTallyText->GetPosition().first + ((turnTallyText->GetWidth() + turnTallyNumText->GetWidth()) / 2), turnTallyText->GetCenter().second};
-    if (lastTurn)
-    {
-        center = {turnTallyText->GetCenter().first, turnTallyText->GetCenter().second};
-    }
+    
+    lastTurnText->SetRendered(false);
+    turnTallyText->SetRendered(false);
     turnTallyNumText->SetRendered(false);
-    turnTallyText->SetColor(Yellow, renderer);
-    string lastTurnText = "Last Turn!";
-    turnTallyText->SetSize(100 * (SCREEN_WIDTH / 3840.f), renderer);
-    turnTallyText->SetTextContent(lastTurnText.c_str(), renderer);
-    turnTallyText->SetCenter(center.first, center.second);
+    suddenDeathText->SetRendered(true);
 
+    suddenDeath = true;
+}
+
+void BeginLastTurn()
+{ 
+    turnTallyText->SetRendered(false);
+    turnTallyNumText->SetRendered(false);
+    lastTurnText->SetRendered(true);
     lastTurn = true;
 }
 

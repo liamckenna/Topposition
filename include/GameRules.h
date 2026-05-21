@@ -4,15 +4,14 @@ class GameRules
     int pieces = 8;
     int maxHeight = 8;
     int playerCount = 4;
-    int peakCount = 20;
     int maxPoints = 100;
     int maxItems = 0;
     int remainingItems = 0;
     int uniqueItemCount = 3;
-    int remainingPoints = 100;
+    int remainingPoints = 0;
     int fatalBattleDifference = 4;
-    bool claimEndsTurn = true;
-    bool autoRollMoves = false;
+    bool claimEndsTurn = false;
+    bool autoRollMoves = true;
     bool evenTurnCount = true;
     bool infiniteRolls = true;
 
@@ -22,7 +21,6 @@ public:
     int GetRemainingPoints() { return remainingPoints; }
     int GetMaxPoints() { return maxPoints; }
     int GetMaxHeight() { return maxHeight; }
-    int GetPeakCount() { return peakCount; }
     int GetRemainingItems() { return remainingItems; }
     int GetMaxItems() { return maxItems; }
     int GetUniqueItemCount() { return uniqueItemCount; }
@@ -38,7 +36,6 @@ public:
     void SetRemainingPoints(int rp) { remainingPoints = rp; }
     void SetRemainingItems(int ri) { remainingItems = ri; }
     void SetMaxHeight(int mh) { maxHeight = mh; }
-    void SetPeakCount(int pc) { peakCount = pc; }
     void SetFatalBattleDifference(int fbd) { fatalBattleDifference = fbd; }
     void SetClaimEndsTurn(bool cet) { claimEndsTurn = cet; }
     void SetAutoRollMoves(bool arm) { autoRollMoves = arm; }
