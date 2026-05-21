@@ -104,13 +104,31 @@ void FinishTurn()
     RefreshClaimNotifs();
     if (currentTurn == players[0])
     {
-        turnCount++;
-        if (turnCount == 10)
+        if (rules->GetEvenTurnCount() && allPeaksClaimed)
         {
-            turnTallyNumText->SetPosition(turnTallyNumText->GetPosition().first - (turnTallyNumText->GetDimensions().first / 2), turnTallyNumText->GetPosition().second);
-            turnTallyText->SetPosition(turnTallyText->GetPosition().first - (turnTallyNumText->GetDimensions().first / 2), turnTallyText->GetPosition().second);
+            UpdateScore();
+            if (firstPlace != nullptr)
+            {
+                GameFinished(firstPlace);
+            }
+            else
+            {
+                BeginSuddenDeath();
+            }
         }
-        turnTallyNumText->SetTextContent(to_string(turnCount).c_str(), renderer);
+
+        turnCount++;
+
+        if (!suddenDeath && !lastTurn)
+        {
+            if (turnCount == 10)
+            {
+                turnTallyNumText->SetPosition(turnTallyNumText->GetPosition().first - (turnTallyNumText->GetDimensions().first / 2), turnTallyNumText->GetPosition().second);
+                turnTallyText->SetPosition(turnTallyText->GetPosition().first - (turnTallyNumText->GetDimensions().first / 2), turnTallyText->GetPosition().second);
+            }
+            turnTallyNumText->SetTextContent(to_string(turnCount).c_str(), renderer);
+        }
+        
     }
 
     hasRolled = false;
@@ -124,6 +142,26 @@ void FinishTurn()
     {
         ClearRoll();
     }
+}
+
+void BeginSuddenDeath()
+{
+    lastTurn = false;
+    SDL_Color Red = {255, 0, 0};
+    
+    std::pair<float, float> center = {turnTallyText->GetPosition().first + ((turnTallyText->GetWidth() + turnTallyNumText->GetWidth()) / 2), turnTallyText->GetCenter().second};
+    if (lastTurn || suddenDeath)
+    {
+        center = {turnTallyText->GetCenter().first, turnTallyText->GetCenter().second};
+    }
+    turnTallyNumText->SetRendered(false);
+    turnTallyText->SetColor(Red, renderer);
+    string suddenDeathText = "Sudden Death!";
+    turnTallyText->SetTextContent(suddenDeathText.c_str(), renderer);
+    turnTallyText->SetSize(85 * (SCREEN_WIDTH / 3840.f), renderer);
+    turnTallyText->SetCenter(center.first, center.second);
+
+    suddenDeath = true;
 }
 
 void ClearRoll()
@@ -187,9 +225,44 @@ void UpdateScore()
     }
     if (pointsLeft == 0)
     {
-        if (firstPlace != nullptr)
-            GameFinished(firstPlace);
+        if (!rules->GetEvenTurnCount())
+        {
+            if (firstPlace != nullptr)
+                GameFinished(firstPlace);
+            else if (!suddenDeath)
+                BeginSuddenDeath();
+        }
+        else if (!lastTurn)
+        {
+            BeginLastTurn();
+        }
     }
+    if (suddenDeath)
+    {
+        if (firstPlace != nullptr)
+        {
+            GameFinished(firstPlace);
+        }
+    }
+}
+
+void BeginLastTurn()
+{
+    SDL_Color Yellow = {255, 255, 0};
+
+    std::pair<float, float> center = {turnTallyText->GetPosition().first + ((turnTallyText->GetWidth() + turnTallyNumText->GetWidth()) / 2), turnTallyText->GetCenter().second};
+    if (lastTurn)
+    {
+        center = {turnTallyText->GetCenter().first, turnTallyText->GetCenter().second};
+    }
+    turnTallyNumText->SetRendered(false);
+    turnTallyText->SetColor(Yellow, renderer);
+    string lastTurnText = "Last Turn!";
+    turnTallyText->SetSize(100 * (SCREEN_WIDTH / 3840.f), renderer);
+    turnTallyText->SetTextContent(lastTurnText.c_str(), renderer);
+    turnTallyText->SetCenter(center.first, center.second);
+
+    lastTurn = true;
 }
 
 void GameFinished(Player *winner)

@@ -12,6 +12,8 @@ void loadText();
 
 void loadUI();
 
+void loadBattleSequence();
+
 void GeneratePixels();
 
 void GenerateOcean();

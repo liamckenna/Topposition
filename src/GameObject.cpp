@@ -409,6 +409,10 @@ void Peak::Claim(Player *player)
     {
         unclaimedPeakCount--;
     }
+    if (unclaimedPeakCount == 0)
+    {
+        allPeaksClaimed = true;
+    }
     claimedBy = player;
     player->peaks.push_back(this);
 }

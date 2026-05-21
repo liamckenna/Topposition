@@ -8,41 +8,6 @@ namespace
     constexpr int BATTLE_ADVANCE_DELAY_MS = 1000;
     constexpr int BATTLE_FATAL_SIGNAL_DELAY_MS = 1800;
 
-    enum BattlePhase
-    {
-        BATTLE_IDLE,
-        BATTLE_START_ROUND,
-        BATTLE_WAIT_ATTACK_ROLL,
-        BATTLE_REVEAL_ATTACK,
-        BATTLE_WAIT_DEFENSE_ROLL,
-        BATTLE_WAIT_DIE_CLICKS,
-        BATTLE_RESOLVE_ROUND,
-        BATTLE_FATAL_ATTACK,
-        BATTLE_FATAL_DEFENSE,
-        BATTLE_ADVANCE,
-        BATTLE_END
-    };
-
-    struct BattleSequenceState
-    {
-        bool active = false;
-        Peak *peak = nullptr;
-        Player *attacker = nullptr;
-        Player *defender = nullptr;
-        std::vector<Piece *> attackers;
-        std::vector<Piece *> defenders;
-        Piece *roundAttacker = nullptr;
-        Piece *roundDefender = nullptr;
-        int attackRoll = 0;
-        int defenseRoll = 0;
-        bool attackRollStarted = false;
-        bool defenseRollStarted = false;
-        Uint64 phaseStart = SDL_GetTicks();
-        BattlePhase phase = BATTLE_IDLE;
-    };
-
-    BattleSequenceState battleSequence;
-
     int RollDie()
     {
         return rand() % 6 + 1;
@@ -104,18 +69,18 @@ namespace
 
     void RefreshBattleParticipants()
     {
-        battleSequence.attackers.clear();
-        battleSequence.defenders.clear();
+        battleSequence->attackers.clear();
+        battleSequence->defenders.clear();
 
-        for (size_t i = 0; i < battleSequence.peak->occupants.size(); i++)
+        for (size_t i = 0; i < battleSequence->peak->occupants.size(); i++)
         {
-            if (battleSequence.peak->occupants[i]->GetPlayer() == battleSequence.attacker)
+            if (battleSequence->peak->occupants[i]->GetPlayer() == battleSequence->attacker)
             {
-                battleSequence.attackers.push_back(battleSequence.peak->occupants[i]);
+                battleSequence->attackers.push_back(battleSequence->peak->occupants[i]);
             }
-            else if (battleSequence.peak->occupants[i]->GetPlayer() == battleSequence.defender)
+            else if (battleSequence->peak->occupants[i]->GetPlayer() == battleSequence->defender)
             {
-                battleSequence.defenders.push_back(battleSequence.peak->occupants[i]);
+                battleSequence->defenders.push_back(battleSequence->peak->occupants[i]);
             }
         }
     }
@@ -126,29 +91,29 @@ namespace
         {
             if (peak->occupants[i]->GetPlayer() != attacker)
             {
-                battleSequence.active = true;
-                battleSequence.peak = peak;
-                battleSequence.attacker = attacker;
-                battleSequence.defender = peak->occupants[i]->GetPlayer();
-                battleSequence.roundAttacker = nullptr;
-                battleSequence.roundDefender = nullptr;
-                battleSequence.attackRoll = 0;
-                battleSequence.defenseRoll = 0;
-                battleSequence.phaseStart = SDL_GetTicks();
-                battleSequence.phase = BATTLE_START_ROUND;
+                battleSequence->active = true;
+                battleSequence->peak = peak;
+                battleSequence->attacker = attacker;
+                battleSequence->defender = peak->occupants[i]->GetPlayer();
+                battleSequence->roundAttacker = nullptr;
+                battleSequence->roundDefender = nullptr;
+                battleSequence->attackRoll = 0;
+                battleSequence->defenseRoll = 0;
+                battleSequence->phaseStart = SDL_GetTicks();
+                battleSequence->phase = BATTLE_START_ROUND;
                 RefreshBattleParticipants();
                 opposingPlayerCircle->SetRendered(true);
-                SDL_SetTextureColorMod(opposingPlayerCircle->GetTexture(), battleSequence.defender->GetSDLColor().r / 1.5f, battleSequence.defender->GetSDLColor().g / 1.5f, battleSequence.defender->GetSDLColor().b / 1.5f);
-                battleSequence.defender->GetCircleText()->SetTextContent(std::to_string(battleSequence.defenders.size()).c_str(), renderer);
-                battleSequence.defender->GetCircleText()->SetCenter(opposingPlayerCircle->GetCenter().first, opposingPlayerCircle->GetCenter().second);
-                battleSequence.defender->GetCircleText()->SetRendered(true);
+                SDL_SetTextureColorMod(opposingPlayerCircle->GetTexture(), battleSequence->defender->GetSDLColor().r / 1.5f, battleSequence->defender->GetSDLColor().g / 1.5f, battleSequence->defender->GetSDLColor().b / 1.5f);
+                battleSequence->defender->GetCircleText()->SetTextContent(std::to_string(battleSequence->defenders.size()).c_str(), renderer);
+                battleSequence->defender->GetCircleText()->SetCenter(opposingPlayerCircle->GetCenter().first, opposingPlayerCircle->GetCenter().second);
+                battleSequence->defender->GetCircleText()->SetRendered(true);
                 endTurnArrow->SetRendered(false);
                 endText->SetRendered(false);
                 turnText->SetRendered(false);
-                battleSequence.peak->GetClaimNotif()->SetRendered(false);
+                battleSequence->peak->GetClaimNotif()->SetRendered(false);
                 crown->SetRendered(false);
-                battleSequence.attacker->GetCircleText()->SetTextContent(std::to_string(battleSequence.attackers.size()).c_str(), renderer);
-                battleSequence.attacker->GetCircleText()->SetCenter(currentPlayerCircle->GetCenter().first, currentPlayerCircle->GetCenter().second);
+                battleSequence->attacker->GetCircleText()->SetTextContent(std::to_string(battleSequence->attackers.size()).c_str(), renderer);
+                battleSequence->attacker->GetCircleText()->SetCenter(currentPlayerCircle->GetCenter().first, currentPlayerCircle->GetCenter().second);
                 if (rules->GetClaimEndsTurn())
                 {
                     ClearRoll();
@@ -165,12 +130,12 @@ namespace
 
     void EndBattleSequence()
     {
-        battleSequence.attacker->GetCircleText()->SetTextContent(battleSequence.attacker->GetCircleTextString().c_str(), renderer);
-        battleSequence.defender->GetCircleText()->SetTextContent(battleSequence.defender->GetCircleTextString().c_str(), renderer);
-        battleSequence.attacker->GetCircleText()->SetCenter(currentPlayerCircle->GetCenter().first, currentPlayerCircle->GetCenter().second);
-        battleSequence.defender->GetCircleText()->SetCenter(opposingPlayerCircle->GetCenter().first, opposingPlayerCircle->GetCenter().second);
-        battleSequence.defender->GetCircleText()->SetRendered(false);
-        battleSequence.defender->GetCircleText()->SetCenter(currentPlayerCircle->GetCenter().first, currentPlayerCircle->GetCenter().second);
+        battleSequence->attacker->GetCircleText()->SetTextContent(battleSequence->attacker->GetCircleTextString().c_str(), renderer);
+        battleSequence->defender->GetCircleText()->SetTextContent(battleSequence->defender->GetCircleTextString().c_str(), renderer);
+        battleSequence->attacker->GetCircleText()->SetCenter(currentPlayerCircle->GetCenter().first, currentPlayerCircle->GetCenter().second);
+        battleSequence->defender->GetCircleText()->SetCenter(opposingPlayerCircle->GetCenter().first, opposingPlayerCircle->GetCenter().second);
+        battleSequence->defender->GetCircleText()->SetRendered(false);
+        battleSequence->defender->GetCircleText()->SetCenter(currentPlayerCircle->GetCenter().first, currentPlayerCircle->GetCenter().second);
         opposingPlayerCircle->SetRendered(false);
         endTurnArrow->SetRendered(true);
         endText->SetRendered(true);
@@ -178,7 +143,8 @@ namespace
         crown->SetRendered(false);
         movesLeftText->SetRendered(true);
 
-        battleSequence = BattleSequenceState();
+        delete battleSequence;
+        battleSequence = new BattleSequenceState();
     }
 
     void FinalizePeakClaim(Peak *peak)
@@ -212,8 +178,9 @@ namespace
         }
         UpdateScore();
         RefreshClaimNotifs();
-        std::string peaksLeftString = "peaks left: " + to_string(unclaimedPeakCount);
-        peaksLeftText->SetTextContent(peaksLeftString.c_str(), renderer);
+        std::pair<float, float> center = peaksLeftNumText->GetCenter();
+        peaksLeftNumText->SetTextContent(to_string(unclaimedPeakCount).c_str(), renderer);
+        peaksLeftNumText->SetCenter(center.first, center.second);
     }
 }
 
@@ -269,135 +236,135 @@ void ClaimPeak(UIElement *peakNotif)
 
 void UpdateBattleSequence()
 {
-    if (!battleSequence.active)
+    if (!battleSequence->active)
     {
         return;
     }
 
-    if (battleSequence.peak == nullptr || battleSequence.attacker == nullptr || !IsOccupyingPeak(battleSequence.peak, battleSequence.attacker) && battleSequence.phase != BATTLE_END)
+    if (battleSequence->peak == nullptr || battleSequence->attacker == nullptr || !IsOccupyingPeak(battleSequence->peak, battleSequence->attacker) && battleSequence->phase != BATTLE_END)
     {
-        battleSequence.phase = BATTLE_END;
-        battleSequence.phaseStart = SDL_GetTicks();
+        battleSequence->phase = BATTLE_END;
+        battleSequence->phaseStart = SDL_GetTicks();
         return;
     }
 
-    switch (battleSequence.phase)
+    switch (battleSequence->phase)
     {
     case BATTLE_START_ROUND:
-        if (battleSequence.attackers.size() < 1 || battleSequence.defenders.size() < 1)
+        if (battleSequence->attackers.size() < 1 || battleSequence->defenders.size() < 1)
         {
-            battleSequence.phase = BATTLE_ADVANCE;
-            battleSequence.phaseStart = SDL_GetTicks();
+            battleSequence->phase = BATTLE_ADVANCE;
+            battleSequence->phaseStart = SDL_GetTicks();
             break;
         }
 
-        battleSequence.roundAttacker = battleSequence.attackers[battleSequence.attackers.size() - 1];
-        battleSequence.roundDefender = battleSequence.defenders[battleSequence.defenders.size() - 1];
+        battleSequence->roundAttacker = battleSequence->attackers[battleSequence->attackers.size() - 1];
+        battleSequence->roundDefender = battleSequence->defenders[battleSequence->defenders.size() - 1];
         if (rules->GetAutoRollMoves())
         {
-            battleSequence.attackRoll = RollDie();
-            StartSingleDieRoll("dieOne", battleSequence.attackRoll);
-            battleSequence.phase = BATTLE_WAIT_ATTACK_ROLL;
+            battleSequence->attackRoll = RollDie();
+            StartSingleDieRoll("dieOne", battleSequence->attackRoll);
+            battleSequence->phase = BATTLE_WAIT_ATTACK_ROLL;
             break;
         }
         else
         {
-            battleSequence.attackRollStarted = false;
-            battleSequence.defenseRollStarted = false;
+            battleSequence->attackRollStarted = false;
+            battleSequence->defenseRollStarted = false;
             die1->SetTexture(textures["die 0"][0]);
             die2->SetTexture(textures["die 0"][0]);
             diceAnimations.clear();
-            battleSequence.phase = BATTLE_WAIT_DIE_CLICKS;
+            battleSequence->phase = BATTLE_WAIT_DIE_CLICKS;
             break;
         }
     case BATTLE_WAIT_DIE_CLICKS:
-        if (battleSequence.attackRollStarted && battleSequence.defenseRollStarted && !HasActiveDiceAnimation())
-            battleSequence.phase = BATTLE_RESOLVE_ROUND;
+        if (battleSequence->attackRollStarted && battleSequence->defenseRollStarted && !HasActiveDiceAnimation())
+            battleSequence->phase = BATTLE_RESOLVE_ROUND;
         break;
     case BATTLE_WAIT_ATTACK_ROLL:
         if (HasActiveDiceAnimation())
             break;
 
-        battleSequence.phase = BATTLE_REVEAL_ATTACK;
-        battleSequence.phaseStart = SDL_GetTicks();
+        battleSequence->phase = BATTLE_REVEAL_ATTACK;
+        battleSequence->phaseStart = SDL_GetTicks();
         break;
     case BATTLE_REVEAL_ATTACK:
-        if (SDL_GetTicks() - battleSequence.phaseStart < BATTLE_ADVANCE_DELAY_MS)
+        if (SDL_GetTicks() - battleSequence->phaseStart < BATTLE_ADVANCE_DELAY_MS)
         {
             break;
         }
-        battleSequence.defenseRoll = RollDie();
-        StartSingleDieRoll("dieTwo", battleSequence.defenseRoll);
-        battleSequence.phase = BATTLE_WAIT_DEFENSE_ROLL;
-        battleSequence.phaseStart = SDL_GetTicks();
+        battleSequence->defenseRoll = RollDie();
+        StartSingleDieRoll("dieTwo", battleSequence->defenseRoll);
+        battleSequence->phase = BATTLE_WAIT_DEFENSE_ROLL;
+        battleSequence->phaseStart = SDL_GetTicks();
         break;
     case BATTLE_WAIT_DEFENSE_ROLL:
         if (HasActiveDiceAnimation())
             break;
 
-        battleSequence.phase = BATTLE_RESOLVE_ROUND;
+        battleSequence->phase = BATTLE_RESOLVE_ROUND;
         break;
     case BATTLE_RESOLVE_ROUND:
     {
-        if (battleSequence.roundAttacker == nullptr || battleSequence.roundDefender == nullptr)
+        if (battleSequence->roundAttacker == nullptr || battleSequence->roundDefender == nullptr)
         {
-            battleSequence.phase = BATTLE_START_ROUND;
+            battleSequence->phase = BATTLE_START_ROUND;
             break;
         }
 
-        if (battleSequence.attackRoll >= battleSequence.defenseRoll)
+        if (battleSequence->attackRoll >= battleSequence->defenseRoll)
         {
 
             crown->SetGlobalPosition(die1->GetGlobalCenter().first - (die1->GetDimensions().first * die1->GetScale() / 2) - (crown->GetDimensions().first * crown->GetScale()), die1->GetGlobalCenter().second - (die1->GetDimensions().second * die1->GetScale() / 2) - (crown->GetDimensions().second * crown->GetScale()));
             crown->SetRotation(-45);
             crown->SetRendered(true);
-            RetreatPiece(battleSequence.peak, battleSequence.roundDefender);
-            battleSequence.defenders.pop_back();
-            battleSequence.defender->GetCircleText()->SetTextContent(std::to_string(battleSequence.defenders.size()).c_str(), renderer);
-            battleSequence.defender->GetCircleText()->SetCenter(opposingPlayerCircle->GetCenter().first, opposingPlayerCircle->GetCenter().second);
+            RetreatPiece(battleSequence->peak, battleSequence->roundDefender);
+            battleSequence->defenders.pop_back();
+            battleSequence->defender->GetCircleText()->SetTextContent(std::to_string(battleSequence->defenders.size()).c_str(), renderer);
+            battleSequence->defender->GetCircleText()->SetCenter(opposingPlayerCircle->GetCenter().first, opposingPlayerCircle->GetCenter().second);
         }
         else
         {
             crown->SetGlobalPosition(die2->GetGlobalCenter().first + (die2->GetDimensions().first * die2->GetScale() / 2), die2->GetGlobalCenter().second - (die2->GetDimensions().second * die2->GetScale() / 2) - (crown->GetDimensions().second * crown->GetScale()));
             crown->SetRotation(45);
             crown->SetRendered(true);
-            RetreatPiece(battleSequence.peak, battleSequence.roundAttacker);
-            battleSequence.attackers.pop_back();
-            battleSequence.attacker->GetCircleText()->SetTextContent(std::to_string(battleSequence.attackers.size()).c_str(), renderer);
-            battleSequence.attacker->GetCircleText()->SetCenter(currentPlayerCircle->GetCenter().first, currentPlayerCircle->GetCenter().second);
+            RetreatPiece(battleSequence->peak, battleSequence->roundAttacker);
+            battleSequence->attackers.pop_back();
+            battleSequence->attacker->GetCircleText()->SetTextContent(std::to_string(battleSequence->attackers.size()).c_str(), renderer);
+            battleSequence->attacker->GetCircleText()->SetCenter(currentPlayerCircle->GetCenter().first, currentPlayerCircle->GetCenter().second);
         }
 
-        if (battleSequence.attackRoll - battleSequence.defenseRoll >= rules->GetFatalBattleDifference())
+        if (battleSequence->attackRoll - battleSequence->defenseRoll >= rules->GetFatalBattleDifference())
         {
-            KillSoldier(battleSequence.roundDefender);
-            battleSequence.phase = BATTLE_FATAL_ATTACK;
+            KillSoldier(battleSequence->roundDefender);
+            battleSequence->phase = BATTLE_FATAL_ATTACK;
         }
-        else if (battleSequence.defenseRoll - battleSequence.attackRoll >= rules->GetFatalBattleDifference())
+        else if (battleSequence->defenseRoll - battleSequence->attackRoll >= rules->GetFatalBattleDifference())
         {
-            KillSoldier(battleSequence.roundAttacker);
-            battleSequence.phase = BATTLE_FATAL_DEFENSE;
+            KillSoldier(battleSequence->roundAttacker);
+            battleSequence->phase = BATTLE_FATAL_DEFENSE;
         }
         else
         {
-            battleSequence.phase = BATTLE_ADVANCE;
+            battleSequence->phase = BATTLE_ADVANCE;
         }
-        battleSequence.roundAttacker = nullptr;
-        battleSequence.roundDefender = nullptr;
-        battleSequence.phaseStart = SDL_GetTicks();
+        battleSequence->roundAttacker = nullptr;
+        battleSequence->roundDefender = nullptr;
+        battleSequence->phaseStart = SDL_GetTicks();
 
         break;
     }
     case BATTLE_FATAL_ATTACK:
     {
-        if (SDL_GetTicks() - battleSequence.phaseStart > BATTLE_FATAL_SIGNAL_DELAY_MS)
+        if (SDL_GetTicks() - battleSequence->phaseStart > BATTLE_FATAL_SIGNAL_DELAY_MS)
         {
             fatalAttackExclamation->SetRendered(false);
-            battleSequence.phaseStart = SDL_GetTicks();
-            battleSequence.phase = BATTLE_ADVANCE;
+            battleSequence->phaseStart = SDL_GetTicks();
+            battleSequence->phase = BATTLE_ADVANCE;
             break;
         }
 
-        switch ((int(SDL_GetTicks() - battleSequence.phaseStart) / (BATTLE_FATAL_SIGNAL_DELAY_MS / 6)) % 2)
+        switch ((int(SDL_GetTicks() - battleSequence->phaseStart) / (BATTLE_FATAL_SIGNAL_DELAY_MS / 6)) % 2)
         {
             case 0:
                 fatalAttackExclamation->SetRendered(true);
@@ -411,15 +378,15 @@ void UpdateBattleSequence()
         
     case BATTLE_FATAL_DEFENSE:
     {
-        if (SDL_GetTicks() - battleSequence.phaseStart > BATTLE_FATAL_SIGNAL_DELAY_MS)
+        if (SDL_GetTicks() - battleSequence->phaseStart > BATTLE_FATAL_SIGNAL_DELAY_MS)
         {
             fatalDefenseExclamation->SetRendered(false);
-            battleSequence.phaseStart = SDL_GetTicks();
-            battleSequence.phase = BATTLE_ADVANCE;
+            battleSequence->phaseStart = SDL_GetTicks();
+            battleSequence->phase = BATTLE_ADVANCE;
             break;
         }
 
-        switch ((int(SDL_GetTicks() - battleSequence.phaseStart) / (BATTLE_FATAL_SIGNAL_DELAY_MS / 6)) % 2)
+        switch ((int(SDL_GetTicks() - battleSequence->phaseStart) / (BATTLE_FATAL_SIGNAL_DELAY_MS / 6)) % 2)
         {
         case 0:
             fatalDefenseExclamation->SetRendered(true);
@@ -432,44 +399,44 @@ void UpdateBattleSequence()
     }
     case BATTLE_ADVANCE:
 
-        if (LastPlayerStanding(battleSequence.peak, battleSequence.attacker))
+        if (LastPlayerStanding(battleSequence->peak, battleSequence->attacker))
         {
-            FinalizePeakClaim(battleSequence.peak);
-            battleSequence.phase = BATTLE_END;
-            battleSequence.phaseStart = SDL_GetTicks();
+            FinalizePeakClaim(battleSequence->peak);
+            battleSequence->phase = BATTLE_END;
+            battleSequence->phaseStart = SDL_GetTicks();
             break;
         }
 
-        if (SDL_GetTicks() - battleSequence.phaseStart < BATTLE_ROUND_DELAY_MS)
+        if (SDL_GetTicks() - battleSequence->phaseStart < BATTLE_ROUND_DELAY_MS)
         {
             break;
         }
         crown->SetRendered(false);
 
-        if (battleSequence.attackers.size() > 0 && battleSequence.defenders.size() > 0)
+        if (battleSequence->attackers.size() > 0 && battleSequence->defenders.size() > 0)
         {
-            battleSequence.phase = BATTLE_START_ROUND;
+            battleSequence->phase = BATTLE_START_ROUND;
             break;
         }
 
-        if (battleSequence.defenders.size() < 1)
+        if (battleSequence->defenders.size() < 1)
         {
-            RetreatPlayer(battleSequence.peak, battleSequence.defender);
-            battleSequence.defender->GetCircleText()->SetRendered(false);
-            battleSequence.defender->GetCircleText()->SetCenter(currentPlayerCircle->GetCenter().first, currentPlayerCircle->GetCenter().second);
+            RetreatPlayer(battleSequence->peak, battleSequence->defender);
+            battleSequence->defender->GetCircleText()->SetRendered(false);
+            battleSequence->defender->GetCircleText()->SetCenter(currentPlayerCircle->GetCenter().first, currentPlayerCircle->GetCenter().second);
         }
 
-        if (!BeginBattleAgainstDefender(battleSequence.peak, battleSequence.attacker))
+        if (!BeginBattleAgainstDefender(battleSequence->peak, battleSequence->attacker))
         {
-            battleSequence.phase = BATTLE_END;
-            battleSequence.phaseStart = SDL_GetTicks();
+            battleSequence->phase = BATTLE_END;
+            battleSequence->phaseStart = SDL_GetTicks();
         }
         break;
     case BATTLE_IDLE:
         break;
     case BATTLE_END:
 
-        if (SDL_GetTicks() - battleSequence.phaseStart < BATTLE_ROUND_DELAY_MS)
+        if (SDL_GetTicks() - battleSequence->phaseStart < BATTLE_ROUND_DELAY_MS)
         {
             break;
         }
@@ -485,42 +452,42 @@ void UpdateBattleSequence()
 
 bool IsBattleSequenceActive()
 {
-    return battleSequence.active;
+    return battleSequence->active;
 }
 
 bool IsBattleWaitingForDieClick(UIElement* die)
 {
     if (die == nullptr)
     {
-        return battleSequence.active && battleSequence.phase == BATTLE_WAIT_DIE_CLICKS;
+        return battleSequence->active && battleSequence->phase == BATTLE_WAIT_DIE_CLICKS;
     }
     else if (die == die1)
     {
-        return battleSequence.active && battleSequence.phase == BATTLE_WAIT_DIE_CLICKS && !battleSequence.attackRollStarted;
+        return battleSequence->active && battleSequence->phase == BATTLE_WAIT_DIE_CLICKS && !battleSequence->attackRollStarted;
     }
     else if (die == die2)
     {
-        return battleSequence.active && battleSequence.phase == BATTLE_WAIT_DIE_CLICKS && !battleSequence.defenseRollStarted;
+        return battleSequence->active && battleSequence->phase == BATTLE_WAIT_DIE_CLICKS && !battleSequence->defenseRollStarted;
     }
     return false;
 }
 
 void OnBattleDieClicked(const std::string &dieName)
 {
-    if (battleSequence.phase != BATTLE_WAIT_DIE_CLICKS)
+    if (battleSequence->phase != BATTLE_WAIT_DIE_CLICKS)
         return;
 
-    if (dieName == "dieOne" && !battleSequence.attackRollStarted)
+    if (dieName == "dieOne" && !battleSequence->attackRollStarted)
     {
-        battleSequence.attackRoll = RollDie();
-        StartSingleDieRoll("dieOne", battleSequence.attackRoll);
-        battleSequence.attackRollStarted = true;
+        battleSequence->attackRoll = RollDie();
+        StartSingleDieRoll("dieOne", battleSequence->attackRoll);
+        battleSequence->attackRollStarted = true;
     }
-    else if (dieName == "dieTwo" && !battleSequence.defenseRollStarted)
+    else if (dieName == "dieTwo" && !battleSequence->defenseRollStarted)
     {
-        battleSequence.defenseRoll = RollDie();
-        StartSingleDieRoll("dieTwo", battleSequence.defenseRoll);
-        battleSequence.defenseRollStarted = true;
+        battleSequence->defenseRoll = RollDie();
+        StartSingleDieRoll("dieTwo", battleSequence->defenseRoll);
+        battleSequence->defenseRollStarted = true;
     }
 }
 

@@ -72,6 +72,12 @@ extern bool validMove;
 
 extern bool hasRolled;
 
+extern bool allPeaksClaimed;
+
+extern bool suddenDeath;
+
+extern bool lastTurn;
+
 extern float cameraZoom;
 
 extern int SCREEN_WIDTH;
@@ -136,6 +142,8 @@ extern Text *turnTallyNumText;
 
 extern Text *peaksLeftText;
 
+extern Text *peaksLeftNumText;
+
 extern Text *movesLeftText;
 
 extern Text *pausedText;
@@ -149,3 +157,5 @@ extern Text *playerWinsText;
 extern Text *playAgainText;
 
 extern Text *winnerExitToMainMenuText;
+
+extern BattleSequenceState* battleSequence;

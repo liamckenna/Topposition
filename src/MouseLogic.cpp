@@ -195,12 +195,18 @@ UIElement *selectUI(int x, int y, bool update, bool selecting)
                     }
                     else if ((uiElements[i] == die1 || uiElements[i] == die2) && hasRolled)
                     {
-                        continue;
+                        if (!rules->GetInfiniteRolls() || movesLeft > 0)
+                        {
+                            continue;
+                        }
                     }
                 }
                 else if ((uiElements[i] == die1 || uiElements[i] == die2) && hasRolled)
                 {
-                    continue;
+                    if (!rules->GetInfiniteRolls() || movesLeft > 0)
+                    {
+                        continue;
+                    }
                 }
                     if (selecting)
                     {

@@ -68,6 +68,8 @@ Text *turnTallyNumText;
 
 Text *peaksLeftText;
 
+Text *peaksLeftNumText;
+
 Text *movesLeftText;
 
 Player *currentTurn;
@@ -137,3 +139,11 @@ Text *playAgainText;
 Text *winnerExitToMainMenuText;
 
 bool hasRolled = false;
+
+bool allPeaksClaimed = false;
+
+bool suddenDeath = false;
+
+bool lastTurn = false;
+
+BattleSequenceState *battleSequence;

@@ -13,6 +13,8 @@ class GameRules
     int fatalBattleDifference = 4;
     bool claimEndsTurn = true;
     bool autoRollMoves = false;
+    bool evenTurnCount = true;
+    bool infiniteRolls = true;
 
 public:
     int GetPlayerCount() { return playerCount; }
@@ -27,6 +29,8 @@ public:
     int GetFatalBattleDifference() { return fatalBattleDifference; }
     bool GetClaimEndsTurn() { return claimEndsTurn; }
     bool GetAutoRollMoves() { return autoRollMoves; }
+    bool GetEvenTurnCount() { return evenTurnCount; }
+    bool GetInfiniteRolls() { return infiniteRolls; }
     void SetPlayerCount(int pc) { playerCount = pc; }
     void SetMaxPoints(int mp) { maxPoints = mp; }
     void SetPieces(int p) { pieces = p; }
@@ -38,5 +42,5 @@ public:
     void SetFatalBattleDifference(int fbd) { fatalBattleDifference = fbd; }
     void SetClaimEndsTurn(bool cet) { claimEndsTurn = cet; }
     void SetAutoRollMoves(bool arm) { autoRollMoves = arm; }
-    
+    void SetInfiniteRolls(bool ir) { infiniteRolls = ir; }
 };

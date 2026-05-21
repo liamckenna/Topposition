@@ -42,6 +42,21 @@ enum objectType
     FLAG = 8
 };
 
+enum BattlePhase
+{
+    BATTLE_IDLE,
+    BATTLE_START_ROUND,
+    BATTLE_WAIT_ATTACK_ROLL,
+    BATTLE_REVEAL_ATTACK,
+    BATTLE_WAIT_DEFENSE_ROLL,
+    BATTLE_WAIT_DIE_CLICKS,
+    BATTLE_RESOLVE_ROUND,
+    BATTLE_FATAL_ATTACK,
+    BATTLE_FATAL_DEFENSE,
+    BATTLE_ADVANCE,
+    BATTLE_END
+};
+
 using namespace std;
 class GameObject
 {
@@ -514,4 +529,22 @@ struct DiceAnimation
 
     DiceAnimation(UIElement *d, vector<SDL_Texture *> f, SDL_Texture *ft, Uint64 st, Uint64 si = 125, int ts = 8, bool showMoves = true)
         : die(d), faces(f), finalTexture(ft), startTime(st), lastTime(st), elapsed(0),stepInterval(si), totalSteps(ts), currentStep(0), finished(false), revealMovesLeftOnFinish(showMoves) {}
+};
+
+struct BattleSequenceState
+{
+    bool active = false;
+    Peak *peak = nullptr;
+    Player *attacker = nullptr;
+    Player *defender = nullptr;
+    std::vector<Piece *> attackers;
+    std::vector<Piece *> defenders;
+    Piece *roundAttacker = nullptr;
+    Piece *roundDefender = nullptr;
+    int attackRoll = 0;
+    int defenseRoll = 0;
+    bool attackRollStarted = false;
+    bool defenseRollStarted = false;
+    Uint64 phaseStart = SDL_GetTicks();
+    BattlePhase phase = BATTLE_IDLE;
 };

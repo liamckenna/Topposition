@@ -54,5 +54,9 @@ void AnimationHandler(float fps, Uint64& lastFrame, Uint64& lastUpdate) {
             }
         }
     }
-    UpdateBattleSequence();
+    if (state == GAME && battleSequence != nullptr)
+    {
+        UpdateBattleSequence();
+    }
+    
 }

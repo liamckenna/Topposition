@@ -458,7 +458,7 @@ void MouseButtonUpGame(Input *playerInput, SDL_MouseButtonEvent &event)
             {
                 if ((selectedObject->GetName() == "dieOne" ||
                      selectedObject->GetName() == "dieTwo") &&
-                    movesLeft < 1 && !hasRolled)
+                    movesLeft < 1 && (!hasRolled || rules->GetInfiniteRolls()))
                 {
                     currentRoll = Roll();
                     movesLeft = currentRoll;

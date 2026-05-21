@@ -40,6 +40,10 @@ void loadGame()
     loadUI();
     Uint64 uiEndTime = SDL_GetTicks();
     std::cout << "UI Loaded in " << (uiEndTime - uiStartTime) / 1000.f << " seconds!" << std::endl;
+    Uint64 battleSequenceStartTime = SDL_GetTicks();
+    loadBattleSequence();
+    Uint64 battleSequenceEndTime = SDL_GetTicks();
+    std::cout << "Battle Sequence Loaded in " << (battleSequenceEndTime - battleSequenceStartTime) / 1000.f << " seconds!" << std::endl;
     Uint64 pixelsStartTime = SDL_GetTicks();
     GeneratePixels();
     Uint64 pixelsEndTime = SDL_GetTicks();
@@ -265,9 +269,17 @@ void loadText()
     turnTallyText->SetPosition(turnTallyText->GetPosition().first + (turnTallyNumText->GetWidth() / 2), turnTallyText->GetPosition().second);
     turnTallyText->SetTextContent("Turn", renderer);
 
-    std::string peaksLeftString = "peaks left: " + to_string(unclaimedPeakCount);
+    std::string peaksLeftString = "peaks left: " + to_string(11);
     peaksLeftText = new Text("peaksLeftText", "fonts/yoster.ttf", White, x, y, textSize, renderer, peaksLeftString.c_str());
     text.push_back(peaksLeftText);
+
+    std::string peaksLeftNumString = to_string(11);
+    peaksLeftNumText = new Text("peaksLeftNumText", "fonts/yoster.ttf", White, x, y, textSize, renderer, peaksLeftNumString.c_str());
+    peaksLeftNumText->SetPosition(peaksLeftText->GetBottomRight().first - peaksLeftNumText->GetWidth(), peaksLeftText->GetPosition().second);
+    peaksLeftNumText->SetTextContent(to_string(unclaimedPeakCount).c_str(), renderer);
+    text.push_back(peaksLeftNumText);
+
+    peaksLeftText->SetTextContent("peaks left: ", renderer);
 
     currentPlayerCircle = new UIElement("currentPlayerCircle", textures["player circle"][0], surfaces["player circle"], true, false, renderer, GAME);
     currentPlayerCircle->SetScale(1.f * (SCREEN_WIDTH / 3840.f));
@@ -497,6 +509,11 @@ void loadUI()
     RefreshShadows();
 }
 
+void loadBattleSequence()
+{
+    battleSequence = new BattleSequenceState();
+}
+
 void GeneratePixels()
 {
     bool start = true;
@@ -655,6 +672,8 @@ void ClearObjects()
     {
         delete animations[i];
     }
+
+    delete battleSequence;
 }
 
 void ResetGlobalVars()
@@ -686,6 +705,7 @@ void ResetGlobalVars()
     turnTallyText = nullptr;
     turnTallyNumText = nullptr;
     peaksLeftText = nullptr;
+    peaksLeftNumText = nullptr;
     movesLeftText = nullptr;
     pausedText = nullptr;
     resetMapText = nullptr;
@@ -702,8 +722,12 @@ void ResetGlobalVars()
     firstPlace = nullptr;
     fatalAttackExclamation = nullptr;
     fatalDefenseExclamation = nullptr;
+    battleSequence = nullptr;
     pState = MAIN;
     hasRolled = false;
+    allPeaksClaimed = false;
+    suddenDeath = false;
+    lastTurn = false;
 }
 
 void RefreshShadows()

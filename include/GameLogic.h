@@ -19,3 +19,7 @@ void Tiebreaker();
 int SoldierCount(Player* player);
 
 void ClearRoll();
+
+void BeginSuddenDeath();
+
+void BeginLastTurn();

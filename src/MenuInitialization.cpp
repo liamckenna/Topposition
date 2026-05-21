@@ -173,10 +173,29 @@ void UpdateTextElementPositions()
             }
             turnTallyNumText->SetTextContent(to_string(turnCount).c_str(), renderer);
 
-            std::string peaksLeftString = "peaks left: " + to_string(unclaimedPeakCount);
+            if (lastTurn)
+            {
+                BeginLastTurn();
+            }
+            if (suddenDeath)
+            {
+                BeginSuddenDeath();
+            }
+            
+            std::string peaksLeftString = "peaks left: " + to_string(11);
             peaksLeftText->SetTextContent(peaksLeftString.c_str(), renderer);
             peaksLeftText->SetSize(65 * (SCREEN_WIDTH / 3840.f), renderer);
             peaksLeftText->SetPosition(x, y);
+
+            
+            peaksLeftNumText->SetTextContent(to_string(11).c_str(), renderer);
+            peaksLeftNumText->SetSize(65 * (SCREEN_WIDTH / 3840.f), renderer);
+            peaksLeftNumText->SetPosition(peaksLeftText->GetBottomRight().first - peaksLeftNumText->GetWidth(), peaksLeftText->GetPosition().second);
+            std::pair<float, float> center = peaksLeftNumText->GetCenter();
+            peaksLeftNumText->SetTextContent(to_string(unclaimedPeakCount).c_str(), renderer);
+            peaksLeftNumText->SetCenter(center.first, center.second);
+
+            peaksLeftText->SetTextContent("peaks left: ", renderer);
 
             const char *eleven = "11";
             movesLeftText->SetTextContent(eleven, renderer);
@@ -184,7 +203,7 @@ void UpdateTextElementPositions()
             x = (SCREEN_WIDTH / 2) - (movesLeftText->GetWidth() / 2);
             y = SCREEN_HEIGHT - movesLeftText->GetHeight() - (SCREEN_HEIGHT / 9);
             movesLeftText->SetPosition(x, y);
-            std::pair<float, float> center = movesLeftText->GetCenter();
+            center = movesLeftText->GetCenter();
             if (hasRolled)
             {
                 movesLeftText->SetTextContent(to_string(movesLeft).c_str(), renderer);
