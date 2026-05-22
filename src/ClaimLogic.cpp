@@ -73,7 +73,10 @@ namespace
         }
         else
         {
-            diceAnimations.clear();
+            diceAnimations.erase(std::remove_if(diceAnimations.begin(), diceAnimations.end(),
+                                                [die](const DiceAnimation &a)
+                                                { return a.die == die; }),
+                                 diceAnimations.end());
         }
         diceAnimations.emplace_back(die, dieFaces, textures[finalFaceName][0], now, 125, 8, false);
     }
