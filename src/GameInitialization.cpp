@@ -515,7 +515,7 @@ void loadUI()
         gameObjects[gameObjects.size() - 1].push_back(claimPeakButton);
         peaks[i]->SetClaimNotif(claimPeakButton);
     }
-    if (rules->GetAutoRollMoves())
+    if (rules->GetAutoRoll())
     {
         currentRoll = Roll();
         movesLeft = currentRoll;

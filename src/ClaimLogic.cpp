@@ -64,7 +64,7 @@ namespace
 
         std::string finalFaceName = "die " + std::to_string(roll);
         Uint64 now = SDL_GetTicks();
-        if (rules->GetAutoRollMoves())
+        if (rules->GetAutoRoll())
         {
             diceAnimations.erase(std::remove_if(diceAnimations.begin(), diceAnimations.end(),
                                                 [die](const DiceAnimation &a)
@@ -276,7 +276,7 @@ void UpdateBattleSequence()
 
         battleSequence->roundAttacker = battleSequence->attackers[battleSequence->attackers.size() - 1];
         battleSequence->roundDefender = battleSequence->defenders[battleSequence->defenders.size() - 1];
-        if (rules->GetAutoRollMoves())
+        if (rules->GetAutoRoll())
         {
             battleSequence->attackRoll = RollDie();
             StartSingleDieRoll("dieOne", battleSequence->attackRoll);

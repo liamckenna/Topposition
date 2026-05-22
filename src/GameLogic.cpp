@@ -134,7 +134,7 @@ void FinishTurn()
 
     hasRolled = false;
 
-    if (rules->GetAutoRollMoves())
+    if (rules->GetAutoRoll())
     {
         currentRoll = Roll();
         movesLeft = currentRoll;

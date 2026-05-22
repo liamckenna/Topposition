@@ -181,7 +181,7 @@ UIElement *selectUI(int x, int y, bool update, bool selecting)
                 {
                     continue;
                 }
-                if (!rules->GetAutoRollMoves())
+                if (!rules->GetAutoRoll())
                 {
                     if (IsBattleSequenceActive())
                     {
@@ -217,7 +217,7 @@ UIElement *selectUI(int x, int y, bool update, bool selecting)
                             endText->SetSelected(true);
                             turnText->SetSelected(true);
                         }
-                        if (!rules->GetAutoRollMoves() && !IsBattleWaitingForDieClick())
+                        if (!rules->GetAutoRoll() && !IsBattleWaitingForDieClick())
                         {
                             if (uiElements[i] == die1)
                             {
@@ -228,7 +228,7 @@ UIElement *selectUI(int x, int y, bool update, bool selecting)
                                 die1->SetSelected(true);
                             }
                         }
-                        else if (rules->GetAutoRollMoves())
+                        else if (rules->GetAutoRoll())
                         {
                             if (uiElements[i] == die1)
                             {
@@ -429,7 +429,7 @@ void updateHoverState(int x, int y)
             turnText->SetHovered(true);
         }
     }
-    if (die1 != nullptr && die2 != nullptr && (rules->GetAutoRollMoves() || !IsBattleWaitingForDieClick()))
+    if (die1 != nullptr && die2 != nullptr && (rules->GetAutoRoll() || !IsBattleWaitingForDieClick()))
     {
         if (die1->GetHovered())
         {
