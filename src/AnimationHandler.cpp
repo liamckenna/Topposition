@@ -49,8 +49,13 @@ void AnimationHandler(float fps, Uint64& lastFrame, Uint64& lastUpdate) {
                     movesLeftText->SetRendered(true);
                 }
             } else {
-                int randomFace = rand() % (int)da.faces.size();
+                int randomFace = da.currentFace;
+                do
+                {
+                    randomFace = rand() % (int)da.faces.size();
+                } while (randomFace == da.currentFace);
                 da.die->SetTexture(da.faces[randomFace]);
+                da.currentFace = randomFace;
             }
         }
     }

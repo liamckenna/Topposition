@@ -18,6 +18,7 @@
 #include "MenuInitialization.h"
 #include "EventHandler.h"
 #include "AnimationHandler.h"
+#include "AudioManager.h"
 
 float last_fps_time = 0.f;
 int frame_count = 0;
@@ -48,6 +49,7 @@ int main(int argc, char *args[])
     {
         HandleEvents(playerInput);
         frame++;
+        AudioManager::update();
         AnimationHandler(fps, lastFrame, lastUpdate);
         RenderScreen();
         CalculateFrameRate();

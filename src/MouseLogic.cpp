@@ -1,5 +1,6 @@
 #include "MouseLogic.h"
 #include "ClaimLogic.h"
+#include "AudioManager.h"
 #include <cmath>
 
 bool zoom(int direction, std::pair<float, float> mousePos)

@@ -1,6 +1,7 @@
 #include "GameInitialization.h"
 #include "Rendering.h"
 #include "MouseLogic.h"
+#include "AudioManager.h"
 
 void ResetMap()
 {
@@ -27,38 +28,52 @@ void loadGame()
     Uint64 mapStartTime = SDL_GetTicks();
     loadMap();
     Uint64 mapEndTime = SDL_GetTicks();
-    std::cout << "Map Loaded in " << (mapEndTime - mapStartTime) / 1000.f << " seconds!" << std::endl;
+    std::cout << "Map loaded in " << (mapEndTime - mapStartTime) / 1000.f << " seconds!" << std::endl;
+
     Uint64 gamePiecesStartTime = SDL_GetTicks();
     loadGamePieces();
     Uint64 gamePiecesEndTime = SDL_GetTicks();
-    std::cout << "Game Pieces Loaded in " << (gamePiecesEndTime - gamePiecesStartTime) / 1000.f << " seconds!" << std::endl;
+    std::cout << "Game Pieces loaded in " << (gamePiecesEndTime - gamePiecesStartTime) / 1000.f << " seconds!" << std::endl;
+
     Uint64 textStartTime = SDL_GetTicks();
     loadText();
     Uint64 textEndTime = SDL_GetTicks();
-    std::cout << "Text Loaded in " << (textEndTime - textStartTime) / 1000.f << " seconds!" << std::endl;
+    std::cout << "Text loaded in " << (textEndTime - textStartTime) / 1000.f << " seconds!" << std::endl;
+
     Uint64 uiStartTime = SDL_GetTicks();
     loadUI();
     Uint64 uiEndTime = SDL_GetTicks();
-    std::cout << "UI Loaded in " << (uiEndTime - uiStartTime) / 1000.f << " seconds!" << std::endl;
+    std::cout << "UI loaded in " << (uiEndTime - uiStartTime) / 1000.f << " seconds!" << std::endl;
+
     Uint64 battleSequenceStartTime = SDL_GetTicks();
     loadBattleSequence();
     Uint64 battleSequenceEndTime = SDL_GetTicks();
-    std::cout << "Battle Sequence Loaded in " << (battleSequenceEndTime - battleSequenceStartTime) / 1000.f << " seconds!" << std::endl;
+    std::cout << "Battle Sequence loaded in " << (battleSequenceEndTime - battleSequenceStartTime) / 1000.f << " seconds!" << std::endl;
+
+    Uint64 audioStartTime = SDL_GetTicks();
+    loadAudio();
+    Uint64 audioEndTime = SDL_GetTicks();
+    std::cout << "Audio loaded in " << (audioEndTime - audioStartTime) / 1000.f << " seconds!" << std::endl;
+
     Uint64 pixelsStartTime = SDL_GetTicks();
     GeneratePixels();
     Uint64 pixelsEndTime = SDL_GetTicks();
     std::cout << "Pixels Generated in " << (pixelsEndTime - pixelsStartTime) / 1000.f << " seconds!" << std::endl;
+    
     Uint64 oceanStartTime = SDL_GetTicks();
     GenerateOcean();
     Uint64 oceanEndTime = SDL_GetTicks();
     std::cout << "Ocean Generated in " << (oceanEndTime - oceanStartTime) / 1000.f << " seconds!" << std::endl;
+
     Uint64 renderPixelsStartTime = SDL_GetTicks();
     renderPixels();
     SDL_SetRenderTarget(renderer, NULL);
     Uint64 renderPixelsEndTime = SDL_GetTicks();
     std::cout << "Pixels Rendered in " << (renderPixelsEndTime - renderPixelsStartTime) / 1000.f << " seconds!" << std::endl;
+
     gameStartTime = SDL_GetTicks();
     std::cout << "Total Load Time: " << (gameStartTime - mapStartTime) / 1000.f << " seconds!" << std::endl;
+
 
     std::cout << "World Resolution: " << worldResolution.first << ", " << worldResolution.second << std::endl;
 }
@@ -602,6 +617,27 @@ void GeneratePixels()
             pixels.push_back(pixel);
         }
     }
+}
+
+void loadAudio()
+{
+    AudioManager::loadSound("gunter_wenk", "audio/gunter wenk.wav");
+    AudioManager::loadSound("ehh", "audio/ehh.wav");
+    AudioManager::loadSound("hold_up", "audio/hold up.wav");
+    AudioManager::loadSound("click", "audio/click.wav");
+    AudioManager::loadSound("drop", "audio/drop.wav");
+    AudioManager::loadSound("splash", "audio/splash.wav");
+    AudioManager::loadSound("roll-crash", "audio/roll-crash.wav");
+    AudioManager::loadSound("roll-left", "audio/roll-left.wav");
+    AudioManager::loadSound("roll-right", "audio/roll-right.wav");
+    AudioManager::loadSound("crash", "audio/crash.wav");
+    AudioManager::loadSound("error", "audio/error.wav");
+    AudioManager::loadSound("whistle", "audio/whistle.wav");
+    AudioManager::loadSound("foghorn", "audio/foghorn.wav");
+
+    AudioManager::setMasterVolume(0.2f);
+    AudioManager::loadSound("ocean_ambiance", "audio/ocean-ambiance.wav");
+    AudioManager::playMusic("ocean_ambiance", 0.35f);
 }
 
 void GenerateOcean()

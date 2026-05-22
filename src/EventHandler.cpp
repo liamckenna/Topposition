@@ -1,6 +1,7 @@
 #include "EventHandler.h"
 #include "MenuInitialization.h"
 #include "MouseLogic.h"
+#include "AudioManager.h"
 #include <future>
 
 void HandleEvents(Input *playerInput)
@@ -310,6 +311,7 @@ void MouseButtonDownGame(Input *playerInput, SDL_MouseButtonEvent &event)
                             piece->GetCurrentAnimation()->Pause();
                         RefreshClaimNotifs();
                         CheckMovementPossibility(piece, startingTerrain);
+                        AudioManager::playSound("gunter_wenk");
                     }
                 }
             }
@@ -351,14 +353,17 @@ void MouseButtonUpMainMenu(Input *playerInput, SDL_MouseButtonEvent &event)
         {
             if (selectedText->GetName() == "playButtonText")
             {
+                AudioManager::playSound("click");
                 RefreshShadows();
                 state = GAME;
             }
             else if (selectedText->GetName() == "settings")
             {
+                AudioManager::playSound("click");
             }
             else if (selectedText->GetName() == "quitButtonText")
             {
+                AudioManager::playSound("click");
                 quit = true;
             }
         }
@@ -413,9 +418,16 @@ void MouseButtonUpGame(Input *playerInput, SDL_MouseButtonEvent &event)
                     if (selectedObject == newSelectedObject)
                     {
                         if (uiElement == die1)
+                        {
+                            AudioManager::playSound("click");
                             OnBattleDieClicked("dieOne");
+                        }
+                            
                         else if (uiElement == die2)
+                        {
+                            AudioManager::playSound("click");
                             OnBattleDieClicked("dieTwo");
+                        }
                     }
                 }
                 uiElement->SetSelected(false);
@@ -448,6 +460,7 @@ void MouseButtonUpGame(Input *playerInput, SDL_MouseButtonEvent &event)
         {
             if (selectedText->GetName() == "turnText" || selectedText->GetName() == "endText")
             {
+                AudioManager::playSound("click");
                 FinishTurn();
             }
         }
@@ -460,15 +473,18 @@ void MouseButtonUpGame(Input *playerInput, SDL_MouseButtonEvent &event)
                      selectedObject->GetName() == "dieTwo") &&
                     movesLeft < 1 && (!hasRolled || rules->GetInfiniteRolls()))
                 {
+                    AudioManager::playSound("click");
                     currentRoll = Roll();
                     movesLeft = currentRoll;
                 }
                 else if (selectedObject->GetName() == "endTurnArrow")
                 {
+                    AudioManager::playSound("click");
                     FinishTurn();
                 }
                 else if (selectedObject->GetName() == "claim peak button")
                 {
+                    AudioManager::playSound("click");
                     ClaimPeak(dynamic_cast<UIElement *>(selectedObject));
                 }
                 else if (selectedObject->type == ITEM)
@@ -487,6 +503,18 @@ void MouseButtonUpGame(Input *playerInput, SDL_MouseButtonEvent &event)
                 if (piece->GetCurrentAnimation() != NULL)
                     piece->GetCurrentAnimation()->Unpause();
                 bool successful_move = Move(piece, startingTerrain, targetTerrain, movesLeft);
+                if ((targetTerrain != nullptr && successful_move))
+                {
+                    AudioManager::playSound("drop");
+                }
+                else if (successful_move)
+                {
+                    AudioManager::playSound("splash", 0.5f);
+                }
+                else
+                {
+                    AudioManager::playSound("error", 0.25f);
+                }
                 RefreshClaimNotifs();
                 startingTerrain = nullptr;
                 hoveringTerrain = nullptr;

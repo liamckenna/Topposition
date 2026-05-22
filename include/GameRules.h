@@ -10,10 +10,10 @@ class GameRules
     int uniqueItemCount = 3;
     int remainingPoints = 0;
     int fatalBattleDifference = 4;
-    bool claimEndsTurn = false;
-    bool autoRollMoves = true;
+    bool claimEndsTurn = true;
+    bool autoRollMoves = false;
     bool evenTurnCount = true;
-    bool infiniteRolls = true;
+    bool infiniteRolls = false;
 
 public:
     int GetPlayerCount() { return playerCount; }

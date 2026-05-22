@@ -1,11 +1,12 @@
 #include "ClaimLogic.h"
 #include "MultiPurposeFunctions.h"
+#include "AudioManager.h"
 #include <algorithm>
 
 namespace
 {
     constexpr int BATTLE_ROUND_DELAY_MS = 1000;
-    constexpr int BATTLE_ADVANCE_DELAY_MS = 1000;
+    constexpr int BATTLE_ADVANCE_DELAY_MS = 0;
     constexpr int BATTLE_FATAL_SIGNAL_DELAY_MS = 1800;
 
     int RollDie()
@@ -43,6 +44,14 @@ namespace
         if (die == nullptr)
         {
             return;
+        }
+        else if (die == die1)
+        {
+            AudioManager::playSound("roll-left");
+        }
+        else if (die == die2)
+        {
+            AudioManager::playSound("roll-right");
         }
 
         std::vector<SDL_Texture *> dieFaces;
@@ -120,7 +129,12 @@ namespace
                 }
                 else
                 {
-                    movesLeftText->SetRendered(false);
+                    string rollText = "Roll!";
+                    std::pair<float, float> center = movesLeftText->GetCenter();
+                    movesLeftText->SetSize(100 * (SCREEN_WIDTH / 3840.f), renderer);
+                    movesLeftText->SetTextContent(rollText.c_str(), renderer);
+                    movesLeftText->SetCenter(center.first, center.second);
+                    //movesLeftText->SetRendered(false);
                 }
                 return true;
             }
@@ -141,9 +155,14 @@ namespace
         endText->SetRendered(true);
         turnText->SetRendered(true);
         crown->SetRendered(false);
-        movesLeftText->SetRendered(true);
 
-        delete battleSequence;
+        //movesLeftText->SetRendered(true);
+        if (!rules->GetClaimEndsTurn())
+        {
+            UpdateMovesLeft();
+        }
+
+            delete battleSequence;
         battleSequence = new BattleSequenceState();
     }
 
@@ -279,7 +298,10 @@ void UpdateBattleSequence()
         }
     case BATTLE_WAIT_DIE_CLICKS:
         if (battleSequence->attackRollStarted && battleSequence->defenseRollStarted && !HasActiveDiceAnimation())
+        {
             battleSequence->phase = BATTLE_RESOLVE_ROUND;
+            AudioManager::playSound("crash");
+        }
         break;
     case BATTLE_WAIT_ATTACK_ROLL:
         if (HasActiveDiceAnimation())
@@ -303,6 +325,7 @@ void UpdateBattleSequence()
             break;
 
         battleSequence->phase = BATTLE_RESOLVE_ROUND;
+        AudioManager::playSound("crash");
         break;
     case BATTLE_RESOLVE_ROUND:
     {
@@ -346,6 +369,7 @@ void UpdateBattleSequence()
         }
         else
         {
+            AudioManager::playSound("splash", 0.25f);
             battleSequence->phase = BATTLE_ADVANCE;
         }
         battleSequence->roundAttacker = nullptr;

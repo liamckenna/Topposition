@@ -522,12 +522,13 @@ struct DiceAnimation
     Uint64 elapsed;
     Uint64 lastTime;
     Uint64 stepInterval;
+    int currentFace = 0;
     int totalSteps;
     int currentStep;
     bool finished;
     bool revealMovesLeftOnFinish;
 
-    DiceAnimation(UIElement *d, vector<SDL_Texture *> f, SDL_Texture *ft, Uint64 st, Uint64 si = 125, int ts = 8, bool showMoves = true)
+    DiceAnimation(UIElement *d, vector<SDL_Texture *> f, SDL_Texture *ft, Uint64 st, Uint64 si = 100, int ts = 10, bool showMoves = true)
         : die(d), faces(f), finalTexture(ft), startTime(st), lastTime(st), elapsed(0),stepInterval(si), totalSteps(ts), currentStep(0), finished(false), revealMovesLeftOnFinish(showMoves) {}
 };
 

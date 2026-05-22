@@ -1,4 +1,5 @@
 #include "ProgramInitialization.h"
+#include "AudioManager.h"
 #define WIN32_LEAN_AND_MEAN
 #define NOBYTE
 #include <windows.h>
@@ -11,7 +12,7 @@ bool init()
     srand((unsigned)time(NULL));
     
     // Initialize SDL
-    if (SDL_Init(SDL_INIT_VIDEO) < 0)
+    if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO) < 0)
     {
         printf("SDL could not initialize! SDL Error: %s\n", SDL_GetError());
         success = false;
@@ -42,6 +43,12 @@ bool init()
 
                 TextureLoader();
 
+                if (!AudioManager::init())
+                {
+                    printf("AudioManager::init failed! Error: %s\n", SDL_GetError());
+                    success = false;
+                }
+
                 if (!TTF_Init())
                 {
                     printf("TTF_Init failed! Error: %s\n", SDL_GetError());
@@ -66,6 +73,8 @@ void close()
     SDL_DestroyWindow(window);
     window = NULL;
     renderer = NULL;
+
+    AudioManager::quit();
 
     // Quit SDL subsystems
     // IMG_Quit();

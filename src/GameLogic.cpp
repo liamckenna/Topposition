@@ -1,7 +1,8 @@
 #include "GameLogic.h"
-
+#include "AudioManager.h"
 int Roll()
 {
+    AudioManager::playSound("roll-crash");
     int rollOne = (rand() % 6) + 1;
     string rollOneStr = "die " + to_string(rollOne);
     int rollTwo = (rand() % 6) + 1;
@@ -236,6 +237,7 @@ void BeginSuddenDeath()
     turnTallyText->SetRendered(false);
     turnTallyNumText->SetRendered(false);
     suddenDeathText->SetRendered(true);
+    AudioManager::playSound("foghorn", 0.75f);
 
     suddenDeath = true;
 }
@@ -245,6 +247,7 @@ void BeginLastTurn()
     turnTallyText->SetRendered(false);
     turnTallyNumText->SetRendered(false);
     lastTurnText->SetRendered(true);
+    AudioManager::playSound("whistle", 0.5f);
     lastTurn = true;
 }
 

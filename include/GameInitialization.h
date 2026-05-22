@@ -31,3 +31,5 @@ void ClearObjects();
 void ResetGlobalVars();
 
 void RefreshShadows();
+
+void loadAudio();
