@@ -136,9 +136,11 @@ namespace
                     movesLeftText->SetCenter(center.first, center.second);
                     //movesLeftText->SetRendered(false);
                 }
+                RefreshClaimNotifs();
                 return true;
             }
         }
+        RefreshClaimNotifs();
         return false;
     }
 
@@ -209,7 +211,7 @@ void RefreshClaimNotifs()
     {
         for (int j = 0; j < peaks[i]->occupants.size(); j++)
         {
-            if (peaks[i]->occupants[j]->GetPlayer() == currentTurn && peaks[i]->GetClaimedBy() != currentTurn && !peaks[i]->occupants[j]->IsHeld())
+            if (peaks[i]->occupants[j]->GetPlayer() == currentTurn && peaks[i]->GetClaimedBy() != currentTurn && !peaks[i]->occupants[j]->IsHeld() && !IsBattleSequenceActive())
             {
                 peaks[i]->occupants[j]->UpdateRelativePositions();
                 peaks[i]->GetClaimNotif()->SetGlobalPosition((peaks[i]->occupants[j]->GetCenter().first / cameraZoom) + cameraPosition.first,
