@@ -42,7 +42,7 @@ void RenderScreen()
         case GAME:
             renderOcean();
             renderTerrain();
-            renderClaimFlags();
+            //renderClaimFlags();
             renderPieces();
             renderClaimNotifs();
             renderSelectedObject();
@@ -53,7 +53,7 @@ void RenderScreen()
         case PAUSED:
             renderOceanFrozen();
             renderTerrain();
-            renderClaimFlags();
+            //renderClaimFlags();
             renderPieces();
             renderClaimNotifs();
             renderSelectedObject();
@@ -134,13 +134,28 @@ void renderTerrain()
 
 void renderPieces()
 {
-    for (int i = pieces.size() - 1; i >= 0; i--)
+    std::vector<Piece*> sorted(pieces.begin(), pieces.end());
+
+    for (int i = 1; i < (int)sorted.size(); i++)
     {
-        if (pieces[i]->type != ITEM && pieces[i]->type != FLAG)
+        Piece* key = sorted[i];
+        float keyY = key->globalPosition.second;
+        int j = i - 1;
+        while (j >= 0 && sorted[j]->globalPosition.second > keyY)
         {
-            if (selectedObject == nullptr || pieces[i] != selectedObject)
+            sorted[j + 1] = sorted[j];
+            j--;
+        }
+        sorted[j + 1] = key;
+    }
+
+    for (Piece* p : sorted)
+    {
+        if (p->type != ITEM)
+        {
+            if (selectedObject == nullptr || p != selectedObject)
             {
-                pieces[i]->RenderGameObject(renderer);
+                p->RenderGameObject(renderer);
             }
         }
     }

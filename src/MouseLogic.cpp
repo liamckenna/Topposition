@@ -181,6 +181,10 @@ UIElement *selectUI(int x, int y, bool update, bool selecting)
                 {
                     continue;
                 }
+                if (selectedObject != nullptr && selectedObject->type == PIECE)
+                {
+                    continue;
+                }
                 if (!rules->GetAutoRoll())
                 {
                     if (IsBattleSequenceActive())
