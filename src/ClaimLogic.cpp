@@ -48,10 +48,12 @@ namespace
         else if (die == die1)
         {
             AudioManager::playSound("roll-left");
+            AudioManager::playSound("grunt-left");
         }
         else if (die == die2)
         {
             AudioManager::playSound("roll-right");
+            AudioManager::playSound("grunt-right");
         }
 
         std::vector<SDL_Texture *> dieFaces;
@@ -262,13 +264,6 @@ void UpdateBattleSequence()
         return;
     }
 
-    if (battleSequence->peak == nullptr || battleSequence->attacker == nullptr || !IsOccupyingPeak(battleSequence->peak, battleSequence->attacker) && battleSequence->phase != BATTLE_END)
-    {
-        battleSequence->phase = BATTLE_END;
-        battleSequence->phaseStart = SDL_GetTicks();
-        return;
-    }
-
     switch (battleSequence->phase)
     {
     case BATTLE_START_ROUND:
@@ -362,22 +357,30 @@ void UpdateBattleSequence()
         if (battleSequence->attackRoll - battleSequence->defenseRoll >= rules->GetFatalBattleDifference())
         {
             KillSoldier(battleSequence->roundDefender);
+            battleSequence->roundAttacker = nullptr;
+            battleSequence->roundDefender = nullptr;
+            battleSequence->phaseStart = SDL_GetTicks();
             battleSequence->phase = BATTLE_FATAL_ATTACK;
+            break;
         }
         else if (battleSequence->defenseRoll - battleSequence->attackRoll >= rules->GetFatalBattleDifference())
         {
             KillSoldier(battleSequence->roundAttacker);
+            battleSequence->roundAttacker = nullptr;
+            battleSequence->roundDefender = nullptr;
+            battleSequence->phaseStart = SDL_GetTicks();
             battleSequence->phase = BATTLE_FATAL_DEFENSE;
+            break;
         }
         else
         {
             AudioManager::playSound("splash", 0.25f);
+            battleSequence->roundAttacker = nullptr;
+            battleSequence->roundDefender = nullptr;
+            battleSequence->phaseStart = SDL_GetTicks();
             battleSequence->phase = BATTLE_ADVANCE;
+            break;
         }
-        battleSequence->roundAttacker = nullptr;
-        battleSequence->roundDefender = nullptr;
-        battleSequence->phaseStart = SDL_GetTicks();
-
         break;
     }
     case BATTLE_FATAL_ATTACK:
@@ -386,7 +389,7 @@ void UpdateBattleSequence()
         {
             fatalAttackExclamation->SetRendered(false);
             battleSequence->phaseStart = SDL_GetTicks();
-            battleSequence->phase = BATTLE_ADVANCE;
+            battleSequence->phase = BATTLE_FATAL_ADVANCE;
             break;
         }
 
@@ -400,37 +403,42 @@ void UpdateBattleSequence()
                 break;
         }
         break;
-    }
-        
+    } 
     case BATTLE_FATAL_DEFENSE:
     {
         if (SDL_GetTicks() - battleSequence->phaseStart > BATTLE_FATAL_SIGNAL_DELAY_MS)
         {
             fatalDefenseExclamation->SetRendered(false);
             battleSequence->phaseStart = SDL_GetTicks();
-            battleSequence->phase = BATTLE_ADVANCE;
+            battleSequence->phase = BATTLE_FATAL_ADVANCE;
             break;
         }
 
         switch ((int(SDL_GetTicks() - battleSequence->phaseStart) / (BATTLE_FATAL_SIGNAL_DELAY_MS / 6)) % 2)
         {
-        case 0:
-            fatalDefenseExclamation->SetRendered(true);
-            break;
-        case 1:
-            fatalDefenseExclamation->SetRendered(false);
-            break;
+            case 0:
+                fatalDefenseExclamation->SetRendered(true);
+                break;
+            case 1:
+                fatalDefenseExclamation->SetRendered(false);
+                break;
         }
         break;
     }
     case BATTLE_ADVANCE:
-
         if (LastPlayerStanding(battleSequence->peak, battleSequence->attacker))
         {
             FinalizePeakClaim(battleSequence->peak);
             battleSequence->phase = BATTLE_END;
             battleSequence->phaseStart = SDL_GetTicks();
             break;
+        }
+
+        if (battleSequence->peak == nullptr || battleSequence->attacker == nullptr || !IsOccupyingPeak(battleSequence->peak, battleSequence->attacker) && battleSequence->phase != BATTLE_END)
+        {
+            battleSequence->phase = BATTLE_END;
+            battleSequence->phaseStart = SDL_GetTicks();
+            return;
         }
 
         if (SDL_GetTicks() - battleSequence->phaseStart < BATTLE_ROUND_DELAY_MS)
@@ -458,10 +466,51 @@ void UpdateBattleSequence()
             battleSequence->phaseStart = SDL_GetTicks();
         }
         break;
-    case BATTLE_IDLE:
+    case BATTLE_FATAL_ADVANCE:
+        if (LastPlayerStanding(battleSequence->peak, battleSequence->attacker))
+        {
+            FinalizePeakClaim(battleSequence->peak);
+            battleSequence->phase = BATTLE_END;
+            battleSequence->phaseStart = SDL_GetTicks() - BATTLE_ROUND_DELAY_MS;
+            break;
+        }
+
+        if (battleSequence->peak == nullptr || battleSequence->attacker == nullptr || !IsOccupyingPeak(battleSequence->peak, battleSequence->attacker) && battleSequence->phase != BATTLE_END)
+        {
+            battleSequence->phase = BATTLE_END;
+            battleSequence->phaseStart = SDL_GetTicks() - BATTLE_ROUND_DELAY_MS;
+            return;
+        }
+
+        if (battleSequence->attackers.size() > 0 && battleSequence->defenders.size() > 0)
+        {
+            crown->SetRendered(false);
+            battleSequence->phase = BATTLE_START_ROUND;
+            break;
+        }
+
+        if (SDL_GetTicks() - battleSequence->phaseStart < BATTLE_ROUND_DELAY_MS)
+        {
+            break;
+        }
+        crown->SetRendered(false);
+
+        if (battleSequence->defenders.size() < 1)
+        {
+            RetreatPlayer(battleSequence->peak, battleSequence->defender);
+            battleSequence->defender->GetCircleText()->SetRendered(false);
+            battleSequence->defender->GetCircleText()->SetCenter(currentPlayerCircle->GetCenter().first, currentPlayerCircle->GetCenter().second);
+        }
+
+        if (!BeginBattleAgainstDefender(battleSequence->peak, battleSequence->attacker))
+        {
+            battleSequence->phase = BATTLE_END;
+            battleSequence->phaseStart = SDL_GetTicks() - BATTLE_ROUND_DELAY_MS;
+        }
+        break;
+        case BATTLE_IDLE:
         break;
     case BATTLE_END:
-
         if (SDL_GetTicks() - battleSequence->phaseStart < BATTLE_ROUND_DELAY_MS)
         {
             break;
@@ -618,5 +667,5 @@ void KillSoldier(Piece *soldier)
     {
         soldier->GetPlayer()->soldierHeadCrosses[soldier->GetPlayer()->GetSoldierIndex(soldier)]->SetRendered(true);
     }
-    
+    AudioManager::playSound("death");
 }

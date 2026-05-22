@@ -11,7 +11,7 @@ class GameRules
     int remainingPoints = 0;
     int fatalBattleDifference = 4;
     bool claimEndsTurn = true;
-    bool autoRollMoves = true;
+    bool autoRollMoves = false;
     bool evenTurnCount = true;
     bool infiniteRolls = false;
 

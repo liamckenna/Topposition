@@ -634,6 +634,9 @@ void loadAudio()
     AudioManager::loadSound("error", "audio/error.wav");
     AudioManager::loadSound("whistle", "audio/whistle.wav");
     AudioManager::loadSound("foghorn", "audio/foghorn.wav");
+    AudioManager::loadSound("death", "audio/death.wav");
+    AudioManager::loadSound("grunt-left", "audio/grunt-left.wav");
+    AudioManager::loadSound("grunt-right", "audio/grunt-right.wav");
 
     AudioManager::setMasterVolume(0.2f);
     AudioManager::loadSound("ocean_ambiance", "audio/ocean-ambiance.wav");

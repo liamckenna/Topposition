@@ -43,13 +43,11 @@ void quit() {
 }
 
 void update() {
-    // Re-queue music when it finishes to loop it
     if (musicStream && currentMusic) {
-        if (SDL_GetAudioStreamQueued(musicStream) == 0)
+        if (SDL_GetAudioStreamQueued(musicStream) < (int)currentMusic->len)
             SDL_PutAudioStreamData(musicStream, currentMusic->buf, currentMusic->len);
     }
 
-    // Destroy one-shot streams once their data has been consumed
     activeStreams.erase(
         std::remove_if(activeStreams.begin(), activeStreams.end(),
             [](SDL_AudioStream* s) {
@@ -114,4 +112,4 @@ void setMasterVolume(float volume) {
     masterVolume = volume;
 }
 
-} // namespace AudioManager
+}
