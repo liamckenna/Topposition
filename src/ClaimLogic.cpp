@@ -89,52 +89,63 @@ namespace
 
     bool BeginBattleAgainstDefender(Peak *peak, Player *attacker)
     {
+        Player *target = nullptr;
         for (size_t i = 0; i < peak->occupants.size(); i++)
         {
-            if (peak->occupants[i]->GetPlayer() != attacker)
+            Player *candidate = peak->occupants[i]->GetPlayer();
+            if (candidate == attacker)
+                continue;
+            if (candidate != peak->GetClaimedBy())
             {
-                battleSequence->active = true;
-                battleSequence->peak = peak;
-                battleSequence->attacker = attacker;
-                battleSequence->defender = peak->occupants[i]->GetPlayer();
-                battleSequence->roundAttacker = nullptr;
-                battleSequence->roundDefender = nullptr;
-                battleSequence->attackRoll = 0;
-                battleSequence->defenseRoll = 0;
-                battleSequence->phaseStart = SDL_GetTicks();
-                battleSequence->phase = BATTLE_START_ROUND;
-                RefreshBattleParticipants();
-                opposingPlayerCircle->SetRendered(true);
-                SDL_SetTextureColorMod(opposingPlayerCircle->GetTexture(), battleSequence->defender->GetSDLColor().r / 1.5f, battleSequence->defender->GetSDLColor().g / 1.5f, battleSequence->defender->GetSDLColor().b / 1.5f);
-                battleSequence->defender->GetCircleText()->SetTextContent(std::to_string(battleSequence->defenders.size()).c_str(), renderer);
-                battleSequence->defender->GetCircleText()->SetCenter(opposingPlayerCircle->GetCenter().first, opposingPlayerCircle->GetCenter().second);
-                battleSequence->defender->GetCircleText()->SetRendered(true);
-                endTurnArrow->SetRendered(false);
-                endText->SetRendered(false);
-                turnText->SetRendered(false);
-                battleSequence->peak->GetClaimNotif()->SetRendered(false);
-                crown->SetRendered(false);
-                battleSequence->attacker->GetCircleText()->SetTextContent(std::to_string(battleSequence->attackers.size()).c_str(), renderer);
-                battleSequence->attacker->GetCircleText()->SetCenter(currentPlayerCircle->GetCenter().first, currentPlayerCircle->GetCenter().second);
-                if (rules->GetClaimEndsTurn())
-                {
-                    ClearRoll();
-                }
-                else
-                {
-                    string rollText = "Roll!";
-                    std::pair<float, float> center = movesLeftText->GetCenter();
-                    movesLeftText->SetSize(100 * (SCREEN_WIDTH / 3840.f), renderer);
-                    movesLeftText->SetTextContent(rollText.c_str(), renderer);
-                    movesLeftText->SetCenter(center.first, center.second);
-                }
-                RefreshClaimNotifs();
-                AudioManager::playSound("horn", 1.5f);
-                return true;
+                target = candidate;
+                break;
             }
+            if (target == nullptr)
+                target = candidate;
+        }
+        if (target == nullptr)
+        {
+            RefreshClaimNotifs();
+            return false;
+        }
+        battleSequence->active = true;
+        battleSequence->peak = peak;
+        battleSequence->attacker = attacker;
+        battleSequence->defender = target;
+        battleSequence->roundAttacker = nullptr;
+        battleSequence->roundDefender = nullptr;
+        battleSequence->attackRoll = 0;
+        battleSequence->defenseRoll = 0;
+        battleSequence->phaseStart = SDL_GetTicks();
+        battleSequence->phase = BATTLE_START_ROUND;
+        RefreshBattleParticipants();
+        opposingPlayerCircle->SetRendered(true);
+        SDL_SetTextureColorMod(opposingPlayerCircle->GetTexture(), battleSequence->defender->GetSDLColor().r / 1.5f, battleSequence->defender->GetSDLColor().g / 1.5f, battleSequence->defender->GetSDLColor().b / 1.5f);
+        battleSequence->defender->GetCircleText()->SetTextContent(std::to_string(battleSequence->defenders.size()).c_str(), renderer);
+        battleSequence->defender->GetCircleText()->SetCenter(opposingPlayerCircle->GetCenter().first, opposingPlayerCircle->GetCenter().second);
+        battleSequence->defender->GetCircleText()->SetRendered(true);
+        endTurnArrow->SetRendered(false);
+        endText->SetRendered(false);
+        turnText->SetRendered(false);
+        battleSequence->peak->GetClaimNotif()->SetRendered(false);
+        crown->SetRendered(false);
+        battleSequence->attacker->GetCircleText()->SetTextContent(std::to_string(battleSequence->attackers.size()).c_str(), renderer);
+        battleSequence->attacker->GetCircleText()->SetCenter(currentPlayerCircle->GetCenter().first, currentPlayerCircle->GetCenter().second);
+        if (rules->GetClaimEndsTurn())
+        {
+            ClearRoll();
+        }
+        else
+        {
+            string rollText = "Roll!";
+            std::pair<float, float> center = movesLeftText->GetCenter();
+            movesLeftText->SetSize(100 * (SCREEN_WIDTH / 3840.f), renderer);
+            movesLeftText->SetTextContent(rollText.c_str(), renderer);
+            movesLeftText->SetCenter(center.first, center.second);
         }
         RefreshClaimNotifs();
-        return false;
+        AudioManager::playSound("horn", 1.5f);
+        return true;
     }
 
     void EndBattleSequence()
