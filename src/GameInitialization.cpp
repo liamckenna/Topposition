@@ -374,6 +374,7 @@ void loadText()
     textSize = 150 * (SCREEN_WIDTH / 3840.f);
 
     movesLeftText = new Text("movesLeftText", "fonts/yoster.ttf", White, 0, 0, textSize, renderer, "11");
+    movesLeftText->SetSelectable(true);
 
     x = (SCREEN_WIDTH / 2) - (movesLeftText->GetWidth() / 2);
     y = SCREEN_HEIGHT - movesLeftText->GetHeight() - (SCREEN_HEIGHT / 9);

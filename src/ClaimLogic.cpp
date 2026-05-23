@@ -14,18 +14,6 @@ namespace
         return rand() % 6 + 1;
     }
 
-    bool HasActiveDiceAnimation()
-    {
-        for (size_t i = 0; i < diceAnimations.size(); i++)
-        {
-            if (!diceAnimations[i].finished)
-            {
-                return true;
-            }
-        }
-        return false;
-    }
-
     UIElement *FindDieElement(const std::string &name)
     {
         for (size_t i = 0; i < uiElements.size(); i++)
@@ -78,7 +66,7 @@ namespace
                                                 { return a.die == die; }),
                                  diceAnimations.end());
         }
-        diceAnimations.emplace_back(die, dieFaces, textures[finalFaceName][0], now, 125, 8, false);
+        diceAnimations.emplace_back(die, dieFaces, textures[finalFaceName][0], now, 100, 10, false);
     }
 
     void RefreshBattleParticipants()
@@ -208,6 +196,18 @@ namespace
         peaksLeftNumText->SetTextContent(to_string(unclaimedPeakCount).c_str(), renderer);
         peaksLeftNumText->SetCenter(center.first, center.second);
     }
+}
+
+bool HasActiveDiceAnimation()
+{
+    for (size_t i = 0; i < diceAnimations.size(); i++)
+    {
+        if (!diceAnimations[i].finished)
+        {
+            return true;
+        }
+    }
+    return false;
 }
 
 void RefreshClaimNotifs()

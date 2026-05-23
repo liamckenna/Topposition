@@ -219,10 +219,12 @@ UIElement *selectUI(int x, int y, bool update, bool selecting)
                         {
                             if (uiElements[i] == die1)
                             {
+                                movesLeftText->SetSelected(true);
                                 die2->SetSelected(true);
                             }
                             else if (uiElements[i] == die2)
                             {
+                                movesLeftText->SetSelected(true);
                                 die1->SetSelected(true);
                             }
                         }
@@ -230,10 +232,12 @@ UIElement *selectUI(int x, int y, bool update, bool selecting)
                         {
                             if (uiElements[i] == die1)
                             {
+                                movesLeftText->SetSelected(true);
                                 die2->SetSelected(true);
                             }
                             else if (uiElements[i] == die2)
                             {
+                                movesLeftText->SetSelected(true);
                                 die1->SetSelected(true);
                             }
                         }
@@ -264,6 +268,13 @@ Text *selectText(int x, int y, bool selecting)
                 SDL_Color color = GetPixelColor(text[i]->GetSurface(),
                                                 (x - width_LowerBound) / (cameraZoom),
                                                 (y - height_LowerBound) / (cameraZoom));
+                if (text[i] == movesLeftText && hasRolled && !IsBattleWaitingForDieClick())
+                {
+                    if (!rules->GetInfiniteRolls() || movesLeft > 0)
+                    {
+                        continue;
+                    }
+                }
                 if (selecting)
                 {
                     text[i]->SetSelected(true);
@@ -282,6 +293,13 @@ Text *selectText(int x, int y, bool selecting)
                         {
                             endTurnArrow->SetSelected(true);
                         }
+                    }
+                }
+                else if (text[i] == movesLeftText)
+                {
+                    if (IsBattleSequenceActive() && (!IsBattleWaitingForDieClick(die1) && !IsBattleWaitingForDieClick(die2)))
+                    {
+                        continue;
                     }
                 }
                 return text[i];
@@ -427,15 +445,39 @@ void updateHoverState(int x, int y)
             turnText->SetHovered(true);
         }
     }
-    if (die1 != nullptr && die2 != nullptr && (rules->GetAutoRoll() || !IsBattleWaitingForDieClick()))
+    if (movesLeftText != nullptr && die1 != nullptr && die2 != nullptr)
     {
-        if (die1->GetHovered())
+        if (rules->GetAutoRoll() || !IsBattleWaitingForDieClick())
         {
-            die2->SetHovered(true);
+            if (movesLeftText->GetHovered())
+            {
+                die1->SetHovered(true);
+                die2->SetHovered(true);
+            }
+            else if (die1->GetHovered())
+            {
+                movesLeftText->SetHovered(true);
+                die2->SetHovered(true);
+            }
+            else if (die2->GetHovered())
+            {
+                movesLeftText->SetHovered(true);
+                die1->SetHovered(true);
+            }
         }
-        else if (die2->GetHovered())
+        else if (!rules->GetAutoRoll() && IsBattleWaitingForDieClick())
         {
-            die1->SetHovered(true);
+            if (movesLeftText->GetHovered())
+            {
+                if (IsBattleWaitingForDieClick(die1))
+                {
+                    die1->SetHovered(true);
+                }
+                if (IsBattleWaitingForDieClick(die2))
+                {
+                    die2->SetHovered(true);
+                }
+            }
         }
     }
 

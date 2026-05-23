@@ -269,11 +269,18 @@ void MouseButtonDownGame(Input *playerInput, SDL_MouseButtonEvent &event)
 {
     if (IsBattleSequenceActive())
     {
-        if (!rules->GetAutoRoll() && event.button == SDL_BUTTON_LEFT && IsBattleWaitingForDieClick())
+        if (!rules->GetAutoRoll() && (event.button == SDL_BUTTON_LEFT && IsBattleWaitingForDieClick()))
         {
             selectedObject = selectUI(playerInput->currentMousePosition.first, playerInput->currentMousePosition.second, false);
             if (selectedObject != nullptr && selectedObject != die1 && selectedObject != die2)
+            {
                 selectedObject = nullptr;
+            }
+            selectedText = selectText(playerInput->currentMousePosition.first, playerInput->currentMousePosition.second);
+            if (selectedText != nullptr && selectedText != movesLeftText)
+            {
+                selectedText = nullptr;
+            }
         }
         return;
     }
@@ -404,6 +411,30 @@ void MouseButtonUpGame(Input *playerInput, SDL_MouseButtonEvent &event)
                 endText->SetSelected(false);
                 endTurnArrow->SetSelected(false);
             }
+            else if (selectedText == movesLeftText)
+            {
+                Text *newSelectedText = selectText(playerInput->currentMousePosition.first, playerInput->currentMousePosition.second);
+                if (selectedText == newSelectedText)
+                {
+                    if (IsBattleWaitingForDieClick(die1) || IsBattleWaitingForDieClick(die2))
+                    {
+                        AudioManager::playSound("click");
+                        if (IsBattleWaitingForDieClick(die1))
+                        {
+                            die1->SetSelected(false);
+                            OnBattleDieClicked("dieOne");
+                        }
+                        if (IsBattleWaitingForDieClick(die2))
+                        {
+                            die2->SetSelected(false);
+                            OnBattleDieClicked("dieTwo");
+                        }
+                    }
+                }
+                newSelectedText = nullptr;
+                movesLeftText->SetHovered(false);
+                movesLeftText->SetSelected(false);
+            }
         }
         if (selectedObject != nullptr)
         {
@@ -460,6 +491,13 @@ void MouseButtonUpGame(Input *playerInput, SDL_MouseButtonEvent &event)
             {
                 AudioManager::playSound("click");
                 FinishTurn();
+            }
+            else if (selectedText == movesLeftText && movesLeft < 1 && (!hasRolled || rules->GetInfiniteRolls()))
+            {
+                AudioManager::playSound("click");
+                currentRoll = Roll();
+                movesLeft = currentRoll;
+                movesLeftText->SetHovered(false);
             }
         }
         else if (selectedObject != nullptr)
@@ -533,6 +571,11 @@ void MouseButtonUpGame(Input *playerInput, SDL_MouseButtonEvent &event)
                 endText->SetSelected(false);
                 endTurnArrow->SetSelected(false);
             }
+            else if (selectedText == movesLeftText)
+            {
+                die1->SetSelected(false);
+                die2->SetSelected(false);
+            }
         }
         if (newSelectedText != nullptr)
         {
@@ -547,6 +590,11 @@ void MouseButtonUpGame(Input *playerInput, SDL_MouseButtonEvent &event)
                 endText->SetSelected(false);
                 endTurnArrow->SetSelected(false);
             }
+            else if (newSelectedText == movesLeftText)
+            {
+                die1->SetSelected(false);
+                die2->SetSelected(false);
+            }
         }
         if (selectedObject != nullptr && selectedObject->type == UI_ELEMENT)
         {
@@ -559,10 +607,12 @@ void MouseButtonUpGame(Input *playerInput, SDL_MouseButtonEvent &event)
             }
             else if (uiElement == die1)
             {
+                movesLeftText->SetSelected(false);
                 die2->SetSelected(false);
             }
             else if (uiElement == die2)
             {
+                movesLeftText->SetSelected(false);
                 die1->SetSelected(false);
             }
         }

@@ -7,6 +7,8 @@ void RefreshClaimNotifs();
 
 void ClaimPeak(UIElement *claimNotif);
 
+bool HasActiveDiceAnimation();
+
 void RetreatPiece(Peak *peak, Piece *piece);
 
 void RetreatPlayer(Peak *peak, Player *player);
