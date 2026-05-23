@@ -2,3 +2,5 @@
 build/
 dist/
 release/
+Topposition/
+*.zip
