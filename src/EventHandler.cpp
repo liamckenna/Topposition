@@ -107,11 +107,8 @@ void EventKeyDown(Input *playerInput, SDL_KeyboardEvent &event)
     case GAME:
         if (selectedObject == nullptr && selectedText == nullptr && event.key == SDLK_ESCAPE)
         {
+            AudioManager::playSound("click");
             state = PAUSED;
-        }
-        if (event.key == SDLK_F11)
-        {
-            GameFinished(currentTurn);
         }
         break;
     case PAUSED:
@@ -120,9 +117,11 @@ void EventKeyDown(Input *playerInput, SDL_KeyboardEvent &event)
             switch(pState)
             {
                 case MAIN:
+                    AudioManager::playSound("click");
                     state = GAME;
                     break;
                 case WINNER:
+                    AudioManager::playSound("click");
                     LoadMenu();
                     break;
                 default:
@@ -592,10 +591,12 @@ void MouseButtonUpPaused(Input *playerInput, SDL_MouseButtonEvent &event)
         {
             if (selectedText == resetMapText || selectedText == playAgainText)
             {
+                AudioManager::playSound("click");
                 ResetMap();
             }
             else if (selectedText == mainExitToMainMenuText || selectedText == winnerExitToMainMenuText)
             {
+                AudioManager::playSound("click");
                 LoadMenu();
             }
         }
