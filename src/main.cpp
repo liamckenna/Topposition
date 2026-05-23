@@ -75,7 +75,8 @@ void CalculateFrameRate()
     frameCountTime += deltaTime;
     if (frameCountTime >= FRAMETIME_CALC_MS)
     {
-        std::cout << "FPS: " << (frameCounter / (FRAMETIME_CALC_MS / 1000)) << std::endl;
+        UpdateFPSCounter(frameCounter / (FRAMETIME_CALC_MS / 1000));
+
         frameCounter = 0;
         frameCountTime = 0;
     }

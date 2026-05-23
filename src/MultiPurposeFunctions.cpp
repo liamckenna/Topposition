@@ -20,11 +20,6 @@ SDL_Color GetPixelColor(const SDL_Surface *surface, const int X, const int Y)
     return Color;
 }
 
-void Print(string s)
-{
-    // std::cout << s << std::endl;
-}
-
 void HueShift(int& r, int& g, int& b, float shiftDegrees)
 {
     float rf = r / 255.0f;

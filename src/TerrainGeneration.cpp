@@ -60,12 +60,10 @@ void GeneratePeak()
         int b = (rand() % MAP_HEIGHT) * 2;
 
         peak->SetCenter(a, b);
-        //peak->globalPosition = std::make_pair(a - (peak->GetDimensions().first * peak->GetScale()) / 2, b - (peak->GetDimensions().second * peak->GetScale()) / 2);
 
         if (peak->GetItem() != nullptr)
         {
             peak->GetItem()->SetCenter(a, b);
-            //peak->GetItem()->globalPosition = std::make_pair(a - (peak->GetItem()->GetDimensions().first * peak->GetItem()->GetScale()) / 2, b - (peak->GetItem()->GetDimensions().second * peak->GetItem()->GetScale()) / 2);
         }
     }
     SDL_Color color;
@@ -112,7 +110,6 @@ void GenerateTerrain(Peak *peak, int shape, int height)
         if (negativeY == 1)
             offsetY *= -1;
         layer->SetCenter(above->GetCenter().first + offsetX, above->GetCenter().second + offsetY);
-        //layer->globalPosition = std::make_pair(layer->GetCenter().first - (layer->GetDimensions().first * layer->GetScale()) / 2, layer->GetCenter().second - (layer->GetDimensions().second * layer->GetScale()) / 2);
         while (!TerrainIsSurrounded(above, layer))
         {
             offsetX = rand() % 20;
@@ -124,7 +121,6 @@ void GenerateTerrain(Peak *peak, int shape, int height)
             if (negativeY == 1)
                 offsetY *= -1;
             layer->SetCenter(above->GetCenter().first + offsetX, above->GetCenter().second + offsetY);
-            //layer->globalPosition = std::make_pair(layer->GetCenter().first - (layer->GetDimensions().first * layer->GetScale()) / 2, layer->GetCenter().second - (layer->GetDimensions().second * layer->GetScale()) / 2);
         }
         layer->SetOffsetX(offsetX);
         layer->SetOffsetY(offsetY);
@@ -170,7 +166,6 @@ std::vector<Terrain *> MergeTerrain(Terrain *peak)
         SDL_Color pixelOne;
         SDL_Color pixelTwo;
 
-        // top left
         if (peak->GetPosition().first > other->GetPosition().first &&
             peak->GetPosition().first < other->GetBottomRight().first &&
             peak->GetPosition().second > other->GetPosition().second &&
@@ -243,7 +238,6 @@ std::vector<Terrain *> MergeTerrain(Terrain *peak)
         }
         else if (topLeftOne && !topRightOne && bottomLeftOne && !bottomRightOne)
         {
-            // std::cout << "One" << std::endl;
             length = other->GetBottomRight().first - peak->GetPosition().first;
             height = peak->GetBottomRight().second - peak->GetPosition().second;
             offsetOne.first = 0;
@@ -253,7 +247,6 @@ std::vector<Terrain *> MergeTerrain(Terrain *peak)
         }
         else if (!topLeftOne && !topRightOne && bottomLeftOne && bottomRightOne)
         {
-            // std::cout << "Two" << std::endl;
             length = peak->GetBottomRight().first - peak->GetPosition().first;
             height = peak->GetBottomRight().second - other->GetPosition().second;
             offsetOne.first = 0;
@@ -263,7 +256,6 @@ std::vector<Terrain *> MergeTerrain(Terrain *peak)
         }
         else if (!topLeftOne && topRightOne && !bottomLeftOne && bottomRightOne)
         {
-            // std::cout << "Three" << std::endl;
             length = peak->GetBottomRight().first - other->GetPosition().first;
             height = peak->GetBottomRight().second - peak->GetPosition().second;
             offsetOne.first = other->GetPosition().first - peak->GetPosition().first;
@@ -273,7 +265,6 @@ std::vector<Terrain *> MergeTerrain(Terrain *peak)
         }
         else if (topLeftOne && topRightOne && !bottomLeftOne && !bottomRightOne)
         {
-            // std::cout << "Four" << std::endl;
             length = peak->GetBottomRight().first - peak->GetPosition().first;
             height = other->GetBottomRight().second - peak->GetPosition().second;
             offsetOne.first = 0;
@@ -283,7 +274,6 @@ std::vector<Terrain *> MergeTerrain(Terrain *peak)
         }
         else if (topLeftOne && !topRightOne && !bottomLeftOne && !bottomRightOne)
         {
-            // std::cout << "Five" << std::endl;
             length = other->GetBottomRight().first - peak->GetPosition().first;
             height = other->GetBottomRight().second - peak->GetPosition().second;
             offsetOne.first = 0;
@@ -293,7 +283,6 @@ std::vector<Terrain *> MergeTerrain(Terrain *peak)
         }
         else if (!topLeftOne && topRightOne && !bottomLeftOne && !bottomRightOne)
         {
-            // std::cout << "Six" << std::endl;
             length = peak->GetBottomRight().first - other->GetPosition().first;
             height = other->GetBottomRight().second - peak->GetPosition().second;
             offsetOne.first = other->GetPosition().first - peak->GetPosition().first;
@@ -303,7 +292,6 @@ std::vector<Terrain *> MergeTerrain(Terrain *peak)
         }
         else if (!topLeftOne && !topRightOne && bottomLeftOne && !bottomRightOne)
         {
-            // std::cout << "Seven" << std::endl;
             length = other->GetBottomRight().first - peak->GetPosition().first;
             height = peak->GetBottomRight().second - other->GetPosition().second;
             offsetOne.first = 0;
@@ -313,7 +301,6 @@ std::vector<Terrain *> MergeTerrain(Terrain *peak)
         }
         else if (!topLeftOne && !topRightOne && !bottomLeftOne && bottomRightOne)
         {
-            // std::cout << "Eight" << std::endl;
             length = peak->GetBottomRight().first - other->GetPosition().first;
             height = peak->GetBottomRight().second - other->GetPosition().second;
             offsetOne.first = other->GetPosition().first - peak->GetPosition().first;
@@ -323,7 +310,6 @@ std::vector<Terrain *> MergeTerrain(Terrain *peak)
         }
         else if (topLeftOne && topRightOne && bottomLeftOne && bottomRightOne)
         {
-            // std::cout << "Nine" << std::endl;
             length = peak->GetBottomRight().first - peak->GetPosition().first;
             height = peak->GetBottomRight().second - peak->GetPosition().second;
             offsetOne.first = 0;
@@ -333,7 +319,6 @@ std::vector<Terrain *> MergeTerrain(Terrain *peak)
         }
         else if (topLeftTwo && topRightTwo && bottomLeftTwo && bottomRightTwo)
         {
-            // std::cout << "Ten" << std::endl;
             length = other->GetBottomRight().first - other->GetPosition().first;
             height = other->GetBottomRight().second - other->GetPosition().second;
             offsetOne.first = other->GetPosition().first - peak->GetPosition().first;
@@ -343,7 +328,6 @@ std::vector<Terrain *> MergeTerrain(Terrain *peak)
         }
         else if (topLeftTwo && !topRightTwo && bottomLeftTwo && !bottomRightTwo)
         {
-            // std::cout << "Eleven" << std::endl;
             length = peak->GetBottomRight().first - other->GetPosition().first;
             height = other->GetBottomRight().second - other->GetPosition().second;
             offsetOne.first = other->GetPosition().first - peak->GetPosition().first;
@@ -353,7 +337,6 @@ std::vector<Terrain *> MergeTerrain(Terrain *peak)
         }
         else if (!topLeftTwo && !topRightTwo && bottomLeftTwo && bottomRightTwo)
         {
-            // std::cout << "Twelve" << std::endl;
             length = other->GetBottomRight().first - other->GetPosition().first;
             height = other->GetBottomRight().second - peak->GetPosition().second;
             offsetOne.first = other->GetPosition().first - peak->GetPosition().first;
@@ -363,7 +346,6 @@ std::vector<Terrain *> MergeTerrain(Terrain *peak)
         }
         else if (!topLeftTwo && topRightTwo && !bottomLeftTwo && bottomRightTwo)
         {
-            // std::cout << "Thirteen" << std::endl;
             length = other->GetBottomRight().first - peak->GetPosition().first;
             height = other->GetBottomRight().second - other->GetPosition().second;
             offsetOne.first = 0;
@@ -373,7 +355,6 @@ std::vector<Terrain *> MergeTerrain(Terrain *peak)
         }
         else if (topLeftTwo && topRightTwo && !bottomLeftTwo && !bottomRightTwo)
         {
-            // std::cout << "Fourteen" << std::endl;
             length = other->GetBottomRight().first - other->GetPosition().first;
             height = peak->GetBottomRight().second - other->GetPosition().second;
             offsetOne.first = other->GetPosition().first - peak->GetPosition().first;
@@ -426,7 +407,6 @@ bool TerrainIsSurrounded(Terrain *peak, Terrain *other)
     SDL_Color pixelOne;
     SDL_Color pixelTwo;
 
-    // top left
     if (peak->GetPosition().first > other->GetPosition().first &&
         peak->GetPosition().first < other->GetBottomRight().first &&
         peak->GetPosition().second > other->GetPosition().second &&
@@ -506,11 +486,9 @@ void GroomTerrain()
                 int b = (rand() % MAP_HEIGHT) * 2;
 
                 peaks[i]->SetCenter(a, b);
-                //peaks[i]->globalPosition = std::make_pair(peaks[i]->GetCenter().first - (peaks[i]->GetDimensions().first * peaks[i]->GetScale()) / 2, peaks[i]->GetCenter().second - (peaks[i]->GetDimensions().second * peaks[i]->GetScale()) / 2);
                 if (peaks[i]->GetItem() != nullptr)
                 {
                     peaks[i]->GetItem()->SetCenter(a, b);
-                    //peaks[i]->GetItem()->globalPosition = std::make_pair(peaks[i]->GetItem()->GetCenter().first - (peaks[i]->GetItem()->GetDimensions().first * peaks[i]->GetItem()->GetScale()) / 2, peaks[i]->GetItem()->GetCenter().second - (peaks[i]->GetItem()->GetDimensions().second * peaks[i]->GetItem()->GetScale()) / 2);
                 }
                 moveCount++;
             }
@@ -528,7 +506,6 @@ void GroomTerrain()
                     above = peaks[i]->childTerrain[j - 1];
                 }
                 current->SetCenter(above->GetCenter().first + current->GetOffsetX(), above->GetCenter().second + current->GetOffsetY());
-                //current->globalPosition = std::make_pair(current->GetCenter().first - (current->GetDimensions().first * current->GetScale()) / 2, current->GetCenter().second - (current->GetDimensions().second * current->GetScale()) / 2);
             }
         }
     }

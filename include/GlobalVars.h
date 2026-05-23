@@ -167,3 +167,5 @@ extern Text *suddenDeathText;
 extern Text *lastTurnText;
 
 extern Text *moveCostText;
+
+extern Text *fpsCounterText;

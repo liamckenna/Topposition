@@ -29,6 +29,8 @@ void renderOceanFrozen();
 
 void CheckOceanTilePositioning();
 
+void UpdateFPSCounter(int fps);
+
 void ReflectOceanTile(OceanTile *tile);
 
 void renderPauseOverlay();

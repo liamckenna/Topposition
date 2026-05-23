@@ -202,7 +202,6 @@ void loadGamePieces()
                 tries++;
                 if (tries > maxTries)
                 {
-                    std::cout << "Failed to place piece for " << playerNumber << " after " << maxTries << " tries!" << std::endl;
                     switch (j % 4)
                     {
                         case 0:
@@ -461,6 +460,13 @@ void loadText()
     moveCostText->SetCenter(movesLeftText->GetBottomRight().first + (SCREEN_WIDTH / 200), movesLeftText->GetPosition().second + (moveCostText->GetHeight() / 2));
     moveCostText->SetGameStateContext(GAME);
     text.push_back(moveCostText);
+
+    fpsCounterText = new Text("fpsCounterText", "fonts/yoster.ttf", White, 0, 0, textSize, renderer, "1444 FPS");
+    fpsCounterText->SetSize(40 * (SCREEN_WIDTH / 3840.f), renderer);
+    fpsCounterText->SetPosition(players[0]->GetTurnText()->GetPosition().first, turnTallyText->GetPosition().second - fpsCounterText->GetHeight());
+    fpsCounterText->SetShadowOffset(5, 5);
+    fpsCounterText->SetGameStateContext(GAME);
+    text.push_back(fpsCounterText);
 }
 
 void loadUI()
@@ -783,6 +789,7 @@ void ResetGlobalVars()
     suddenDeathText = nullptr;
     lastTurnText = nullptr;
     moveCostText = nullptr;
+    fpsCounterText = nullptr;
     currentPlayerCircle = nullptr;
     opposingPlayerCircle = nullptr;
     endTurnArrow = nullptr;

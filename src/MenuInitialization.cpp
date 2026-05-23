@@ -205,7 +205,7 @@ void UpdateTextElementPositions()
 
             moveCostText->SetSize(65 * (SCREEN_WIDTH / 3840.f), renderer);
             moveCostText->SetCenter(movesLeftText->GetBottomRight().first + (SCREEN_WIDTH / 200), movesLeftText->GetPosition().second + (moveCostText->GetHeight() / 2));
-            
+
             center = movesLeftText->GetCenter();
             if (hasRolled)
             {
@@ -277,6 +277,11 @@ void UpdateTextElementPositions()
                     players[i]->soldierHeadCrosses[j]->SetPosition(peaksLeftText->GetPosition().first + (j * (players[i]->soldierHeadCrosses[j]->GetDimensions().first * players[i]->soldierHeadCrosses[j]->GetScale() + SCREEN_WIDTH / 600)) - SCREEN_WIDTH / 350, peaksLeftText->GetPosition().second + peaksLeftText->GetHeight() + SCREEN_HEIGHT / 100);
                 }
             }
+            fpsCounterText->SetTextContent("1444 FPS", renderer);
+            fpsCounterText->SetSize(40 * (SCREEN_WIDTH / 3840.f), renderer);
+            fpsCounterText->SetPosition(players[0]->GetTurnText()->GetPosition().first, turnTallyText->GetPosition().second - fpsCounterText->GetHeight());
+            
+
             RefreshShadows();
             break;
         }

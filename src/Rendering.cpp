@@ -32,7 +32,6 @@ void RenderScreen()
     switch (state)
     {   
         case MAIN_MENU:
-            //renderMenuBackground();
             renderOcean();
             renderTerrain();
             renderPauseOverlay();
@@ -42,7 +41,6 @@ void RenderScreen()
         case GAME:
             renderOcean();
             renderTerrain();
-            //renderClaimFlags();
             renderPieces();
             renderClaimNotifs();
             renderSelectedObject();
@@ -53,7 +51,6 @@ void RenderScreen()
         case PAUSED:
             renderOceanFrozen();
             renderTerrain();
-            //renderClaimFlags();
             renderPieces();
             renderClaimNotifs();
             renderSelectedObject();
@@ -316,4 +313,17 @@ void RenderLoadingScreen()
     loadingText->RenderText(renderer);
     SDL_RenderPresent(renderer);
     free(loadingText);
+}
+
+void UpdateFPSCounter(int fps)
+{
+    if (fpsCounterText == nullptr)
+        return;
+    
+    string fpsString = to_string(fps) + " FPS";
+
+    float right = fpsCounterText->GetBottomRight().first;
+
+    fpsCounterText->SetTextContent(fpsString.c_str(), renderer);
+    fpsCounterText->SetPosition(right - fpsCounterText->GetWidth(), fpsCounterText->GetPosition().second);
 }

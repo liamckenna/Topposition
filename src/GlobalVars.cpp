@@ -146,6 +146,8 @@ Text *lastTurnText;
 
 Text *moveCostText;
 
+Text *fpsCounterText;
+
 bool hasRolled = false;
 
 bool allPeaksClaimed = false;

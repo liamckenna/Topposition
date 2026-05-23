@@ -7,11 +7,9 @@
 bool init()
 {
     SetDllDirectoryA("libs");
-    // Initialization flag
     bool success = true;
     srand((unsigned)time(NULL));
     
-    // Initialize SDL
     if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO) < 0)
     {
         printf("SDL could not initialize! SDL Error: %s\n", SDL_GetError());
@@ -19,7 +17,6 @@ bool init()
     }
     else
     {
-        // Create window
         window = SDL_CreateWindow("Topposition", SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_OCCLUDED | SDL_WINDOW_RESIZABLE);
 
         if (window == NULL)
@@ -63,12 +60,6 @@ bool init()
 
 void close()
 {
-    // Free loaded image
-    /*for (auto i : textures) {
-        SDL_DestroyTexture(i.second);
-        i.second = NULL;
-    }*/
-    // Destroy window
     SDL_DestroyRenderer(renderer);
     SDL_DestroyWindow(window);
     window = NULL;
@@ -76,17 +67,13 @@ void close()
 
     AudioManager::quit();
 
-    // Quit SDL subsystems
-    // IMG_Quit();
     SDL_Quit();
 }
 
 SDL_Surface *loadSurface(std::string path)
 {
-    // The final optimized image
     SDL_Surface *optimizedSurface = NULL;
 
-    // Load image at specified path
     SDL_Surface *loadedSurface = IMG_Load(path.c_str());
     if (loadedSurface == NULL)
     {
@@ -94,14 +81,12 @@ SDL_Surface *loadSurface(std::string path)
     }
     else
     {
-        // Convert surface to screen format
         optimizedSurface = SDL_ConvertSurface(loadedSurface, SDL_PIXELFORMAT_RGBA8888);
         if (optimizedSurface == NULL)
         {
             printf("Unable to optimize image %s! SDL Error: %s\n", path.c_str(), SDL_GetError());
         }
 
-        // Get rid of old loaded surface
         SDL_DestroySurface(loadedSurface);
     }
     return optimizedSurface;
@@ -109,10 +94,8 @@ SDL_Surface *loadSurface(std::string path)
 
 SDL_Texture *loadTexture(std::string path)
 {
-    // The final texture
     SDL_Texture *newTexture = NULL;
 
-    // Load image at specified path
     SDL_Surface *loadedSurface = IMG_Load(path.c_str());
     if (loadedSurface == NULL)
     {
@@ -120,7 +103,6 @@ SDL_Texture *loadTexture(std::string path)
     }
     else
     {
-        // Create texture from surface pixels
         newTexture = SDL_CreateTextureFromSurface(renderer, loadedSurface);
         SDL_SetTextureScaleMode(newTexture, SDL_SCALEMODE_NEAREST);
         if (newTexture == NULL)
@@ -128,7 +110,6 @@ SDL_Texture *loadTexture(std::string path)
             printf("Unable to create texture from %s! SDL Error: %s\n", path.c_str(), SDL_GetError());
         }
 
-        // Get rid of old loaded surface
         SDL_DestroySurface(loadedSurface);
     }
 
@@ -137,7 +118,6 @@ SDL_Texture *loadTexture(std::string path)
 
 void TextureLoader()
 {
-    // load all textures
     struct dirent *entry = nullptr;
     struct dirent *innerEntry = nullptr;
     struct dirent *innerx2 = nullptr;

@@ -60,15 +60,12 @@ bool zoom(int direction, std::pair<float, float> mousePos)
             cameraZoom = SCREEN_WIDTH / 1920.f;
         }
     }
-    //std::cout << "Camera Zoom: " << cameraZoom << std::endl;
 
     cameraPosition.first += (mouseX / prevCameraZoom) - (mouseX / cameraZoom);
     cameraPosition.second += (mouseY / prevCameraZoom) - (mouseY / cameraZoom);
-    //std::cout << "Camera Position: " << cameraPosition.first << ", " << cameraPosition.second << std::endl;
 
     worldResolution.first = SCREEN_WIDTH / cameraZoom;
     worldResolution.second = SCREEN_HEIGHT / cameraZoom;
-    //std::cout << "World Resolution: " << worldResolution.first << ", " << worldResolution.second << std::endl;
 
     ClampCameraBoundaries();
 
@@ -79,9 +76,6 @@ void scroll(Input *playerInput)
 {
     cameraPosition.first -= (playerInput->currentMousePosition.first - playerInput->prevMousePosition.first) / cameraZoom;
     cameraPosition.second -= (playerInput->currentMousePosition.second - playerInput->prevMousePosition.second) / cameraZoom;
-
-
-    //std::cout << "Camera Position: " << cameraPosition.first << ", " << cameraPosition.second << std::endl;
 
     ClampCameraBoundaries();
 }

@@ -139,7 +139,6 @@ namespace
                     movesLeftText->SetSize(100 * (SCREEN_WIDTH / 3840.f), renderer);
                     movesLeftText->SetTextContent(rollText.c_str(), renderer);
                     movesLeftText->SetCenter(center.first, center.second);
-                    //movesLeftText->SetRendered(false);
                 }
                 RefreshClaimNotifs();
                 AudioManager::playSound("horn", 1.5f);
@@ -164,7 +163,6 @@ namespace
         turnText->SetRendered(true);
         crown->SetRendered(false);
 
-        //movesLeftText->SetRendered(true);
         if (!rules->GetClaimEndsTurn())
         {
             UpdateMovesLeft();

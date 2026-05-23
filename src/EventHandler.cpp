@@ -93,7 +93,6 @@ void EventWindowResized(Input *playerInput, SDL_WindowEvent &event)
         break;
     }
 
-    std::cout << "New screen dimensions: " << SCREEN_WIDTH << ", " << SCREEN_HEIGHT << std::endl;
     updateUIElementPositions();
 }
 
@@ -498,7 +497,6 @@ void MouseButtonUpGame(Input *playerInput, SDL_MouseButtonEvent &event)
                 piece->SetScale(piece->GetScale() / 2.f);
                 piece->SetBottomMiddle(bottom_middle.first, bottom_middle.second);
                 piece->SetHeld(false);
-                // Terrain *startingTerrain = selectTerrain(piece->GetDesignatedLocation().first, piece->GetDesignatedLocation().second);
                 Terrain *targetTerrain = selectTerrain(piece->GetBottomMiddle().first, piece->GetBottomMiddle().second);
                 if (piece->GetCurrentAnimation() != NULL)
                     piece->GetCurrentAnimation()->Unpause();
