@@ -181,6 +181,4 @@ void TextureLoader()
         }
         closedir(odp);
     }
-    printf("There are %d unique terrain shapes.\n", shapeCount);
-    printf("There's %d files in the current directory.\n", textureCount);
 }
