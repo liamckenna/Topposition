@@ -98,6 +98,13 @@ void EventWindowResized(Input *playerInput, SDL_WindowEvent &event)
 
 void EventKeyDown(Input *playerInput, SDL_KeyboardEvent &event)
 {
+    if (event.key == SDLK_F11)
+    {
+        bool isFullscreen = SDL_GetWindowFlags(window) & SDL_WINDOW_FULLSCREEN;
+        SDL_SetWindowFullscreen(window, !isFullscreen);
+        return;
+    }
+
     switch (state)
     {
     case MAIN_MENU:
