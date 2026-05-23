@@ -73,9 +73,6 @@ void loadGame()
 
     gameStartTime = SDL_GetTicks();
     std::cout << "Total Load Time: " << (gameStartTime - mapStartTime) / 1000.f << " seconds!" << std::endl;
-
-
-    std::cout << "World Resolution: " << worldResolution.first << ", " << worldResolution.second << std::endl;
 }
 
 void SetCameraAtCenter()

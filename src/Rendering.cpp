@@ -321,9 +321,5 @@ void UpdateFPSCounter(int fps)
         return;
     
     string fpsString = to_string(fps) + " FPS";
-
-    float right = fpsCounterText->GetBottomRight().first;
-
     fpsCounterText->SetTextContent(fpsString.c_str(), renderer);
-    fpsCounterText->SetPosition(right - fpsCounterText->GetWidth(), fpsCounterText->GetPosition().second);
 }
