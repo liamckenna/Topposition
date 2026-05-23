@@ -46,16 +46,20 @@ if(WIN32)
         COMMAND ${CMAKE_COMMAND} -E make_directory "${RELEASE_DIR}/libs"
         COMMAND ${CMAKE_COMMAND} -E make_directory "${RELEASE_DIR}/textures"
         COMMAND ${CMAKE_COMMAND} -E make_directory "${RELEASE_DIR}/fonts"
+        COMMAND ${CMAKE_COMMAND} -E make_directory "${RELEASE_DIR}/audio"
+
         # Recursively collect every transitive DLL dependency and copy to libs/.
         # Also removes any DLLs auto-dropped into the release/ root by SDL3's
         # cmake package config so all DLLs live only in release/libs/.
         COMMAND ${CMAKE_COMMAND}
-            "-DEXE_PATH=$<TARGET_FILE:Topposition>"
-            "-DMINGW_BIN_DIR=${MINGW_BIN_DIR}"
-            "-DRELEASE_DIR=${RELEASE_DIR}"
-            -P "${CMAKE_CURRENT_SOURCE_DIR}/cmake/CopyRuntimeDeps.cmake"
+        "-DEXE_PATH=$<TARGET_FILE:Topposition>"
+        "-DMINGW_BIN_DIR=${MINGW_BIN_DIR}"
+        "-DRELEASE_DIR=${RELEASE_DIR}"
+        -P "${CMAKE_CURRENT_SOURCE_DIR}/cmake/CopyRuntimeDeps.cmake"
         COMMAND ${CMAKE_COMMAND} -E copy_directory "${CMAKE_SOURCE_DIR}/Textures" "${RELEASE_DIR}/textures"
         COMMAND ${CMAKE_COMMAND} -E copy_directory "${CMAKE_SOURCE_DIR}/Fonts" "${RELEASE_DIR}/fonts"
+        COMMAND ${CMAKE_COMMAND} -E copy_directory "${CMAKE_SOURCE_DIR}/Audio" "${RELEASE_DIR}/audio"
+
         COMMAND_EXPAND_LISTS
         COMMENT "Packaging Topposition release folder"
     )
