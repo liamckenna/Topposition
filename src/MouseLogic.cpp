@@ -151,7 +151,7 @@ UIElement *selectUI(int x, int y, bool update, bool selecting)
 {
     for (int i = 0; i < uiElements.size(); i++)
     {
-        if (!uiElements[i]->GetSelectable() || !uiElements[i]->GetRendered())
+        if (!uiElements[i]->GetSelectable() || !uiElements[i]->GetRendered() || (!selecting && state != uiElements[i]->GetGameStateContext()))
         {
             continue;
         }

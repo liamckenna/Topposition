@@ -621,7 +621,7 @@ void GeneratePixels()
 
 void loadAudio()
 {
-    AudioManager::loadSound("gunter_wenk", "audio/gunter wenk.wav");
+    AudioManager::loadSound("up", "audio/up.wav");
     AudioManager::loadSound("ehh", "audio/ehh.wav");
     AudioManager::loadSound("hold_up", "audio/hold up.wav");
     AudioManager::loadSound("click", "audio/click.wav");
@@ -637,6 +637,10 @@ void loadAudio()
     AudioManager::loadSound("death", "audio/death.wav");
     AudioManager::loadSound("grunt-left", "audio/grunt-left.wav");
     AudioManager::loadSound("grunt-right", "audio/grunt-right.wav");
+    AudioManager::loadSound("lol", "audio/lol.wav");
+    AudioManager::loadSound("horn", "audio/horn.wav");
+    AudioManager::loadSound("bell", "audio/bell.wav");
+    AudioManager::loadSound("victory-theme", "audio/victory-theme.wav");
 
     AudioManager::setMasterVolume(0.2f);
     AudioManager::loadSound("ocean_ambiance", "audio/ocean-ambiance.wav");

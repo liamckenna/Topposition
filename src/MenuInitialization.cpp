@@ -23,7 +23,7 @@ void loadMenuUI()
 
     int textSize = 250 * (SCREEN_WIDTH / 3840.f);
     Text *playButtonText = new Text("playButtonText", "fonts/yoster.ttf", White, 0, 0, textSize, renderer, "Play");
-    playButtonText->SetCenter(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 + SCREEN_HEIGHT / 6);
+    playButtonText->SetCenter(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 + SCREEN_HEIGHT / 5);
     playButtonText->SetRenderShadow(false);
     playButtonText->SetSelectable(true);
     playButtonText->SetGameStateContext(MAIN_MENU);
@@ -136,7 +136,7 @@ void UpdateTextElementPositions()
                 if (text[i]->GetName() == "playButtonText")
                 {
                     text[i]->SetSize(250 * (SCREEN_WIDTH / 3840.f), renderer);
-                    text[i]->SetCenter(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 + SCREEN_HEIGHT / 6);
+                    text[i]->SetCenter(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 + SCREEN_HEIGHT / 5);
                 }
                 else if (text[i]->GetName() == "settings")
                 {

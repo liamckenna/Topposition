@@ -48,12 +48,12 @@ namespace
         else if (die == die1)
         {
             AudioManager::playSound("roll-left");
-            AudioManager::playSound("grunt-left");
+            AudioManager::playSound("grunt-left", 2.5f);
         }
         else if (die == die2)
         {
             AudioManager::playSound("roll-right");
-            AudioManager::playSound("grunt-right");
+            AudioManager::playSound("grunt-right", 2.5f);
         }
 
         std::vector<SDL_Texture *> dieFaces;
@@ -142,6 +142,7 @@ namespace
                     //movesLeftText->SetRendered(false);
                 }
                 RefreshClaimNotifs();
+                AudioManager::playSound("horn", 1.5f);
                 return true;
             }
         }
@@ -175,6 +176,7 @@ namespace
 
     void FinalizePeakClaim(Peak *peak)
     {
+        AudioManager::playSound("bell", 0.75f);
         peak->Claim(currentTurn);
         if (peak->GetItem() != nullptr)
         {
@@ -251,6 +253,7 @@ void ClaimPeak(UIElement *peakNotif)
 
     if (LastPlayerStanding(peak, currentTurn))
     {
+        AudioManager::playSound("lol", 2.5f);
         FinalizePeakClaim(peak);
         if (rules->GetClaimEndsTurn())
             FinishTurn();

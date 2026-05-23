@@ -253,6 +253,7 @@ void BeginLastTurn()
 
 void GameFinished(Player *winner)
 {
+    AudioManager::playSound("victory-theme", 2.f);
     state = PAUSED;
     pState = WINNER;
 

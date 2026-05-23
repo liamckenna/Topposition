@@ -311,7 +311,7 @@ void MouseButtonDownGame(Input *playerInput, SDL_MouseButtonEvent &event)
                             piece->GetCurrentAnimation()->Pause();
                         RefreshClaimNotifs();
                         CheckMovementPossibility(piece, startingTerrain);
-                        AudioManager::playSound("gunter_wenk");
+                        AudioManager::playSound("up", 0.75f);
                     }
                 }
             }
@@ -513,7 +513,7 @@ void MouseButtonUpGame(Input *playerInput, SDL_MouseButtonEvent &event)
                 }
                 else
                 {
-                    AudioManager::playSound("error", 0.25f);
+                    AudioManager::playSound("error", 0.5f);
                 }
                 RefreshClaimNotifs();
                 startingTerrain = nullptr;
