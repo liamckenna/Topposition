@@ -12,8 +12,8 @@ class GameRules
     int fatalBattleDifference = 4;
     bool claimEndsTurn = true;
     bool autoRoll = false;
-    bool evenTurnCount = true;
     bool infiniteRolls = false;
+    bool evenTurnCount = true;
 
 public:
     int GetPlayerCount() { return playerCount; }
