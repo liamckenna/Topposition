@@ -133,7 +133,12 @@ namespace
         battleSequence->attacker->GetCircleText()->SetCenter(currentPlayerCircle->GetCenter().first, currentPlayerCircle->GetCenter().second);
         if (rules->GetClaimEndsTurn())
         {
-            ClearRoll();
+            string rollText = "Roll!";
+            std::pair<float, float> center = movesLeftText->GetCenter();
+            movesLeftText->SetSize(100 * (SCREEN_WIDTH / 3840.f), renderer);
+            movesLeftText->SetTextContent(rollText.c_str(), renderer);
+            movesLeftText->SetCenter(center.first, center.second);
+
         }
         else
         {
@@ -162,12 +167,9 @@ namespace
         turnText->SetRendered(true);
         crown->SetRendered(false);
 
-        if (!rules->GetClaimEndsTurn())
-        {
-            UpdateMovesLeft();
-        }
+        UpdateMovesLeft();
 
-            delete battleSequence;
+        delete battleSequence;
         battleSequence = new BattleSequenceState();
     }
 
@@ -530,10 +532,13 @@ void UpdateBattleSequence()
         {
             break;
         }
-        EndBattleSequence();
-        RefreshClaimNotifs();
-        if (rules->GetClaimEndsTurn())
-            FinishTurn();
+        {
+            bool attackerWon = battleSequence->peak->GetClaimedBy() == battleSequence->attacker;
+            EndBattleSequence();
+            RefreshClaimNotifs();
+            if (rules->GetClaimEndsTurn() && !attackerWon)
+                FinishTurn();
+        }
         break;
     default:
         break;
