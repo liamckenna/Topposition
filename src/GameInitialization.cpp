@@ -666,10 +666,20 @@ void GeneratePixels()
                 }
                 else if (pixel->GetHiddenTerrain()->GetBiome() == "glacier")
                 {
-                    int randI = (randR + randG + randB) / 3; // single grayscale offset
-                    pixelColor = {static_cast<Uint8>(std::min(185 / rules->GetMaxHeight() * (pixel->GetHiddenTerrain()->GetLayer() - 1) + (randI * randT), 255)),
-                                  static_cast<Uint8>(std::min(200 / rules->GetMaxHeight() * (pixel->GetHiddenTerrain()->GetLayer() - 1) + 100 + (randI * randT), 255)),
-                                  static_cast<Uint8>(std::min(255 / rules->GetMaxHeight() * (pixel->GetHiddenTerrain()->GetLayer() - 1) + 140 + (randI * randT), 255)), 255};
+                    if (pixel->GetHiddenTerrain() == pixel->GetHiddenTerrain()->GetPeak())
+                    {
+                        int randI = (randR + randG + randB) / 3;
+                        pixelColor = {static_cast<Uint8>(std::min(200 + (randI * randT), 255)),
+                                      static_cast<Uint8>(std::min(235 + (randI * randT), 255)),
+                                      static_cast<Uint8>(std::min(255, 255)), 255};
+                    }
+                    else
+                    {
+                        int randI = (randR + randG + randB) / 3; // single grayscale offset
+                        pixelColor = {static_cast<Uint8>(std::min(185 / rules->GetMaxHeight() * (pixel->GetHiddenTerrain()->GetLayer() - 1) + (randI * randT), 255)),
+                                      static_cast<Uint8>(std::min(200 / rules->GetMaxHeight() * (pixel->GetHiddenTerrain()->GetLayer() - 1) + 100 + (randI * randT), 255)),
+                                      static_cast<Uint8>(std::min(255 / rules->GetMaxHeight() * (pixel->GetHiddenTerrain()->GetLayer() - 1) + 140 + (randI * randT), 255)), 255};
+                    }   
                 }
             }
             pixel->SetColor(pixelColor);
