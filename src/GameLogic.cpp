@@ -102,7 +102,7 @@ void FinishTurn()
     RotateTurn();
     movesLeft = 0;
     UpdateMovesLeft();
-    RefreshClaimNotifs();
+    RefreshClaimAndDefendNotifs();
     if (currentTurn == players[0])
     {
         if (rules->GetEvenTurnCount() && allPeaksClaimed)

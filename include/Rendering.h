@@ -9,7 +9,7 @@ void renderPauseOverlay();
 
 void renderUI();
 
-void renderClaimNotifs();
+void renderClaimAndDefendNotifs();
 
 void renderClaimFlags();
 

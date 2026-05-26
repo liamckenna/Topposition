@@ -42,7 +42,7 @@ void RenderScreen()
             renderOcean();
             renderTerrain();
             renderPieces();
-            renderClaimNotifs();
+            renderClaimAndDefendNotifs();
             renderSelectedObject();
             renderUI();
             renderText();
@@ -52,7 +52,7 @@ void RenderScreen()
             renderOceanFrozen();
             renderTerrain();
             renderPieces();
-            renderClaimNotifs();
+            renderClaimAndDefendNotifs();
             renderSelectedObject();
             renderUI();
             renderText();
@@ -93,7 +93,7 @@ void renderUI()
     }
 }
 
-void renderClaimNotifs()
+void renderClaimAndDefendNotifs()
 {
     for (int i = 0; i < uiElements.size(); i++)
     {

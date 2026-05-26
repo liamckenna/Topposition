@@ -257,6 +257,7 @@ class Peak : public Terrain
 {
     int peakID;
     UIElement *claimNotif;
+    UIElement *defendNotif;
     Item *item = nullptr;
     Player *claimedBy = nullptr;
 
@@ -272,7 +273,9 @@ public:
     void SetPeakID(int pid) { peakID = pid; }
     int GetPeakID() { return peakID; }
     void SetClaimNotif(UIElement *cn) { claimNotif = cn; }
+    void SetDefendNotif(UIElement *dn) { defendNotif = dn; }
     UIElement *GetClaimNotif() { return claimNotif; }
+    UIElement *GetDefendNotif() { return defendNotif; }
     void SetItem(Item *i) { item = i; }
     Item *GetItem() { return item; }
     void Claim(Player *player);

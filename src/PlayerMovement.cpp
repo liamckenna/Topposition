@@ -26,7 +26,7 @@ bool Move(Piece* piece, Terrain* startingPoint, Terrain* targetTerrain, int& mov
             }
         }
         if (targetTerrain != NULL) targetTerrain->occupants.push_back(piece);
-        RefreshClaimNotifs();
+        RefreshClaimAndDefendNotifs();
         if (targetTerrain == NULL)  {
             piece->SetCurrentAnimation(piece->animations["floatIdle"]);
             piece->SetSurface(surfaces[currentTurn->GetName() + " piece float"]);

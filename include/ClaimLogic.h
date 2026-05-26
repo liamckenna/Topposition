@@ -3,9 +3,11 @@
 #include "GameLogic.h"
 #include "MouseLogic.h"
 
-void RefreshClaimNotifs();
+void RefreshClaimAndDefendNotifs();
 
 void ClaimPeak(UIElement *claimNotif);
+
+void DefendPeak(UIElement *defendNotif);
 
 bool HasActiveDiceAnimation();
 

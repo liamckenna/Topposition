@@ -171,7 +171,7 @@ UIElement *selectUI(int x, int y, bool update, bool selecting)
                 SDL_Color color = GetPixelColor(uiElements[i]->GetSurface(),
                                                 (x - width_LowerBound) / (cameraZoom * uiElements[i]->GetScale()),
                                                 (y - height_LowerBound) / (cameraZoom * uiElements[i]->GetScale()));
-                if (color.r == 0 && color.g == 0 && color.b == 0 && uiElements[i]->GetName() == "claim peak button")
+                if (color.r == 0 && color.g == 0 && color.b == 0 && (uiElements[i]->GetName() == "claim peak button" || uiElements[i]->GetName() == "defend peak button"))
                 {
                     continue;
                 }

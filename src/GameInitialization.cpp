@@ -511,13 +511,21 @@ void loadUI()
     for (int i = 0; i < peaks.size(); i++)
     {
         UIElement *claimPeakButton = new UIElement("claim peak button", textures["claim peak"][0], surfaces["claim peak"], false, true, renderer, GAME, peaks[i]);
-        claimPeakButton->SetScale(0.1);
-        claimPeakButton->SetCenter(peaks[i]->GetCenter().first + 50, peaks[i]->GetCenter().second - 50);
+        claimPeakButton->SetScale(4);
+        claimPeakButton->SetCenter(peaks[i]->GetCenter().first, peaks[i]->GetCenter().second);
         claimPeakButton->SetResizable(true);
         claimPeakButton->SetTopLayer(false);
         uiElements.push_back(claimPeakButton);
         gameObjects[gameObjects.size() - 1].push_back(claimPeakButton);
         peaks[i]->SetClaimNotif(claimPeakButton);
+        UIElement *defendPeakButton = new UIElement("defend peak button", textures["defend peak"][0], surfaces["defend peak"], false, true, renderer, GAME, peaks[i]);
+        defendPeakButton->SetScale(4);
+        defendPeakButton->SetCenter(peaks[i]->GetCenter().first, peaks[i]->GetCenter().second);
+        defendPeakButton->SetResizable(true);
+        defendPeakButton->SetTopLayer(false);
+        uiElements.push_back(defendPeakButton);
+        gameObjects[gameObjects.size() - 1].push_back(defendPeakButton);
+        peaks[i]->SetDefendNotif(defendPeakButton);
     }
     if (rules->GetAutoRoll())
     {

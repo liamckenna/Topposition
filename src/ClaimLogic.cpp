@@ -105,7 +105,7 @@ namespace
         }
         if (target == nullptr)
         {
-            RefreshClaimNotifs();
+            RefreshClaimAndDefendNotifs();
             return false;
         }
         battleSequence->active = true;
@@ -128,6 +128,8 @@ namespace
         endText->SetRendered(false);
         turnText->SetRendered(false);
         battleSequence->peak->GetClaimNotif()->SetRendered(false);
+        battleSequence->peak->GetDefendNotif()->SetRendered(false);
+
         crown->SetRendered(false);
         battleSequence->attacker->GetCircleText()->SetTextContent(std::to_string(battleSequence->attackers.size()).c_str(), renderer);
         battleSequence->attacker->GetCircleText()->SetCenter(currentPlayerCircle->GetCenter().first, currentPlayerCircle->GetCenter().second);
@@ -148,7 +150,7 @@ namespace
             movesLeftText->SetTextContent(rollText.c_str(), renderer);
             movesLeftText->SetCenter(center.first, center.second);
         }
-        RefreshClaimNotifs();
+        RefreshClaimAndDefendNotifs();
         AudioManager::playSound("horn", 1.5f);
         return true;
     }
@@ -204,7 +206,7 @@ namespace
             }
         }
         UpdateScore();
-        RefreshClaimNotifs();
+        RefreshClaimAndDefendNotifs();
         std::pair<float, float> center = peaksLeftNumText->GetCenter();
         peaksLeftNumText->SetTextContent(to_string(unclaimedPeakCount).c_str(), renderer);
         peaksLeftNumText->SetCenter(center.first, center.second);
@@ -223,31 +225,76 @@ bool HasActiveDiceAnimation()
     return false;
 }
 
-void RefreshClaimNotifs()
+void RefreshClaimAndDefendNotifs()
 {
     for (int i = 0; i < peaks.size(); i++)
     {
         for (int j = 0; j < peaks[i]->occupants.size(); j++)
         {
-            if (peaks[i]->occupants[j]->GetPlayer() == currentTurn && peaks[i]->GetClaimedBy() != currentTurn && !peaks[i]->occupants[j]->IsHeld() && !IsBattleSequenceActive())
+            bool isOwner = peaks[i]->GetClaimedBy() == currentTurn;
+            bool enemyPresent = !LastPlayerStanding(peaks[i], currentTurn);
+            if (peaks[i]->occupants[j]->GetPlayer() == currentTurn && (!isOwner || enemyPresent) && !peaks[i]->occupants[j]->IsHeld() && !IsBattleSequenceActive())
             {
                 peaks[i]->occupants[j]->UpdateRelativePositions();
-                peaks[i]->GetClaimNotif()->SetGlobalPosition((peaks[i]->occupants[j]->GetCenter().first / cameraZoom) + cameraPosition.first,
-                                                             (peaks[i]->occupants[j]->GetCenter().second / cameraZoom) + cameraPosition.second - 150);
-                peaks[i]->GetClaimNotif()->SetRendered(true);
+                if (isOwner && enemyPresent)
+                {
+                    peaks[i]->GetDefendNotif()->SetGlobalPosition((peaks[i]->occupants[j]->GetCenter().first / cameraZoom) + cameraPosition.first,
+                                                                 (peaks[i]->occupants[j]->GetCenter().second / cameraZoom) + cameraPosition.second - 150);
+                    peaks[i]->GetDefendNotif()->SetRendered(true);
+                    peaks[i]->GetClaimNotif()->SetRendered(false);
+                }
+                else
+                {
+                    peaks[i]->GetClaimNotif()->SetGlobalPosition((peaks[i]->occupants[j]->GetCenter().first / cameraZoom) + cameraPosition.first,
+                                                                 (peaks[i]->occupants[j]->GetCenter().second / cameraZoom) + cameraPosition.second - 150);
+                    peaks[i]->GetClaimNotif()->SetRendered(true);
+                    peaks[i]->GetDefendNotif()->SetRendered(false);
+                }
                 break;
             }
             else
             {
                 peaks[i]->GetClaimNotif()->SetRendered(false);
+                peaks[i]->GetDefendNotif()->SetRendered(false);
             }
         }
         if (peaks[i]->occupants.size() == 0)
+        {
             peaks[i]->GetClaimNotif()->SetRendered(false);
+            peaks[i]->GetDefendNotif()->SetRendered(false);
+        }
+            
     }
 }
 
 void ClaimPeak(UIElement *peakNotif)
+{
+    if (IsBattleSequenceActive())
+    {
+        return;
+    }
+
+    Peak *peak = peakNotif->GetAssociatedPeak();
+    if (!IsOccupyingPeak(peak, currentTurn))
+    {
+        if (rules->GetClaimEndsTurn())
+            FinishTurn();
+        return;
+    }
+
+    if (LastPlayerStanding(peak, currentTurn))
+    {
+        AudioManager::playSound("lol", 2.5f);
+        FinalizePeakClaim(peak);
+        if (rules->GetClaimEndsTurn())
+            FinishTurn();
+        return;
+    }
+
+    BeginBattleAgainstDefender(peak, currentTurn);
+}
+
+void DefendPeak(UIElement *peakNotif)
 {
     if (IsBattleSequenceActive())
     {
@@ -349,9 +396,24 @@ void UpdateBattleSequence()
             break;
         }
 
-        if (battleSequence->attackRoll >= battleSequence->defenseRoll)
-        {
+        Player *peakOwner = battleSequence->peak->GetClaimedBy();
+        bool tie = (battleSequence->attackRoll == battleSequence->defenseRoll);
 
+        if (tie && peakOwner != battleSequence->attacker && peakOwner != battleSequence->defender)
+        {
+            // Neither team owns the peak — re-roll
+            battleSequence->roundAttacker = nullptr;
+            battleSequence->roundDefender = nullptr;
+            battleSequence->phaseStart = SDL_GetTicks();
+            battleSequence->phase = BATTLE_ADVANCE;
+            break;
+        }
+
+        bool attackerWinsRound = tie ? (peakOwner == battleSequence->attacker)
+                                     : (battleSequence->attackRoll > battleSequence->defenseRoll);
+
+        if (attackerWinsRound)
+        {
             crown->SetGlobalPosition(die1->GetGlobalCenter().first - (die1->GetDimensions().first * die1->GetScale() / 2) - (crown->GetDimensions().first * crown->GetScale()), die1->GetGlobalCenter().second - (die1->GetDimensions().second * die1->GetScale() / 2) - (crown->GetDimensions().second * crown->GetScale()));
             crown->SetRotation(-45);
             crown->SetRendered(true);
@@ -535,7 +597,7 @@ void UpdateBattleSequence()
         {
             bool attackerWon = battleSequence->peak->GetClaimedBy() == battleSequence->attacker;
             EndBattleSequence();
-            RefreshClaimNotifs();
+            RefreshClaimAndDefendNotifs();
             if (rules->GetClaimEndsTurn() && !attackerWon)
                 FinishTurn();
         }

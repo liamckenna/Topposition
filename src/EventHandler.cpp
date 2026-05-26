@@ -321,7 +321,7 @@ void MouseButtonDownGame(Input *playerInput, SDL_MouseButtonEvent &event)
                         startingTerrain = selectTerrain(piece->GetDesignatedLocation().first, piece->GetDesignatedLocation().second);
                         if (piece->GetCurrentAnimation() != NULL)
                             piece->GetCurrentAnimation()->Pause();
-                        RefreshClaimNotifs();
+                        RefreshClaimAndDefendNotifs();
                         CheckMovementPossibility(piece, startingTerrain);
                         AudioManager::playSound("up", 0.75f);
                     }
@@ -530,8 +530,10 @@ void MouseButtonUpGame(Input *playerInput, SDL_MouseButtonEvent &event)
                     AudioManager::playSound("click");
                     ClaimPeak(dynamic_cast<UIElement *>(selectedObject));
                 }
-                else if (selectedObject->type == ITEM)
+                else if (selectedObject->GetName() == "defend peak button")
                 {
+                    AudioManager::playSound("click");
+                    DefendPeak(dynamic_cast<UIElement *>(selectedObject));
                 }
             }
             else if (selectedObject->type == PIECE)
@@ -557,7 +559,7 @@ void MouseButtonUpGame(Input *playerInput, SDL_MouseButtonEvent &event)
                 {
                     AudioManager::playSound("error", 0.5f);
                 }
-                RefreshClaimNotifs();
+                RefreshClaimAndDefendNotifs();
                 startingTerrain = nullptr;
                 hoveringTerrain = nullptr;
                 seaHover = false;
