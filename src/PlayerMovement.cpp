@@ -29,11 +29,11 @@ bool Move(Piece* piece, Terrain* startingPoint, Terrain* targetTerrain, int& mov
         RefreshClaimAndDefendNotifs();
         if (targetTerrain == NULL)  {
             piece->SetCurrentAnimation(piece->animations["floatIdle"]);
-            piece->SetSurface(surfaces[currentTurn->GetName() + " piece float"]);
+            piece->SetSurface(surfaces[currentTurn->GetColor() + " piece float"]);
         }
         else {
             piece->SetCurrentAnimation(piece->animations["saluteIdle"]);
-            piece->SetSurface(surfaces[currentTurn->GetName() + " piece salute"]);
+            piece->SetSurface(surfaces[currentTurn->GetColor() + " piece salute"]);
         }
     }
 

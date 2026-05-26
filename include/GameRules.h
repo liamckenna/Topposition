@@ -1,4 +1,5 @@
 #pragma once
+#include <string>
 class GameRules
 {
     int pieces = 8;
@@ -16,6 +17,11 @@ class GameRules
     bool evenTurnCount = true;
 
 public:
+    std::string p1color = "white";
+    std::string p2color = "black";
+    std::string p3color = "cyan";
+    std::string p4color = "magenta";
+
     int GetPlayerCount() { return playerCount; }
     int GetPieces() { return pieces; }
     int GetRemainingPoints() { return remainingPoints; }

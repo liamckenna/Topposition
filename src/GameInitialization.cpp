@@ -125,39 +125,67 @@ void loadGamePieces()
         switch (j)
         {
         case 0:
-            color = "red";
+            color = rules->p1color;
             playerNumber = "playerOne";
             selectable = true;
-            sdlColor = {255, 0, 0};
             break;
         case 1:
-            color = "green";
+            color = rules->p2color;
             playerNumber = "playerTwo";
             selectable = false;
-            sdlColor = {0, 255, 0};
             break;
         case 2:
-            color = "blue";
+            color = rules->p3color;
             playerNumber = "playerThree";
             selectable = false;
-            sdlColor = {0, 0, 255};
             break;
         case 3:
-            color = "yellow";
+            color = rules->p4color;
             playerNumber = "playerFour";
             selectable = false;
-            sdlColor = {255, 255, 0};
             break;
+        }
+        if (color == "red")
+        {
+            sdlColor = {255, 0, 0};
+        }
+        else if (color == "green")
+        {
+            sdlColor = {0, 255, 0};
+        }
+        else if (color == "blue")
+        {
+            sdlColor = {0, 0, 255};
+        }
+        else if (color == "yellow")
+        {
+            sdlColor = {255, 255, 0};
+        }
+        else if (color == "cyan")
+        {
+            sdlColor = {0, 255, 255};
+        }
+        else if (color == "magenta")
+        {
+            sdlColor = {255, 0, 255};
+        }
+        else if (color == "white")
+        {
+            sdlColor = {255, 255, 254};
+        }
+        else if (color == "black")
+        {
+            sdlColor = {25, 25, 25};
         }
         player->SetName(playerNumber);
         player->SetColor(color);
         player->SetSDLColor(sdlColor);
         player->SetCircleTextString("P" + std::to_string(j + 1));
-        string flagName = playerNumber + " flag";
+        string flagName = color + " flag";
         for (int i = 0; i < peaks.size(); i++)
         {
-            Piece *flag = new Piece(playerNumber, textures[flagName][0], surfaces[flagName], false);
-            flag->SetScale(3);
+            Piece *flag = new Piece(color, textures[flagName][0], surfaces[flagName], false);
+            flag->SetScale(4);
             flag->SetBottomMiddle(peaks[i]->GetCenter().first, peaks[i]->GetCenter().second);
             flag->type = FLAG;
 
@@ -166,7 +194,7 @@ void loadGamePieces()
             peaks[i]->flags.push_back(flag);
             flag->SetPlayer(player);
         }
-        string pieceName = playerNumber + " piece float";
+        string pieceName = color + " piece float";
 
         for (int i = 0; i < rules->GetPieces(); i++)
         {
@@ -225,14 +253,14 @@ void loadGamePieces()
                 }
             } while (selectTerrain(x, y, false) != NULL || selectUI(x, y, false, false) != NULL);
 
-            Piece *piece = new Piece(pieceName + " " + std::to_string(i), textures[pieceName][0], surfaces[pieceName], true);
+            Piece *piece = new Piece(pieceName + " " + std::to_string(i), textures["blue piece float"][0], surfaces["blue piece float"], true);
             piece->SetScale(3);
             gameObjects[rules->GetMaxHeight() + 1].push_back(piece);
             piece->SetBottomMiddle(x, y);
             piece->SetDesignatedLocation(x, y);
             piece->SetSelectable(selectable);
-            Animation *floatIdle = new Animation(textures[playerNumber + " piece float sheet"][0], surfaces[playerNumber + " piece float sheet"], 1, 12, {3, 4}, {48, 48});
-            Animation *saluteIdle = new Animation(textures[playerNumber + " piece salute sheet"][0], surfaces[playerNumber + " piece salute sheet"], 2, 24, {4, 6}, {48, 48});
+            Animation *floatIdle = new Animation(textures[color + " piece float sheet"][0], surfaces[color + " piece float sheet"], 1, 12, {3, 4}, {48, 48});
+            Animation *saluteIdle = new Animation(textures[color + " piece salute sheet"][0], surfaces[color + " piece salute sheet"], 2, 24, {4, 6}, {48, 48});
             animations.push_back(floatIdle);
             animations.push_back(saluteIdle);
             piece->SetCurrentAnimation(floatIdle);
@@ -540,8 +568,8 @@ void loadUI()
     {
         for(int j = 0; j < players[i]->soldiers.size(); j++)
         {
-            UIElement *soldierHead = new UIElement(players[i]->GetName() + " soldier " + std::to_string(j) + " head", textures[players[i]->GetName() + " soldier head"][0], surfaces[players[i]->GetName() + " soldier head"], true, false, renderer, GAME);
-            UIElement *soldierHeadCross = new UIElement(players[i]->GetName() + " soldier " + std::to_string(j) + " head cross", textures["soldier head cross"][0], surfaces["soldier head cross"], true, false, renderer, GAME);
+            UIElement *soldierHead = new UIElement(players[i]->GetColor() + " soldier " + std::to_string(j) + " head", textures[players[i]->GetColor() + " player head"][0], surfaces[players[i]->GetColor() + " player head"], true, false, renderer, GAME);
+            UIElement *soldierHeadCross = new UIElement(players[i]->GetColor() + " soldier " + std::to_string(j) + " head cross", textures["soldier head cross"][0], surfaces["soldier head cross"], true, false, renderer, GAME);
 
             soldierHead->SetScale(2.f * (SCREEN_WIDTH / 3840.f));
             soldierHeadCross->SetScale(2.f * (SCREEN_WIDTH / 3840.f));
