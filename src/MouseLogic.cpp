@@ -74,6 +74,9 @@ bool zoom(int direction, std::pair<float, float> mousePos)
 
 void scroll(Input *playerInput)
 {
+    if (worldResolution.first >= 9600 || worldResolution.second >= 5400)
+        return;
+    
     cameraPosition.first -= (playerInput->currentMousePosition.first - playerInput->prevMousePosition.first) / cameraZoom;
     cameraPosition.second -= (playerInput->currentMousePosition.second - playerInput->prevMousePosition.second) / cameraZoom;
 
