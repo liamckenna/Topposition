@@ -621,12 +621,30 @@ void GeneratePixels()
             pixel->SetHeight(height);
 
             SDL_Color pixelColor;
-            if (pixel->GetHiddenTerrain()->GetLayer() == 1 && pixel->GetHiddenTerrain()->GetBiome() == "plains")
+            if (pixel->GetHiddenTerrain()->GetLayer() == 1 && (pixel->GetHiddenTerrain()->GetBiome() == "plains" || pixel->GetHiddenTerrain()->GetBiome() == "glacier"))
             {
-                Uint8 randR = rand() % 56 + 200;
-                Uint8 randG = randR - 8;
-                Uint8 randB = randR - 50;
-                pixelColor = {randR, randG, randB, 255};
+                if (pixel->GetHiddenTerrain()->GetBiome() == "plains")
+                {
+                    Uint8 randR = rand() % 56 + 200;
+                    Uint8 randG = randR - 8;
+                    Uint8 randB = randR - 50;
+                    pixelColor = {randR, randG, randB, 255};
+                }
+                else
+                {
+                    pixelColor = {235, 235, 255, 255};
+                }
+            }
+            else if (pixel->GetHiddenTerrain()->GetBiome() == "glacier" && pixel->GetHiddenTerrain()->GetLayer() == 2)
+            {
+                Uint8 randR = rand() % 11;
+                Uint8 randG = rand() % 11;
+                Uint8 randB = rand() % 11;
+                Uint8 randT = rand() % 2;
+                int randI = (randR + randG + randB) / 3;
+                pixelColor = {static_cast<Uint8>(std::min(138 + (randI * randT), 255)),
+                              static_cast<Uint8>(std::min(200 + (randI * randT), 255)),
+                              static_cast<Uint8>(std::min(255, 255)), 255};
             }
             else
             {
@@ -648,9 +666,10 @@ void GeneratePixels()
                 }
                 else if (pixel->GetHiddenTerrain()->GetBiome() == "glacier")
                 {
-                    pixelColor = {static_cast<Uint8>(185 / rules->GetMaxHeight() * (pixel->GetHiddenTerrain()->GetLayer() - 1)),
-                                  static_cast<Uint8>(std::min(200 / rules->GetMaxHeight() * (pixel->GetHiddenTerrain()->GetLayer() - 1) + 100, 255)),
-                                  static_cast<Uint8>(std::min(255 / rules->GetMaxHeight() * (pixel->GetHiddenTerrain()->GetLayer() - 1) + 140, 255)), 255};
+                    int randI = (randR + randG + randB) / 3; // single grayscale offset
+                    pixelColor = {static_cast<Uint8>(std::min(185 / rules->GetMaxHeight() * (pixel->GetHiddenTerrain()->GetLayer() - 1) + (randI * randT), 255)),
+                                  static_cast<Uint8>(std::min(200 / rules->GetMaxHeight() * (pixel->GetHiddenTerrain()->GetLayer() - 1) + 100 + (randI * randT), 255)),
+                                  static_cast<Uint8>(std::min(255 / rules->GetMaxHeight() * (pixel->GetHiddenTerrain()->GetLayer() - 1) + 140 + (randI * randT), 255)), 255};
                 }
             }
             pixel->SetColor(pixelColor);
