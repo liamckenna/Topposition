@@ -598,8 +598,20 @@ void UpdateBattleSequence()
             bool attackerWon = battleSequence->peak->GetClaimedBy() == battleSequence->attacker;
             EndBattleSequence();
             RefreshClaimAndDefendNotifs();
-            if (rules->GetClaimEndsTurn() && !attackerWon)
-                FinishTurn();
+            if (rules->GetClaimEndsTurn())
+            {
+                if (attackerWon)
+                {
+                    if (!CurrentPlayerCanAct())
+                    {
+                        FinishTurn();
+                    }
+                }
+                else
+                {
+                    FinishTurn();
+                }
+            }
         }
         break;
     default:

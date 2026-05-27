@@ -103,6 +103,17 @@ void FinishTurn()
     movesLeft = 0;
     UpdateMovesLeft();
     RefreshClaimAndDefendNotifs();
+    if (HasActiveDiceAnimation())
+    {
+        diceAnimations.clear();
+        string rollText = "Roll!";
+        std::pair<float, float> center = movesLeftText->GetCenter();
+        movesLeftText->SetSize(100 * (SCREEN_WIDTH / 3840.f), renderer);
+        movesLeftText->SetTextContent(rollText.c_str(), renderer);
+        movesLeftText->SetCenter(center.first, center.second);
+        movesLeftText->SetRendered(true);
+    }
+    
     if (currentTurn == players[0])
     {
         if (rules->GetEvenTurnCount() && allPeaksClaimed)
@@ -267,4 +278,29 @@ void GameFinished(Player *winner)
 
 void Tiebreaker()
 {
+}
+
+bool CurrentPlayerCanAct()
+{
+    if (movesLeft > 0)
+        return true;
+
+    if (IsBattleSequenceActive())
+        return false;
+
+    for (int i = 0; i < peaks.size(); i++)
+    {
+        bool isOwner = peaks[i]->GetClaimedBy() == currentTurn;
+        bool enemyPresent = !LastPlayerStanding(peaks[i], currentTurn);
+        if (!isOwner || enemyPresent)
+        {
+            for (int j = 0; j < peaks[i]->occupants.size(); j++)
+            {
+                if (peaks[i]->occupants[j]->GetPlayer() == currentTurn && !peaks[i]->occupants[j]->IsHeld())
+                    return true;
+            }
+        }
+    }
+
+    return false;
 }

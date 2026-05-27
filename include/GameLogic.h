@@ -23,3 +23,5 @@ void ClearRoll();
 void BeginSuddenDeath();
 
 void BeginLastTurn();
+
+bool CurrentPlayerCanAct();

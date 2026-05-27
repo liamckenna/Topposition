@@ -17,10 +17,10 @@ class GameRules
     bool evenTurnCount = true;
 
 public:
-    std::string p1color = "white";
-    std::string p2color = "black";
+    std::string p1color = "yellow";
+    std::string p2color = "blue";
     std::string p3color = "cyan";
-    std::string p4color = "magenta";
+    std::string p4color = "green";
 
     int GetPlayerCount() { return playerCount; }
     int GetPieces() { return pieces; }
