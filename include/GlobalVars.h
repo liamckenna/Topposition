@@ -11,6 +11,7 @@
 #include <thread>
 #include <atomic>
 #include "GameObject.h"
+#include "GameRules.h"
 
 extern SDL_Window *window;
 
@@ -169,3 +170,19 @@ extern Text *lastTurnText;
 extern Text *moveCostText;
 
 extern Text *fpsCounterText;
+
+extern SDL_Color sdl_red;
+
+extern SDL_Color sdl_green;
+
+extern SDL_Color sdl_blue;
+
+extern SDL_Color sdl_yellow;
+
+extern SDL_Color sdl_magenta;
+
+extern SDL_Color sdl_cyan;
+
+extern SDL_Color sdl_black;
+
+extern SDL_Color sdl_white;

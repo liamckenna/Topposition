@@ -115,76 +115,30 @@ void loadGamePieces()
     gameObjects.push_back(vector<GameObject *>());
     for (int j = 0; j < rules->GetPlayerCount(); j++)
     {
-        string color;
-        string playerNumber;
-        SDL_Color sdlColor;
         bool selectable;
         Player *player = new Player();
-
         players.push_back(player);
+        player->RefreshColorVars();
         switch (j)
         {
         case 0:
-            color = rules->p1color;
-            playerNumber = "playerOne";
             selectable = true;
             break;
         case 1:
-            color = rules->p2color;
-            playerNumber = "playerTwo";
             selectable = false;
             break;
         case 2:
-            color = rules->p3color;
-            playerNumber = "playerThree";
             selectable = false;
             break;
         case 3:
-            color = rules->p4color;
-            playerNumber = "playerFour";
             selectable = false;
             break;
         }
-        if (color == "red")
-        {
-            sdlColor = {255, 0, 0};
-        }
-        else if (color == "green")
-        {
-            sdlColor = {0, 255, 0};
-        }
-        else if (color == "blue")
-        {
-            sdlColor = {0, 0, 255};
-        }
-        else if (color == "yellow")
-        {
-            sdlColor = {255, 255, 0};
-        }
-        else if (color == "cyan")
-        {
-            sdlColor = {0, 255, 255};
-        }
-        else if (color == "magenta")
-        {
-            sdlColor = {255, 0, 255};
-        }
-        else if (color == "white")
-        {
-            sdlColor = {255, 255, 254};
-        }
-        else if (color == "black")
-        {
-            sdlColor = {25, 25, 25};
-        }
-        player->SetName(playerNumber);
-        player->SetColor(color);
-        player->SetSDLColor(sdlColor);
         player->SetCircleTextString("P" + std::to_string(j + 1));
-        string flagName = color + " flag";
+        string flagName = player->GetColor() + " flag";
         for (int i = 0; i < peaks.size(); i++)
         {
-            Piece *flag = new Piece(color, textures[flagName][0], surfaces[flagName], false);
+            Piece *flag = new Piece(player->GetColor(), textures[flagName][0], surfaces[flagName], false);
             flag->SetScale(4);
             flag->SetBottomMiddle(peaks[i]->GetCenter().first, peaks[i]->GetCenter().second);
             flag->type = FLAG;
@@ -192,9 +146,10 @@ void loadGamePieces()
             pieces.push_back(flag);
             gameObjects[gameObjects.size() - 2].push_back(flag);
             peaks[i]->flags.push_back(flag);
+            player->flags.push_back(flag);
             flag->SetPlayer(player);
         }
-        string pieceName = color + " piece float";
+        string pieceName = player->GetColor() + " piece float";
 
         for (int i = 0; i < rules->GetPieces(); i++)
         {
@@ -259,8 +214,8 @@ void loadGamePieces()
             piece->SetBottomMiddle(x, y);
             piece->SetDesignatedLocation(x, y);
             piece->SetSelectable(selectable);
-            Animation *floatIdle = new Animation(textures[color + " piece float sheet"][0], surfaces[color + " piece float sheet"], 1, 12, {3, 4}, {48, 48});
-            Animation *saluteIdle = new Animation(textures[color + " piece salute sheet"][0], surfaces[color + " piece salute sheet"], 2, 24, {4, 6}, {48, 48});
+            Animation *floatIdle = new Animation(textures[player->GetColor() + " piece float sheet"][0], surfaces[player->GetColor() + " piece float sheet"], 1, 12, {3, 4}, {48, 48});
+            Animation *saluteIdle = new Animation(textures[player->GetColor() + " piece salute sheet"][0], surfaces[player->GetColor() + " piece salute sheet"], 2, 24, {4, 6}, {48, 48});
             animations.push_back(floatIdle);
             animations.push_back(saluteIdle);
             piece->SetCurrentAnimation(floatIdle);
@@ -668,18 +623,18 @@ void GeneratePixels()
                 {
                     if (pixel->GetHiddenTerrain() == pixel->GetHiddenTerrain()->GetPeak())
                     {
-                        int randI = (randR + randG + randB) / 3;
+                        int randI = (randR + randG + randB) / 6;
                         pixelColor = {static_cast<Uint8>(std::min(200 + (randI * randT), 255)),
                                       static_cast<Uint8>(std::min(235 + (randI * randT), 255)),
                                       static_cast<Uint8>(std::min(255, 255)), 255};
                     }
                     else
                     {
-                        int randI = (randR + randG + randB) / 3; // single grayscale offset
+                        int randI = (randR + randG + randB) / 6;
                         pixelColor = {static_cast<Uint8>(std::min(185 / rules->GetMaxHeight() * (pixel->GetHiddenTerrain()->GetLayer() - 1) + (randI * randT), 255)),
                                       static_cast<Uint8>(std::min(200 / rules->GetMaxHeight() * (pixel->GetHiddenTerrain()->GetLayer() - 1) + 100 + (randI * randT), 255)),
                                       static_cast<Uint8>(std::min(255 / rules->GetMaxHeight() * (pixel->GetHiddenTerrain()->GetLayer() - 1) + 140 + (randI * randT), 255)), 255};
-                    }   
+                    }
                 }
             }
             pixel->SetColor(pixelColor);

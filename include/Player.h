@@ -1,6 +1,7 @@
 #pragma once
 #include <vector>
 #include "GameObject.h"
+#include "Enums.h"
 #include <string>
 
 class Peak;
@@ -8,7 +9,6 @@ class Piece;
 class Item;
 class UIElement;
 class Text;
-
 
 class Player {
     int score = 0;
@@ -25,11 +25,10 @@ public:
     std::vector<Peak*> peaks;
     std::vector<Piece*> soldiers;
     std::vector<Item*> inventory;
+    std::vector<Piece*> flags;
     std::vector<UIElement*> soldierHeads;
     std::vector<UIElement*> soldierHeadCrosses;
     Player();
-    std::string GetName() {return name;}
-    void SetName(std::string n) {name = n;}
     int GetScore() {return score;}
     void SetScore(int s);
     Text* GetTurnText() {return turnText;}
@@ -50,4 +49,9 @@ public:
     void SetCircleTextString(std::string cts) {circleTextString = cts;}
     int GetSoldierIndex(Piece* soldier);
     int GetPlayerIndex();
+    void RefreshColor();
+    void RefreshColorVars();
+    void RefreshColorDependentVars();
 };
+
+SDL_Color GetSDLColorFromTeamColor(TeamColor tc);

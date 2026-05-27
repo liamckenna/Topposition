@@ -136,9 +136,9 @@ void renderPieces()
     for (int i = 1; i < (int)sorted.size(); i++)
     {
         Piece* key = sorted[i];
-        float keyY = key->globalPosition.second;
+        float keyY = key->GetBottomMiddle().second;
         int j = i - 1;
-        while (j >= 0 && sorted[j]->globalPosition.second > keyY)
+        while (j >= 0 && sorted[j]->GetBottomMiddle().second > keyY)
         {
             sorted[j + 1] = sorted[j];
             j--;

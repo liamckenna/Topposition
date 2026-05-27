@@ -104,6 +104,22 @@ void EventKeyDown(Input *playerInput, SDL_KeyboardEvent &event)
         SDL_SetWindowFullscreen(window, !isFullscreen);
         return;
     }
+    else if (event.key == SDLK_1)
+    {
+        rules->CycleTeamColor(0);
+    }
+    else if (event.key == SDLK_2)
+    {
+        rules->CycleTeamColor(1);
+    }
+    else if (event.key == SDLK_3)
+    {
+        rules->CycleTeamColor(2);
+    }
+    else if (event.key == SDLK_4)
+    {
+        rules->CycleTeamColor(3);
+    }
 
     switch (state)
     {

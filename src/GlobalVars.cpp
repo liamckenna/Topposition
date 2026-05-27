@@ -157,3 +157,19 @@ bool suddenDeath = false;
 bool lastTurn = false;
 
 BattleSequenceState *battleSequence;
+
+SDL_Color sdl_red = {255, 0, 0};
+
+SDL_Color sdl_green = {0, 255, 0};
+
+SDL_Color sdl_blue = {0, 0, 255};
+
+SDL_Color sdl_yellow = {255, 255, 0};
+
+SDL_Color sdl_magenta = {255, 0, 255};
+
+SDL_Color sdl_cyan = {0, 255, 255};
+
+SDL_Color sdl_black = {25, 25, 25};
+
+SDL_Color sdl_white = {255, 255,  254};

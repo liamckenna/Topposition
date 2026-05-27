@@ -1,5 +1,6 @@
 #pragma once
 #include <string>
+#include "GameObject.h"
 class GameRules
 {
     int pieces = 8;
@@ -15,12 +16,9 @@ class GameRules
     bool autoRoll = false;
     bool infiniteRolls = false;
     bool evenTurnCount = true;
+    TeamColor teamColors[4] = {RED, BLUE, GREEN, YELLOW};
 
 public:
-    std::string p1color = "yellow";
-    std::string p2color = "blue";
-    std::string p3color = "cyan";
-    std::string p4color = "green";
 
     int GetPlayerCount() { return playerCount; }
     int GetPieces() { return pieces; }
@@ -46,4 +44,7 @@ public:
     void SetClaimEndsTurn(bool cet) { claimEndsTurn = cet; }
     void SetAutoRoll(bool arm) { autoRoll = arm; }
     void SetInfiniteRolls(bool ir) { infiniteRolls = ir; }
+    void CycleTeamColor(int i);
+    bool ColorTaken(int i);
+    TeamColor GetColor(int i);
 };
