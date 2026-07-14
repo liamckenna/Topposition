@@ -618,7 +618,14 @@ void Text::RenderText(SDL_Renderer *renderer)
     }
 }
 
-Animation::Animation(SDL_Texture *ss, SDL_Surface *s, float d, int fc, pair<int, int> sd, pair<int, int> spd)
+void GameObject::SetCurrentAnimation(Animation *ca, bool preserveFrame)
+{
+    if (preserveFrame && currentAnimation != nullptr && ca != nullptr)
+        ca->SyncFrameFrom(currentAnimation);
+    currentAnimation = ca;
+}
+
+Animation::Animation(SDL_Texture *ss, SDL_Surface *s, float d, int fc, pair<int, int> sd, pair<int, int> spd, int fo)
 {
     spriteSheet = ss;
     surface = s;
@@ -626,8 +633,24 @@ Animation::Animation(SDL_Texture *ss, SDL_Surface *s, float d, int fc, pair<int,
     frameCount = fc;
     sheetDimensions = sd;
     spriteDimensions = spd;
-    frameOffset = rand() % frameCount;
+    if (fo >= 0)
+        frameOffset = fo;
+    else
+        frameOffset = rand() % frameCount;
+
     lastFrame = frameOffset;
+    lastUpdate = currentTime;
+    UpdateRect();
+}
+
+void Animation::UpdateRect()
+{
+    int row = lastFrame / sheetDimensions.first;
+    int column = lastFrame % sheetDimensions.first;
+    rect->x = spriteDimensions.first * column;
+    rect->y = spriteDimensions.second * row;
+    rect->w = spriteDimensions.first;
+    rect->h = spriteDimensions.second;
 }
 
 void Animation::CycleFrame(Uint64 current)
@@ -642,11 +665,17 @@ void Animation::CycleFrame(Uint64 current)
         lastFrame += framesToUpdate;
         lastFrame %= frameCount;
         lastUpdate = currentTime;
-        int row = lastFrame / sheetDimensions.first;
-        int column = lastFrame % sheetDimensions.first;
-        rect->x = spriteDimensions.first * column;
-        rect->y = spriteDimensions.second * row;
-        rect->w = spriteDimensions.first;
-        rect->h = spriteDimensions.second;
+        UpdateRect();
     }
+}
+
+void Animation::SyncFrameFrom(const Animation *other)
+{
+    if (other == nullptr || other->frameCount <= 0 || frameCount <= 0)
+        return;
+
+    float phase = (float)other->lastFrame / other->frameCount;
+    lastFrame = (int)roundf(phase * frameCount) % frameCount;
+    lastUpdate = other->lastUpdate;
+    UpdateRect();
 }

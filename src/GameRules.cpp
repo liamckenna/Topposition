@@ -9,7 +9,7 @@ void GameRules::CycleTeamColor(int i)
     do
     {
         int color = teamColors[i];
-        if (color == 8)
+        if (color == colorCount)
         {
             color = 0;
         }

@@ -75,6 +75,8 @@ extern bool validMove;
 
 extern bool hasRolled;
 
+extern bool assistRollUsed;
+
 extern bool allPeaksClaimed;
 
 extern bool suddenDeath;
@@ -181,8 +183,18 @@ extern SDL_Color sdl_yellow;
 
 extern SDL_Color sdl_magenta;
 
-extern SDL_Color sdl_cyan;
-
 extern SDL_Color sdl_black;
 
 extern SDL_Color sdl_white;
+
+extern SDL_Color sdl_aquamarine;
+
+extern SDL_Color sdl_cornflower;
+
+extern SDL_Color sdl_forest;
+
+extern SDL_Color sdl_melrose;
+
+extern SDL_Color sdl_purple;
+
+extern SDL_Color sdl_orange;

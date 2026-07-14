@@ -3,9 +3,25 @@
 int Roll()
 {
     AudioManager::playSound("roll-crash");
+    int diceCount = 2;
+    if (rules->GetAssistFirstTurn() && !assistRollUsed &&
+        currentTurn != nullptr && currentTurn->GetColor() == rules->GetAssistedColor())
+    {
+        diceCount = rules->GetAssistDiceCount();
+        assistRollUsed = true;
+    }
+
+    int total = 0;
     int rollOne = (rand() % 6) + 1;
+    int rollTwo = rollOne;
+    for (int i = 0; i < diceCount; i++)
+    {
+        int face = (rand() % 6) + 1;
+        total += face;
+        rollOne = rollTwo;
+        rollTwo = face;
+    }
     string rollOneStr = "die " + to_string(rollOne);
-    int rollTwo = (rand() % 6) + 1;
     string rollTwoStr = "die " + to_string(rollTwo);
 
     vector<SDL_Texture *> dieFaces;
@@ -27,7 +43,7 @@ int Roll()
             diceAnimations.emplace_back(uiElements[i], dieFaces, textures[rollTwoStr][0], now);
         }
     }
-    movesLeft = rollOne + rollTwo;
+    movesLeft = total;
 
     movesLeftText->SetRendered(false);
 
@@ -50,6 +66,18 @@ void RotateTurn()
         currentTurn->soldierHeadCrosses[currentTurn->GetSoldierIndex(currentTurn->soldiers[i])]->SetRendered(false);
     }
 
+    for (auto &soldier : currentTurn->soldiers)
+    {
+        if (soldier->GetCurrentAnimation() == soldier->animations["saluteIdle"])
+        {
+            soldier->SetCurrentAnimation(soldier->animations["standIdle"], true);
+        }
+        else if (soldier->GetCurrentAnimation() == soldier->animations["floatSaluteIdle"])
+        {
+            soldier->SetCurrentAnimation(soldier->animations["floatIdle"], true);
+        }
+    }
+
     do
     {
         for (int i = 0; i < players.size(); i++)
@@ -68,6 +96,18 @@ void RotateTurn()
             }
         }
     } while (SoldierCount(currentTurn) <= 0);
+
+    for (auto &soldier : currentTurn->soldiers)
+    {
+        if (soldier->GetCurrentAnimation() == soldier->animations["standIdle"])
+        {
+            soldier->SetCurrentAnimation(soldier->animations["saluteIdle"], true);
+        }
+        else if (soldier->GetCurrentAnimation() == soldier->animations["floatIdle"])
+        {
+            soldier->SetCurrentAnimation(soldier->animations["floatSaluteIdle"], true);
+        }
+    }
 
     for (int i = 0; i < currentTurn->soldiers.size(); i++)
     {

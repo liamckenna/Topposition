@@ -28,12 +28,26 @@ bool Move(Piece* piece, Terrain* startingPoint, Terrain* targetTerrain, int& mov
         if (targetTerrain != NULL) targetTerrain->occupants.push_back(piece);
         RefreshClaimAndDefendNotifs();
         if (targetTerrain == NULL)  {
-            piece->SetCurrentAnimation(piece->animations["floatIdle"]);
-            piece->SetSurface(surfaces[currentTurn->GetColor() + " piece float"]);
+            if (piece->GetPlayer() == currentTurn)
+            {
+                piece->SetCurrentAnimation(piece->animations["floatSaluteIdle"]);
+            }
+            else 
+            {
+                piece->SetCurrentAnimation(piece->animations["floatIdle"]);
+            }
+            piece->SetSurface(surfaces["float"]);
         }
         else {
-            piece->SetCurrentAnimation(piece->animations["saluteIdle"]);
-            piece->SetSurface(surfaces[currentTurn->GetColor() + " piece salute"]);
+            if (piece->GetPlayer() == currentTurn)
+            {
+                piece->SetCurrentAnimation(piece->animations["saluteIdle"]);
+            }
+            else 
+            {
+                piece->SetCurrentAnimation(piece->animations["standIdle"]);
+            }
+            piece->SetSurface(surfaces["salute"]);
         }
     }
 

@@ -150,6 +150,8 @@ Text *fpsCounterText;
 
 bool hasRolled = false;
 
+bool assistRollUsed = false;
+
 bool allPeaksClaimed = false;
 
 bool suddenDeath = false;
@@ -168,8 +170,18 @@ SDL_Color sdl_yellow = {255, 255, 0};
 
 SDL_Color sdl_magenta = {255, 0, 255};
 
-SDL_Color sdl_cyan = {0, 255, 255};
-
 SDL_Color sdl_black = {25, 25, 25};
 
 SDL_Color sdl_white = {255, 255,  254};
+
+SDL_Color sdl_aquamarine = {66, 245, 203};
+
+SDL_Color sdl_cornflower = {90, 155, 225};
+
+SDL_Color sdl_forest = {52, 125, 72};
+
+SDL_Color sdl_melrose = {189, 184, 255};
+
+SDL_Color sdl_purple = {150, 20, 209};
+
+SDL_Color sdl_orange = {255, 111, 0};

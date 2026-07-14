@@ -86,17 +86,12 @@ bool loadMap()
 
     bool success = true;
 
-    GameObject *water = new GameObject("water", textures["water"][0], surfaces["water"], false, true);
-
-    water->SetGlobalPosition(0, 0);
-
     for (int i = 0; i < rules->GetMaxHeight() + 1; i++)
     {
         gameObjects.push_back(vector<GameObject *>());
         terrain.push_back(vector<Terrain *>());
     }
 
-    gameObjects[0].push_back(water);
     rules->SetRemainingPoints(rules->GetMaxPoints());
     rules->SetRemainingItems(rules->GetMaxItems());
     while (rules->GetRemainingPoints() > 0)
@@ -149,7 +144,7 @@ void loadGamePieces()
             player->flags.push_back(flag);
             flag->SetPlayer(player);
         }
-        string pieceName = player->GetColor() + " piece float";
+        string pieceName = player->GetColor() + " float";
 
         for (int i = 0; i < rules->GetPieces(); i++)
         {
@@ -208,19 +203,26 @@ void loadGamePieces()
                 }
             } while (selectTerrain(x, y, false) != NULL || selectUI(x, y, false, false) != NULL);
 
-            Piece *piece = new Piece(pieceName + " " + std::to_string(i), textures["blue piece float"][0], surfaces["blue piece float"], true);
+            Piece *piece = new Piece(pieceName + " " + std::to_string(i), textures["float"][0], surfaces["float"], true);
             piece->SetScale(3);
             gameObjects[rules->GetMaxHeight() + 1].push_back(piece);
             piece->SetBottomMiddle(x, y);
             piece->SetDesignatedLocation(x, y);
             piece->SetSelectable(selectable);
-            Animation *floatIdle = new Animation(textures[player->GetColor() + " piece float sheet"][0], surfaces[player->GetColor() + " piece float sheet"], 1, 12, {3, 4}, {48, 48});
-            Animation *saluteIdle = new Animation(textures[player->GetColor() + " piece salute sheet"][0], surfaces[player->GetColor() + " piece salute sheet"], 2, 24, {4, 6}, {48, 48});
+            Animation *floatIdle = new Animation(textures[player->GetColor() + " float sheet"][0], surfaces[player->GetColor() + " float sheet"], 1, 12, {3, 4}, {48, 48});
+            Animation *saluteIdle = new Animation(textures[player->GetColor() + " salute sheet"][0], surfaces[player->GetColor() + " salute sheet"], 2, 24, {4, 6}, {48, 48});
+            Animation *floatSaluteIdle = new Animation(textures[player->GetColor() + " float salute sheet"][0], surfaces[player->GetColor() + " float salute sheet"], 1, 12, {3, 4}, {48, 48});
+            Animation *standIdle = new Animation(textures[player->GetColor() + " stand sheet"][0], surfaces[player->GetColor() + " stand sheet"], 2, 24, {4, 6}, {48, 48});
             animations.push_back(floatIdle);
             animations.push_back(saluteIdle);
-            piece->SetCurrentAnimation(floatIdle);
+            animations.push_back(floatSaluteIdle);
+            animations.push_back(standIdle);
+            if (j == 0) piece->SetCurrentAnimation(floatSaluteIdle);
+            else piece->SetCurrentAnimation(floatIdle);
             piece->animations["floatIdle"] = floatIdle;
             piece->animations["saluteIdle"] = saluteIdle;
+            piece->animations["floatSaluteIdle"] = floatSaluteIdle;
+            piece->animations["standIdle"] = standIdle;
             pieces.push_back(piece);
             player->soldiers.push_back(piece);
             piece->SetPlayer(player);
@@ -523,7 +525,7 @@ void loadUI()
     {
         for(int j = 0; j < players[i]->soldiers.size(); j++)
         {
-            UIElement *soldierHead = new UIElement(players[i]->GetColor() + " soldier " + std::to_string(j) + " head", textures[players[i]->GetColor() + " player head"][0], surfaces[players[i]->GetColor() + " player head"], true, false, renderer, GAME);
+            UIElement *soldierHead = new UIElement(players[i]->GetColor() + " soldier " + std::to_string(j) + " head", textures[players[i]->GetColor() + " head"][0], surfaces[players[i]->GetColor() + " head"], true, false, renderer, GAME);
             UIElement *soldierHeadCross = new UIElement(players[i]->GetColor() + " soldier " + std::to_string(j) + " head cross", textures["soldier head cross"][0], surfaces["soldier head cross"], true, false, renderer, GAME);
 
             soldierHead->SetScale(2.f * (SCREEN_WIDTH / 3840.f));
@@ -821,6 +823,7 @@ void ResetGlobalVars()
     battleSequence = nullptr;
     pState = MAIN;
     hasRolled = false;
+    assistRollUsed = false;
     allPeaksClaimed = false;
     suddenDeath = false;
     lastTurn = false;

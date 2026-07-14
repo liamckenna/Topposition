@@ -71,10 +71,6 @@ void Player::RefreshColorVars()
             sdlColor = sdl_magenta;
             color = "magenta";
             break;
-        case CYAN:
-            sdlColor = sdl_cyan;
-            color = "cyan";
-            break;
         case BLACK:
             sdlColor = sdl_black;
             color = "black";
@@ -83,7 +79,31 @@ void Player::RefreshColorVars()
             sdlColor = sdl_white;
             color = "white";
             break;
-    }
+        case AQUAMARINE:
+            sdlColor = sdl_aquamarine;
+            color = "aquamarine";
+            break;
+        case CORNFLOWER:
+            sdlColor = sdl_cornflower;
+            color = "cornflower";
+            break;
+        case FOREST:
+            sdlColor = sdl_forest;
+            color = "forest";
+            break;
+        case MELROSE:
+            sdlColor = sdl_melrose;
+            color = "melrose";
+            break;
+        case PURPLE:
+            sdlColor = sdl_purple;
+            color = "purple";
+            break;
+        case ORANGE:
+            sdlColor = sdl_orange;
+            color = "orange";
+            break;
+        }
 }
 
 void Player::RefreshColorDependentVars()
@@ -97,28 +117,58 @@ void Player::RefreshColorDependentVars()
     {
         Animation *oldFloat = soldiers[i]->animations["floatIdle"];
         Animation *oldSalute = soldiers[i]->animations["saluteIdle"];
+        Animation *oldFloatSalute = soldiers[i]->animations["floatSaluteIdle"];
+        Animation *oldStand = soldiers[i]->animations["standIdle"];
+        int off = oldFloat->GetFrame();
+        int osf = oldSalute->GetFrame();
+        int ofs = oldFloatSalute->GetFrame();
+        int ost = oldStand->GetFrame();
         animations.erase(std::remove(animations.begin(), animations.end(), oldFloat), animations.end());
         animations.erase(std::remove(animations.begin(), animations.end(), oldSalute), animations.end());
+        animations.erase(std::remove(animations.begin(), animations.end(), oldFloatSalute), animations.end());
+        animations.erase(std::remove(animations.begin(), animations.end(), oldStand), animations.end());
         delete oldFloat;
         delete oldSalute;
+        delete oldFloatSalute;
+        delete oldStand;
 
-        Animation *floatIdle = new Animation(textures[color + " piece float sheet"][0], surfaces[color + " piece float sheet"], 1, 12, {3, 4}, {48, 48});
+        Animation *floatIdle = new Animation(textures[color + " float sheet"][0], surfaces[color + " float sheet"], 1, 12, {3, 4}, {48, 48}, off);
         soldiers[i]->animations["floatIdle"] = floatIdle;
 
-        Animation *saluteIdle = new Animation(textures[color + " piece salute sheet"][0], surfaces[color + " piece salute sheet"], 2, 24, {4, 6}, {48, 48});
+        Animation *saluteIdle = new Animation(textures[color + " salute sheet"][0], surfaces[color + " salute sheet"], 2, 24, {4, 6}, {48, 48}, osf);
         soldiers[i]->animations["saluteIdle"] = saluteIdle;
+
+        Animation *floatSaluteIdle = new Animation(textures[color + " float salute sheet"][0], surfaces[color + " float salute sheet"], 1, 12, {3, 4}, {48, 48}, ofs);
+        soldiers[i]->animations["floatSaluteIdle"] = floatSaluteIdle;
+
+        Animation *standIdle = new Animation(textures[color + " stand sheet"][0], surfaces[color + " stand sheet"], 2, 24, {4, 6}, {48, 48}, ost);
+        soldiers[i]->animations["standIdle"] = standIdle;
 
         if (soldiers[i]->GetOccupyingTerrain() != nullptr)
         {
-            soldiers[i]->SetCurrentAnimation(saluteIdle);
+            if (this == currentTurn)
+            {
+                soldiers[i]->SetCurrentAnimation(saluteIdle);
+            }
+            else
+            {
+                soldiers[i]->SetCurrentAnimation(standIdle);
+            }
         }
         else
         {
-            soldiers[i]->SetCurrentAnimation(floatIdle);
+            if (this == currentTurn)
+            {
+                soldiers[i]->SetCurrentAnimation(floatSaluteIdle);
+            }
+            else
+            {
+                soldiers[i]->SetCurrentAnimation(floatIdle);
+            }
         }
 
-        soldierHeads[i]->SetTexture(textures[color + " player head"][0]);
-        soldierHeads[i]->SetSurface(surfaces[color + " player head"]);
+        soldierHeads[i]->SetTexture(textures[color + " head"][0]);
+        soldierHeads[i]->SetSurface(surfaces[color + " head"]);
     }
 
     for (int i = 0; i < flags.size(); i++)
@@ -142,12 +192,22 @@ SDL_Color GetSDLColorFromTeamColor(TeamColor tc)
             return sdl_yellow;
         case MAGENTA:
             return sdl_magenta;
-        case CYAN:
-            return sdl_cyan;
         case BLACK:
             return sdl_black;
         case WHITE:
             return sdl_white;
-    }
+        case AQUAMARINE:
+            return sdl_aquamarine;
+        case CORNFLOWER:
+            return sdl_cornflower;
+        case FOREST:
+            return sdl_forest;
+        case MELROSE:
+            return sdl_melrose;
+        case PURPLE:
+            return sdl_purple;
+        case ORANGE:
+            return sdl_orange;
+        }
     return sdl_red;
 }

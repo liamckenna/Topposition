@@ -56,7 +56,7 @@ public:
     pair<float, float> GetBottomRight(bool update = true);
     pair<float, float> GetBottomMiddle(bool update = true);
     bool GetTopLayer() { return topLayer; }
-    void SetCurrentAnimation(Animation *ca) { currentAnimation = ca; }
+    void SetCurrentAnimation(Animation *ca, bool preserveFrame = false);
     void SetRectangle(SDL_FRect *r) { renderRect = r; }
     void SetResizable(bool r) { resizable = r; }
     void SetTexture(SDL_Texture *t) { texture = t; }
@@ -462,9 +462,14 @@ class Animation
     bool paused = false;
     int frameOffset;
 
+    void UpdateRect();
+
 public:
-    Animation(SDL_Texture *ss, SDL_Surface *s, float d, int fc, pair<int, int> sd, pair<int, int> spd);
+    Animation(SDL_Texture *ss, SDL_Surface *s, float d, int fc, pair<int, int> sd, pair<int, int> spd, int fo = -1);
     void CycleFrame(Uint64 current);
+    void SyncFrameFrom(const Animation *other);
+    int GetFrame() const { return lastFrame; }
+    int GetFrameCount() const { return frameCount; }
     SDL_FRect *GetRect() { return rect; }
     SDL_Texture *GetSpriteSheet() { return spriteSheet; }
     void Pause() { paused = true; }

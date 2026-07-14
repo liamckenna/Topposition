@@ -16,6 +16,10 @@ class GameRules
     bool autoRoll = false;
     bool infiniteRolls = false;
     bool evenTurnCount = true;
+    bool assistFirstTurn = false;
+    std::string assistedColor = "magenta";
+    int assistDiceCount = 10;
+    int colorCount = 13;
     TeamColor teamColors[4] = {RED, BLUE, GREEN, YELLOW};
 
 public:
@@ -33,6 +37,9 @@ public:
     bool GetAutoRoll() { return autoRoll; }
     bool GetEvenTurnCount() { return evenTurnCount; }
     bool GetInfiniteRolls() { return infiniteRolls; }
+    bool GetAssistFirstTurn() { return assistFirstTurn; }
+    std::string GetAssistedColor() { return assistedColor; }
+    int GetAssistDiceCount() { return assistDiceCount; }
     void SetPlayerCount(int pc) { playerCount = pc; }
     void SetMaxPoints(int mp) { maxPoints = mp; }
     void SetPieces(int p) { pieces = p; }
@@ -44,6 +51,9 @@ public:
     void SetClaimEndsTurn(bool cet) { claimEndsTurn = cet; }
     void SetAutoRoll(bool arm) { autoRoll = arm; }
     void SetInfiniteRolls(bool ir) { infiniteRolls = ir; }
+    void SetAssistFirstTurn(bool aft) { assistFirstTurn = aft; }
+    void SetAssistedColor(std::string ac) { assistedColor = ac; }
+    void SetAssistDiceCount(int adc) { assistDiceCount = adc; }
     void CycleTeamColor(int i);
     bool ColorTaken(int i);
     TeamColor GetColor(int i);

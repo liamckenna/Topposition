@@ -52,7 +52,12 @@ enum TeamColor
     GREEN = 3,
     YELLOW = 4,
     MAGENTA = 5,
-    CYAN = 6,
+    AQUAMARINE = 6,
     BLACK = 7,
-    WHITE = 8
+    WHITE = 8,
+    ORANGE = 9,
+    CORNFLOWER = 10,
+    FOREST = 11,
+    MELROSE = 12,
+    PURPLE = 13
 };

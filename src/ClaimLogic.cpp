@@ -245,6 +245,9 @@ void RefreshClaimAndDefendNotifs()
                 }
                 else
                 {
+                    string claimTexture = enemyPresent ? "attack peak" : "claim peak";
+                    peaks[i]->GetClaimNotif()->SetTexture(textures[claimTexture][0]);
+                    peaks[i]->GetClaimNotif()->SetSurface(surfaces[claimTexture]);
                     peaks[i]->GetClaimNotif()->SetGlobalPosition((peaks[i]->occupants[j]->GetCenter().first / cameraZoom) + cameraPosition.first,
                                                                  (peaks[i]->occupants[j]->GetCenter().second / cameraZoom) + cameraPosition.second - 150);
                     peaks[i]->GetClaimNotif()->SetRendered(true);
@@ -690,7 +693,14 @@ void RetreatPiece(Peak *peak, Piece *piece)
         {
             foundRetreatLocation = true;
             piece->SetBottomMiddle(x, y);
-            piece->SetCurrentAnimation(piece->animations["floatIdle"]);
+            if (piece->GetPlayer() == currentTurn)
+            {
+                piece->SetCurrentAnimation(piece->animations["floatSaluteIdle"]);
+            }
+            else 
+            {
+                piece->SetCurrentAnimation(piece->animations["floatIdle"]);
+            }
         }
         else {
             retreatDistance += 50;
